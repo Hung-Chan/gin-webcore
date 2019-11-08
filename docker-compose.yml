@@ -1,0 +1,48 @@
+version: "3"
+
+volumes:
+  mariadb_data:
+    driver: local
+
+
+networks:
+  go-net:
+    driver: bridge
+
+services:
+  go-core:
+    build:
+      context: ./
+    volumes:
+      - .:/go/src/go-core
+    ports:
+      - "1001:1001"
+    depends_on:
+      - mariadb
+      - phpmyadmin
+    networks:
+      - go-net
+
+  mariadb:
+    image: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - go-net
+
+  phpmyadmin:
+    depends_on:
+      - mariadb
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - '8080:80'
+    environment:
+      - PMA_ARBITRARY=1
+    networks:
+      - go-net
+
