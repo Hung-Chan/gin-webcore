@@ -69,14 +69,14 @@ func InitRouter() *gin.Engine {
 	// 選單群組管理
 	menuGroups := router.Group("menu-groups")
 	{
-		menuSettings.GET("", controllers.MenuGroupsList)
+		menuGroups.GET("", controllers.MenuGroupsList)
 
 		// 操作api (新增、檢視、修改、複製、刪除)
-		menuSettings.POST("", controllers.MenuGroupsCreate)
-		menuSettings.GET("/view/:id", controllers.MenuGroupsView)
-		menuSettings.PATCH("/:id", controllers.MenuGroupsUpdate)
-		menuSettings.PUT("", controllers.MenuGroupsCopy)
-		menuSettings.DELETE("/:id", controllers.MenuGroupsDelete)
+		menuGroups.POST("", controllers.MenuGroupsCreate)
+		menuGroups.GET("/view/:id", controllers.MenuGroupsView)
+		menuGroups.PATCH("/:id", controllers.MenuGroupsUpdate)
+		menuGroups.PUT("", controllers.MenuGroupsCopy)
+		menuGroups.DELETE("/:id", controllers.MenuGroupsDelete)
 	}
 
 	// 選單管理
