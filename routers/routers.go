@@ -1,8 +1,6 @@
 package routers
 
 import (
-	"gin-webcore/controllers"
-
 	"github.com/gin-gonic/gin"
 )
 
