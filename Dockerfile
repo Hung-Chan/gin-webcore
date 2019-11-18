@@ -1,7 +1,7 @@
 # Golang 1.13.1 Alpine
 FROM golang:1.13.1-alpine3.10
 
-WORKDIR /go/src/go-core
+WORKDIR /go/src/gin-webcore
 
 COPY ./ .
 

@@ -7,5 +7,5 @@ import (
 func main() {
 
 	router := routers.InitRouter()
-	router.Run(":1001")
+	router.Run(":1002")
 }
