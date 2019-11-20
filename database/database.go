@@ -9,6 +9,7 @@ import (
 	"gin-webcore/migrations/menugroups"
 	"gin-webcore/migrations/menusettings"
 	"log"
+	"time"
 
 	"github.com/jinzhu/gorm"
 
@@ -36,6 +37,15 @@ func init() {
 
 	fmt.Println("Mysql connect")
 	runMigrate(DB)
+
+	DB.Callback().Update().Register("gorm:update_time_stamp", updateTimeCallback)
+}
+
+// updateTimeCallback .
+func updateTimeCallback(scope *gorm.Scope) {
+	if _, ok := scope.Get("gorm:update_column"); !ok {
+		scope.SetColumn("UpdatedAt", time.Now())
+	}
 }
 
 // runMigrate .
