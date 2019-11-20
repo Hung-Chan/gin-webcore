@@ -1,11 +1,8 @@
 package adminaccesses
 
 import (
-	"gin-webcore/migrations/administrators"
 	"gin-webcore/migrations/model"
 )
-
-var administrator = new(administrators.Administrator)
 
 // AdminAccess .
 type AdminAccess struct {
