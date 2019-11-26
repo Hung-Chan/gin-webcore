@@ -25,8 +25,6 @@ func (gin Gin) ResultOk(code int, message string, data interface{}) {
 		Message: message,
 		Data:    data,
 	})
-	gin.Context.Abort()
-	return
 }
 
 // ResultFail .
@@ -36,6 +34,4 @@ func (gin Gin) ResultFail(code int, message string) {
 		Message: message,
 		Data:    nil,
 	})
-	gin.Context.Abort()
-	return
 }
