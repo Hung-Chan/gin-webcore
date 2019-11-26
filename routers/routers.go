@@ -95,12 +95,12 @@ func InitRouter() *gin.Engine {
 		menuSettings.PATCH("", controllers.MenuSettingsSort)
 	}
 
-	// auth := router.Group("auth")
-	// {
-	// 	auth.POST("/login", controllers.Login)
-	// 	auth.GET("/info", controllers.Info)
-	// 	auth.GET("/sidebarMenu", controllers.SidebarMenu)
-	// }
+	auth := router.Group("auth")
+	{
+		auth.POST("/login", controllers.Login)
+		// 	auth.GET("/info", controllers.Info)
+		// 	auth.GET("/sidebarMenu", controllers.SidebarMenu)
+	}
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
