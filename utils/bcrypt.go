@@ -1,9 +1,6 @@
 package utils
 
 import (
-	"fmt"
-	"time"
-
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -15,8 +12,6 @@ func HashPassword(password string) (string, error) {
 
 // CheckHashPassword .
 func CheckHashPassword(hash string, password string) bool {
-	k := time.Now()
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	fmt.Println("密碼驗證", time.Since(k))
 	return err == nil
 }
