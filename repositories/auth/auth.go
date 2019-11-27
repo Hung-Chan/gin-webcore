@@ -14,7 +14,6 @@ type LoginInfo struct {
 
 // LoginInfoManagement .
 type LoginInfoManagement interface {
-	Login()
 	GetAccount(account string) LoginInfo
 	UpdateToken(id int, token string)
 }
@@ -37,9 +36,4 @@ func (lg LoginInfo) GetAccount(account string) LoginInfo {
 func (lg LoginInfo) UpdateToken(id int, token string) {
 
 	db.Table("administrators").Where("id = ?", id).Update("token", token)
-}
-
-// Login .
-func (lg LoginInfo) Login() {
-
 }
