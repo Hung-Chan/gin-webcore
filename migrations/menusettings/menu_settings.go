@@ -16,5 +16,5 @@ type MenuSetting struct {
 	Access   string `gorm:"type: text; comment:'選單權限'"`
 	Sort     int    `gorm:"type: int; comment:'排序'" sql:"default:1"`
 	Enable   int    `gorm:"type: tinyint(1); comment:'啟用狀態'" sql:"default:1"`
-	AdminID  int    `gorm:"type: int unsigned; comment:'寫入/修改者id'" sql:"default:0"`
+	AdminID  int    `gorm:"type: int unsigned; comment:'寫入/修改者id'" sql:"default:1"`
 }
