@@ -1,9 +1,10 @@
 package menugroups
 
 import (
-	"fmt"
 	"gin-webcore/database"
 	"gin-webcore/models"
+
+	"github.com/jinzhu/gorm"
 )
 
 // MenuGroup .
@@ -42,13 +43,11 @@ func (mg *MenuGroup) SetSort() {
 
 // MenuGroupCreate .
 func (mg *MenuGroup) MenuGroupCreate() {
-
 	db.Debug().Table(TableName).Omit("id", "updated_at").Create(mg)
 }
 
 // MenuGroupView .
 func (mg MenuGroup) MenuGroupView(id int) TmenuGroup {
-
 	db.Debug().Table(TableName).Where("id = ?", id).Scan(&mg.TmenuGroup)
 
 	return mg.TmenuGroup
@@ -56,17 +55,30 @@ func (mg MenuGroup) MenuGroupView(id int) TmenuGroup {
 
 // MenuGroupUpdate .
 func (mg *MenuGroup) MenuGroupUpdate(id int) {
-	fmt.Println(mg)
 	if mg.Sort > 0 {
-		fmt.Println("處理排序問題")
-		db.Debug().Table(TableName).Where("id = ?", id).Update(mg).Update(mg)
+		var sort int = mg.Sort
+
+		db.Debug().Table(TableName).Select("sort").Where("id = ?", id).Find(mg)
+
+		if sort > mg.Sort {
+			db.Debug().Table(TableName).Where("id != ?", id).Where("sort BETWEEN ? AND ?", mg.Sort, sort).Update("sort", gorm.Expr("sort - ?", 1))
+		} else {
+			db.Debug().Table(TableName).Where("id != ?", id).Where("sort BETWEEN ? AND ?", sort, mg.Sort).Update("sort", gorm.Expr("sort + ?", 1))
+		}
+
+		db.Debug().Table(TableName).Where("id = ?", id).Update("sort", sort)
+
 		return
 	}
+
 	db.Debug().Table(TableName).Where("id = ?", id).Update(mg)
 }
 
 // MenuGroupDelete .
 func (mg MenuGroup) MenuGroupDelete(id int) {
+	mg.SetSort()
+	mg.MenuGroupUpdate(id)
+
 	db.Debug().Table(TableName).Where("id = ?", id).Delete(&mg)
 }
 
