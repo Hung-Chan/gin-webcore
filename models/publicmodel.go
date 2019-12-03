@@ -2,12 +2,14 @@ package models
 
 import "time"
 
-// PublicQueryModel : 此Model為所有查詢功能固定所帶參數 .
-type PublicQueryModel struct {
-	Page          *int    `form:"page"`
-	Limit         *int    `form:"limit"`
-	SortColumn    *string `form:"sortColumn"`
-	SortDirection *string `form:"sortDirection"`
+// QueryModel : 此Model為所有查詢功能固定所帶參數 .
+type QueryModel struct {
+	Page          int    `form:"page"`
+	Limit         int    `form:"limit"`
+	SortColumn    string `form:"sortColumn"`
+	SortDirection string `form:"sortDirection"`
+	Enable        int    `form:"enable"`
+	Name          string `form:"name"`
 }
 
 // IDInfo .

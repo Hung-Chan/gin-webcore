@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"gin-webcore/models"
 	"gin-webcore/repositories/menugroups"
 	"gin-webcore/response"
 	"gin-webcore/validate"
@@ -13,10 +14,37 @@ import (
 
 // MenuGroupsList .
 func MenuGroupsList(context *gin.Context) {
-
+	s := time.Now()
 	response := response.Gin{Context: context}
 
-	response.ResultOk(200, "Success", "Data")
+	var menuGroup menugroups.MenuGroupsManagement = new(menugroups.MenuGroup)
+
+	// 預設初始查詢資料
+	queryModel := models.QueryModel{
+		Page:          1,
+		Limit:         10,
+		SortColumn:    "id",
+		SortDirection: "ASC",
+		Enable:        -1,
+		Name:          "",
+	}
+
+	if err := context.ShouldBind(&queryModel); err != nil {
+		response.ResultFail(1001, "data bind error")
+		return
+	}
+
+	page := queryModel.Page
+	limit := queryModel.Limit
+	sortColumn := queryModel.SortColumn
+	sortDirection := queryModel.SortDirection
+	name := queryModel.Name
+	enable := queryModel.Enable
+
+	result := menuGroup.MenuGroupsList(page, limit, sortColumn, sortDirection, name, enable)
+
+	fmt.Println("列表選單群組", time.Since(s))
+	response.ResultOk(200, "Success", result)
 }
 
 // MenuGroupCreate .

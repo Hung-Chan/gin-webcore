@@ -14,6 +14,9 @@ type MenuGroup struct {
 	Sort int `json:"sort"`
 }
 
+// MenuGroups .
+type MenuGroups []MenuGroup
+
 // TmenuGroup .
 type TmenuGroup struct {
 	Name   *string `json:"name"`
@@ -23,6 +26,7 @@ type TmenuGroup struct {
 // MenuGroupsManagement .
 type MenuGroupsManagement interface {
 	SetSort()
+	MenuGroupsList(page int, limit int, sortColumn string, sortDirection string, name string, enable int) MenuGroups
 	MenuGroupCreate()
 	MenuGroupView(id int) TmenuGroup
 	MenuGroupUpdate(id int)
@@ -39,6 +43,25 @@ var (
 // SetSort .
 func (mg *MenuGroup) SetSort() {
 	mg.Sort = mg.Total() + 1
+}
+
+// MenuGroupsList .
+func (mg MenuGroup) MenuGroupsList(page int, limit int, sortColumn string, sortDirection string, name string, enable int) MenuGroups {
+	var menuGroups MenuGroups
+
+	res := db.Debug().Table(TableName)
+
+	if name != "" {
+		res = res.Where("name LIKE ?", "%"+name+"%")
+	}
+
+	if enable != -1 {
+		res = res.Where("enable = ?", enable)
+	}
+
+	res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&menuGroups)
+
+	return menuGroups
 }
 
 // MenuGroupCreate .
