@@ -71,7 +71,7 @@ func (mg *MenuGroup) MenuGroupUpdate(id int) {
 		return
 	}
 
-	db.Debug().Table(TableName).Where("id = ?", id).Update(mg)
+	db.Debug().Model(mg).Where("id = ?", id).Update(mg)
 }
 
 // MenuGroupDelete .
