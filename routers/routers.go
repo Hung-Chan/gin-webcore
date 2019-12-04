@@ -99,7 +99,7 @@ func InitRouter() *gin.Engine {
 	{
 		auth.POST("/login", controllers.Login)
 		auth.GET("/info", controllers.Info)
-		// 	auth.GET("/sidebarMenu", controllers.SidebarMenu)
+		auth.GET("/sidebarMenu", controllers.SidebarMenu)
 	}
 
 	router.GET("/", func(c *gin.Context) {

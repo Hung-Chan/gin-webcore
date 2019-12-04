@@ -5,6 +5,7 @@ import (
 	"gin-webcore/middleware"
 	"gin-webcore/repositories/administrators"
 	Auth "gin-webcore/repositories/auth"
+	"gin-webcore/repositories/menusettings"
 	"gin-webcore/response"
 	"gin-webcore/utils"
 	"gin-webcore/validate"
@@ -79,4 +80,17 @@ func Info(context *gin.Context) {
 
 	fmt.Println("取得登入者資訊", time.Since(s))
 	response.ResultOk(200, "Success", result)
+}
+
+// SidebarMenu .
+func SidebarMenu(context *gin.Context) {
+	s := time.Now()
+	response := response.Gin{Context: context}
+
+	var menusettingService menusettings.MenuSettingsManagement = new(menusettings.MenuSetting)
+
+	data := menusettingService.SidebarMenu()
+
+	fmt.Println("取得選單資料", time.Since(s))
+	response.ResultOk(200, "Success", data)
 }
