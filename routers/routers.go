@@ -98,7 +98,7 @@ func InitRouter() *gin.Engine {
 	auth := router.Group("auth")
 	{
 		auth.POST("/login", controllers.Login)
-		// 	auth.GET("/info", controllers.Info)
+		auth.GET("/info", controllers.Info)
 		// 	auth.GET("/sidebarMenu", controllers.SidebarMenu)
 	}
 

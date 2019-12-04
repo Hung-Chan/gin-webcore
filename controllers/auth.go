@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"gin-webcore/middleware"
+	"gin-webcore/repositories/administrators"
 	Auth "gin-webcore/repositories/auth"
 	"gin-webcore/response"
 	"gin-webcore/utils"
@@ -57,5 +58,25 @@ func Login(context *gin.Context) {
 	result["expiresIn"] = 3600
 
 	fmt.Println("登入功能取得Token", time.Since(s))
+	response.ResultOk(200, "Success", result)
+}
+
+// Info .
+func Info(context *gin.Context) {
+	s := time.Now()
+	result := make(map[string]interface{})
+	response := response.Gin{Context: context}
+
+	var adminService administrators.AdministratorsManagement = new(administrators.Administrator)
+
+	// 預設登入者是最高權限
+	data := adminService.AdministratorFindByID(1)
+	res := adminService.GetPermission(data.GroupID)
+
+	result["name"] = data.Name
+	result["enable"] = data.Enable
+	result["permissions"] = res.Permission
+
+	fmt.Println("取得登入者資訊", time.Since(s))
 	response.ResultOk(200, "Success", result)
 }
