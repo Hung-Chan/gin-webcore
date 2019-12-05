@@ -17,6 +17,7 @@ func MenuGroupsList(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
+	var result = make(map[string]interface{})
 	var menuGroup menugroups.MenuGroupsManagement = new(menugroups.MenuGroup)
 
 	// 預設初始查詢資料
@@ -41,7 +42,10 @@ func MenuGroupsList(context *gin.Context) {
 	name := queryModel.Name
 	enable := queryModel.Enable
 
-	result := menuGroup.MenuGroupsList(page, limit, sortColumn, sortDirection, name, enable)
+	data := menuGroup.MenuGroupsList(page, limit, sortColumn, sortDirection, name, enable)
+
+	result["list"] = data
+	result["total"] = menuGroup.Total()
 
 	fmt.Println("列表選單群組", time.Since(s))
 	response.ResultOk(200, "Success", result)
