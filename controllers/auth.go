@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"gin-webcore/middleware"
 	"gin-webcore/repositories/administrators"
@@ -74,9 +75,16 @@ func Info(context *gin.Context) {
 	data := adminService.AdministratorFindByID(1)
 	res := adminService.GetPermission(data.GroupID)
 
+	permission := make(map[string]interface{})
+
+	if err := json.Unmarshal([]byte(res.Permission), &permission); err != nil {
+		response.ResultFail(200, "Permission parse error")
+		return
+	}
+
 	result["name"] = data.Name
 	result["enable"] = data.Enable
-	result["permissions"] = res.Permission
+	result["permissions"] = permission
 
 	fmt.Println("取得登入者資訊", time.Since(s))
 	response.ResultOk(200, "Success", result)
