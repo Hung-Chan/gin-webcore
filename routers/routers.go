@@ -59,11 +59,11 @@ func InitRouter() *gin.Engine {
 		adminAccesses.GET("", controllers.AdminAccessesList)
 
 		// 操作api (新增、檢視、修改、複製、刪除)
-		adminAccesses.POST("", controllers.AdminAccessesCreate)
-		adminAccesses.GET("/view/:id", controllers.AdminAccessesView)
-		adminAccesses.PATCH("/:id", controllers.AdminAccessesUpdate)
-		adminAccesses.PUT("", controllers.AdminAccessesCopy)
-		adminAccesses.DELETE("/:id", controllers.AdminAccessesDelete)
+		adminAccesses.POST("", controllers.AdminAccessCreate)
+		adminAccesses.GET("/view/:id", controllers.AdminAccessView)
+		adminAccesses.PATCH("/:id", controllers.AdminAccessUpdate)
+		adminAccesses.PUT("", controllers.AdminAccessCopy)
+		adminAccesses.DELETE("/:id", controllers.AdminAccessDelete)
 	}
 
 	// 選單群組管理
