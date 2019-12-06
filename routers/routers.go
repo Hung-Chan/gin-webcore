@@ -102,6 +102,32 @@ func InitRouter() *gin.Engine {
 		auth.GET("/sidebarMenu", controllers.SidebarMenu)
 	}
 
+	// IP白名單管理
+	ipWhitelistings := router.Group("ip-whitelistings")
+	{
+		ipWhitelistings.GET("", controllers.IPWhitelistingsList)
+
+		// 操作api (新增、檢視、修改、複製、刪除)
+		ipWhitelistings.POST("", controllers.IPWhitelistingCreate)
+		ipWhitelistings.GET("/view/:id", controllers.IPWhitelistingView)
+		ipWhitelistings.PATCH("/:id", controllers.IPWhitelistingUpdate)
+		ipWhitelistings.PUT("", controllers.IPWhitelistingCopy)
+		ipWhitelistings.DELETE("/:id", controllers.IPWhitelistingDelete)
+	}
+
+	// IP網段白名單管理
+	ipSubnetWhitelistings := router.Group("ip-subnet-whitelistings")
+	{
+		ipSubnetWhitelistings.GET("", controllers.IPSubnetWhitelistingsList)
+
+		// 操作api (新增、檢視、修改、複製、刪除)
+		ipSubnetWhitelistings.POST("", controllers.IPSubnetWhitelistingCreate)
+		ipSubnetWhitelistings.GET("/view/:id", controllers.IPSubnetWhitelistingView)
+		ipSubnetWhitelistings.PATCH("/:id", controllers.IPSubnetWhitelistingUpdate)
+		ipSubnetWhitelistings.PUT("", controllers.IPSubnetWhitelistingCopy)
+		ipSubnetWhitelistings.DELETE("/:id", controllers.IPSubnetWhitelistingDelete)
+	}
+
 	// 地區黑名單管理
 	areaBlacklistings := router.Group("area-blacklistings")
 	{
