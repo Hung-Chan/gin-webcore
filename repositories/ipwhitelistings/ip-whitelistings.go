@@ -2,13 +2,15 @@ package ipwhitelistings
 
 import (
 	"gin-webcore/database"
-	"gin-webcore/models/ipwhitelisting"
+	"gin-webcore/models"
+	"gin-webcore/models/ipwhitelistings"
 )
 
 type (
 	// IPWhitelisting .
 	IPWhitelisting struct {
-		ipwhitelisting.IPWhitelisting
+		models.IDInfo
+		ipwhitelistings.IPWhitelisting
 	}
 
 	// IPWhitelistings .

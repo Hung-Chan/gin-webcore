@@ -1,4 +1,4 @@
-package ipwhitelisting
+package ipwhitelistings
 
 // IPWhitelisting .
 type IPWhitelisting struct {
