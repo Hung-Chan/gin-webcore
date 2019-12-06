@@ -102,6 +102,19 @@ func InitRouter() *gin.Engine {
 		auth.GET("/sidebarMenu", controllers.SidebarMenu)
 	}
 
+	// 地區黑名單管理
+	areaBlacklistings := router.Group("area-blacklistings")
+	{
+		areaBlacklistings.GET("", controllers.AreaBlacklistingsList)
+
+		// 操作api (新增、檢視、修改、複製、刪除)
+		areaBlacklistings.POST("", controllers.AreaBlacklistingCreate)
+		areaBlacklistings.GET("/view/:id", controllers.AreaBlacklistingView)
+		areaBlacklistings.PATCH("/:id", controllers.AreaBlacklistingUpdate)
+		areaBlacklistings.PUT("", controllers.AreaBlacklistingCopy)
+		areaBlacklistings.DELETE("/:id", controllers.AreaBlacklistingDelete)
+	}
+
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"CODE": 200,
