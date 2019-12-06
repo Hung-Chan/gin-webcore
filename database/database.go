@@ -6,6 +6,9 @@ import (
 	"gin-webcore/migrations/admingroups"
 	"gin-webcore/migrations/administrators"
 	"gin-webcore/migrations/adminlevels"
+	"gin-webcore/migrations/areablacklisting"
+	"gin-webcore/migrations/ipsubnetwhitelisting"
+	"gin-webcore/migrations/ipwhitelisting"
 	"gin-webcore/migrations/menugroups"
 	"gin-webcore/migrations/menusettings"
 	"log"
@@ -313,6 +316,17 @@ func runMigrate(db *gorm.DB) {
 		}
 	}
 
+	if !db.HasTable(&areablacklisting.AreaBlacklisting{}) {
+		db.AutoMigrate(&areablacklisting.AreaBlacklisting{})
+	}
+
+	if !db.HasTable(&ipsubnetwhitelisting.IPSubnetWhitelisting{}) {
+		db.AutoMigrate(&ipsubnetwhitelisting.IPSubnetWhitelisting{})
+	}
+
+	if !db.HasTable(&ipwhitelisting.IPWhitelisting{}) {
+		db.AutoMigrate(&ipwhitelisting.IPWhitelisting{})
+	}
 	// db.Model(&administrators.Administrator{}).AddForeignKey("admin_id", "administrators(id)", "RESTRICT", "RESTRICT")
 	// db.Model(&administrators.Administrator{}).AddForeignKey("group_id", "admin_groups(id)", "RESTRICT", "RESTRICT")
 	// db.Model(&administrators.Administrator{}).AddForeignKey("level_id", "admin_levels(id)", "RESTRICT", "RESTRICT")
