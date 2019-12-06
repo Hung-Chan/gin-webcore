@@ -64,7 +64,7 @@ func (adminLevel AdminLevel) AdminLevelView(id int) interface{} {
 
 // AdminLevelUpdate .
 func (adminLevel AdminLevel) AdminLevelUpdate(id int) {
-	db.Debug().Model(adminLevel).Where("id = ? ", id).Update(&adminLevel)
+	db.Debug().Model(adminLevel).Where("id = ? ", id).Update(&adminLevel.AdminLevel)
 }
 
 // AdminLevelDelete .
