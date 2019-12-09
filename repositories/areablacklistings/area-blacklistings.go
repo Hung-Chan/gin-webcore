@@ -30,7 +30,7 @@ type (
 var (
 	db = database.DB
 	// TableName .
-	TableName = "ip_whitelistings"
+	TableName = "area_blacklistings"
 )
 
 // AreaBlacklistingsList .
