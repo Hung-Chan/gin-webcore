@@ -10,18 +10,31 @@ networks:
     driver: bridge
 
 services:
-  go-core:
+  gin-webcore:
     build:
       context: ./
     volumes:
-      - .:/go/src/go-core
+      - .:/go/src/gin-webcore
     ports:
-      - "1001:1001"
+      - "1002:1002"
     depends_on:
       - mariadb
       - phpmyadmin
     networks:
       - go-net
+
+  # go-core:
+  #   build:
+  #     context: ./
+  #   volumes:
+  #     - .:/go/src/go-core
+  #   ports:
+  #     - "1001:1001"
+  #   depends_on:
+  #     - mariadb
+  #     - phpmyadmin
+  #   networks:
+  #     - go-net
 
   mariadb:
     image: mariadb
