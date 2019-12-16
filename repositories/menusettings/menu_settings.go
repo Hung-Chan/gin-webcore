@@ -19,6 +19,9 @@ type (
 	// MenuSettings .
 	MenuSettings []MenuSetting
 
+	// Permissions .
+	Permissions []menusettings.Permission
+
 	// MenuSettingsManagement .
 	MenuSettingsManagement interface {
 		SidebarMenu() MenuSettings
@@ -38,4 +41,11 @@ func (ms MenuSetting) SidebarMenu() MenuSettings {
 		return db.Table(TableName).Select("*")
 	}).Find(&menuSettings)
 	return menuSettings
+}
+
+// GetPermission .
+func (ms MenuSetting) GetPermission() Permissions {
+	var permissions Permissions
+	db.Debug().Table(TableName).Where("enable =? ", 1).Find(&permissions)
+	return permissions
 }

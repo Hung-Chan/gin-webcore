@@ -13,6 +13,9 @@ type (
 		adminaccesses.AdminAccess
 	}
 
+	// AdminAccessesOption .
+	AdminAccessesOption []adminaccesses.AdminAccess
+
 	// AdminAccesses .
 	AdminAccesses []AdminAccess
 
@@ -80,4 +83,13 @@ func (adminAccess AdminAccess) Total() int {
 	db.Debug().Table(TableName).Count(&count)
 
 	return count
+}
+
+// GetAccess .
+func (adminAccess AdminAccess) GetAccess() AdminAccessesOption {
+	var adminAccessesOption AdminAccessesOption
+
+	db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&adminAccessesOption)
+
+	return adminAccessesOption
 }
