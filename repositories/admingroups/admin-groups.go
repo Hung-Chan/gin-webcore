@@ -16,6 +16,9 @@ type (
 	// AdminGroups .
 	AdminGroups []AdminGroup
 
+	// AdminGroupOptions .
+	AdminGroupOptions []admingroups.AdminGroupOption
+
 	// AdminGroupFuncManagement .
 	AdminGroupFuncManagement interface {
 		AdmingroupCreate()
@@ -80,4 +83,13 @@ func (adminGroup AdminGroup) Total() int {
 	db.Debug().Table(TableName).Count(&count)
 
 	return count
+}
+
+// AdmingroupOption .
+func (adminGroup AdminGroup) AdmingroupOption() AdminGroupOptions {
+	var adminGroupOptions AdminGroupOptions
+
+	db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&adminGroupOptions)
+
+	return adminGroupOptions
 }

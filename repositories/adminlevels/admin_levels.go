@@ -13,7 +13,11 @@ type (
 		adminlevels.AdminLevel
 	}
 
+	// AdminLevels .
 	AdminLevels []AdminLevel
+
+	// AdminLevelOptions .
+	AdminLevelOptions []adminlevels.AdminLevelOption
 
 	// AdminLevelRepositoryManagement .
 	AdminLevelRepositoryManagement interface {
@@ -79,4 +83,13 @@ func (adminLevel AdminLevel) Total() int {
 	db.Debug().Table(TableName).Count(&count)
 
 	return count
+}
+
+// AdminLevelOption .
+func (adminLevel AdminLevel) AdminLevelOption() AdminLevelOptions {
+	var adminLevelOptions AdminLevelOptions
+
+	db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&adminLevelOptions)
+
+	return adminLevelOptions
 }

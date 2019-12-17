@@ -17,6 +17,7 @@ func InitRouter() *gin.Engine {
 		admins.GET("", controllers.AdminsList)
 		admins.GET("/groups", controllers.AdminsGroups)
 		admins.GET("/levels", controllers.AdminsLevels)
+		admins.GET("/group-permission/:id", controllers.AdminsGroupPermission)
 
 		// 操作api (新增、檢視、修改、複製、刪除)
 		admins.POST("", controllers.AdminsCreate)

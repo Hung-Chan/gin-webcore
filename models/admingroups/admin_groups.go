@@ -12,4 +12,10 @@ type (
 		Remark     string          `json:"remark"`
 		Enable     *int            `json:"enable"`
 	}
+
+	// AdminGroupOption .
+	AdminGroupOption struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	}
 )

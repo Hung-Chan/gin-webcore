@@ -1,15 +1,23 @@
 package administrators
 
+import (
+	"encoding/json"
+)
+
 type (
 	// Administrator .
 	Administrator struct {
-		Account  string
-		Password string
-		Name     string
-		GroupID  int
-		LevelID  int
-		Token    string
-		Remark   string
-		Enable   int
+		Name     string `json:"name"`
+		Account  string `json:"account"`
+		Password string `json:"password"`
+		GroupID  *int   `json:"group_id"`
+		LevelID  *int   `json:"level_id"`
+		Enable   *int   `json:"enable"`
+		Remark   string `json:"remark"`
+	}
+
+	// NewPermission .
+	NewPermission struct {
+		Permission json.RawMessage `json:"permission"`
 	}
 )

@@ -69,11 +69,11 @@ func Info(context *gin.Context) {
 	result := make(map[string]interface{})
 	response := response.Gin{Context: context}
 
-	var adminService administrators.AdministratorsManagement = new(administrators.Administrator)
+	var adminsRepository = /*administrators.AdminGroupFuncManagement*/ new(administrators.Administrator)
 
 	// 預設登入者是最高權限
-	data := adminService.AdministratorFindByID(1)
-	res := adminService.GetPermission(data.GroupID)
+	data := adminsRepository.AdministratorFindByID(1)
+	res := adminsRepository.GetPermission(*data.GroupID)
 
 	permission := make(map[string]interface{})
 
