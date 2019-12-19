@@ -1,0 +1,101 @@
+definitions:
+  auth.LoginInfo:
+    properties:
+      account:
+        example: admin
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      password:
+        example: qaz123
+        type: string
+      updated_at:
+        type: string
+    required:
+    - account
+    - password
+    type: object
+  response.response:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      message:
+        type: string
+    type: object
+host: localhost:1002
+info:
+  contact: {}
+  description: This is a Gin-webcore
+  license: {}
+  title: Golang Gin-Webcore API
+  version: "1.0"
+paths:
+  /auth/info:
+    get:
+      description: Get Admin Info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Info
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Admin Login
+      parameters:
+      - description: login
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/auth.LoginInfo'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Token:
+              description: qwerty
+              type: string
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Login
+      tags:
+      - Auth
+  /auth/sidebarMenu:
+    get:
+      description: Get SidebarMenu
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin SidebarMenu
+      tags:
+      - Auth
+swagger: "2.0"

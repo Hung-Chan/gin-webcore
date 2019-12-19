@@ -17,7 +17,17 @@ import (
 
 var authService Auth.LoginInfoManagement = new(Auth.LoginInfo)
 
-// Login .
+// Login godoc
+// @Summary Admin Login
+// @Description Admin Login
+// @Tags Auth
+// @Accept  json
+// @Produce  json
+// @Param data body auth.LoginInfo ture "login"
+// @Success 200 {object} response.response
+// @Header 200 {string} Token "qwerty"
+// @Failure 400 {object} response.response
+// @Router /auth/login [post]
 func Login(context *gin.Context) {
 	s := time.Now()
 
@@ -63,7 +73,14 @@ func Login(context *gin.Context) {
 	response.ResultOk(200, "Success", result)
 }
 
-// Info .
+// Info godoc
+// @Summary Admin Info
+// @Description Get Admin Info
+// @Tags Auth
+// @Produce  json
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /auth/info [get]
 func Info(context *gin.Context) {
 	s := time.Now()
 	result := make(map[string]interface{})
@@ -90,7 +107,14 @@ func Info(context *gin.Context) {
 	response.ResultOk(200, "Success", result)
 }
 
-// SidebarMenu .
+// SidebarMenu godoc
+// @Summary Admin SidebarMenu
+// @Description Get SidebarMenu
+// @Tags Auth
+// @Produce  json
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /auth/sidebarMenu [get]
 func SidebarMenu(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}

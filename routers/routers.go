@@ -4,6 +4,8 @@ import (
 	"gin-webcore/controllers"
 
 	"github.com/gin-gonic/gin"
+	"github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
 )
 
 // InitRouter .
@@ -147,6 +149,8 @@ func InitRouter() *gin.Engine {
 			"CODE": 200,
 		})
 	})
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }

@@ -12,7 +12,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AdminAccessesList .
+// AdminAccessesList godoc
+// @Summary Add a new pet to the store
+// @Description get string by ID
 func AdminAccessesList(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}

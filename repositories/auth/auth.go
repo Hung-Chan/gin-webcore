@@ -8,8 +8,8 @@ import (
 // LoginInfo .
 type LoginInfo struct {
 	models.IDInfo
-	Account  string `json:"account" validate:"required,min=4,max=20"`
-	Password string `json:"password" validate:"required,min=4,max=20"`
+	Account  string `json:"account" validate:"required,min=4,max=20" example:"admin"`
+	Password string `json:"password" validate:"required,min=4,max=20" example:"qaz123"`
 }
 
 // LoginInfoManagement .
