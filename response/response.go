@@ -29,7 +29,7 @@ func (gin Gin) ResultOk(code int, message string, data interface{}) {
 
 // ResultFail .
 func (gin Gin) ResultFail(code int, message string) {
-	gin.Context.JSON(http.StatusBadRequest, response{
+	gin.Context.JSON(http.StatusUnauthorized, response{
 		Code:    code,
 		Message: message,
 		Data:    nil,

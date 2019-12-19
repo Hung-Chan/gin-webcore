@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gin-webcore/middleware"
 	"gin-webcore/repositories/administrators"
-	Auth "gin-webcore/repositories/auth"
+	"gin-webcore/repositories/auth"
 	"gin-webcore/repositories/menusettings"
 	"gin-webcore/response"
 	"gin-webcore/utils"
@@ -15,15 +15,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var authService Auth.LoginInfoManagement = new(Auth.LoginInfo)
-
 // Login godoc
 // @Summary Admin Login
 // @Description Admin Login
 // @Tags Auth
 // @Accept  json
 // @Produce  json
-// @Param data body auth.LoginInfo ture "login"
+// @Param data body auth.Login ture "login"
 // @Success 200 {object} response.response
 // @Header 200 {string} Token "qwerty"
 // @Failure 400 {object} response.response
@@ -34,36 +32,40 @@ func Login(context *gin.Context) {
 	result := make(map[string]interface{})
 	response := response.Gin{Context: context}
 
-	var login Auth.LoginInfo
-	if err := context.ShouldBind(&login); err != nil {
-		response.ResultFail(200, "Data bind error")
+	var loginRepository = new(auth.AuthRepository)
+
+	if bindError := context.ShouldBind(&loginRepository.Login); bindError != nil {
+		response.ResultFail(99999, "Data bind error")
 		return
 	}
 
-	if checkData := validate.VdeInfo(&login); checkData != nil {
+	if checkData := validate.VdeInfo(&loginRepository.Login); checkData != nil {
 		response.ResultFail(200, checkData.Error())
 		return
 	}
 
-	userInfo := authService.GetAccount(login.Account)
-	if userInfo.Account == "" {
-		response.ResultFail(200, "Can't find account")
+	adminInfo, adminInfoError := loginRepository.GetAccount()
+	if adminInfoError != nil {
+		response.ResultFail(10007, "account not found")
 		return
 	}
 
-	checkPassword := utils.CheckHashPassword(userInfo.Password, login.Password)
-	if checkPassword == false {
-		response.ResultFail(200, "Password error")
+	adminCheckPassword := utils.CheckHashPassword(adminInfo.Password, loginRepository.Password)
+	if adminCheckPassword == false {
+		response.ResultFail(10008, "Password error")
 		return
 	}
 
-	token, err := middleware.GenerateToken(userInfo.Account)
-	if err != nil {
-		response.ResultFail(200, "Token error")
+	token, tokenError := middleware.GenerateToken(adminInfo.Account)
+	if tokenError != nil {
+		response.ResultFail(10011, "Token error")
 		return
 	}
 
-	authService.UpdateToken(*userInfo.ID, token)
+	if updateTokenError := loginRepository.UpdateToken(*adminInfo.ID, token); updateTokenError != nil {
+		response.ResultFail(10012, "Token write error")
+		return
+	}
 
 	result["accessToken"] = token
 	result["tokenType"] = "bearer"

@@ -3,37 +3,36 @@ package auth
 import (
 	"gin-webcore/database"
 	"gin-webcore/models"
+	"gin-webcore/models/auth"
+	"gin-webcore/repositories/administrators"
 )
 
-// LoginInfo .
-type LoginInfo struct {
+// AuthRepository .
+type AuthRepository struct {
 	models.IDInfo
-	Account  string `json:"account" validate:"required,min=4,max=20" example:"admin"`
-	Password string `json:"password" validate:"required,min=4,max=20" example:"qaz123"`
-}
-
-// LoginInfoManagement .
-type LoginInfoManagement interface {
-	GetAccount(account string) LoginInfo
-	UpdateToken(id int, token string)
+	auth.Login
 }
 
 var db = database.DB
 
 // GetAccount .
-func (lg LoginInfo) GetAccount(account string) LoginInfo {
+func (authRepository AuthRepository) GetAccount() (*AuthRepository, error) {
+	err := db.Debug().Table(administrators.TableName).Where("account = ?", authRepository.Account).Find(&authRepository).Error
 
-	db.Table("administrators").Where("account = ?", account).Scan(&lg)
+	if err != nil {
+		return nil, err
+	}
 
-	// if db.Error != nil {
-	// 	return lg
-	// }
-
-	return lg
+	return &authRepository, nil
 }
 
 // UpdateToken .
-func (lg LoginInfo) UpdateToken(id int, token string) {
+func (authRepository AuthRepository) UpdateToken(id int, token string) error {
+	err := db.Table(administrators.TableName).Where("id = ?", id).Update("token", token).Error
 
-	db.Table("administrators").Where("id = ?", id).Update("token", token)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

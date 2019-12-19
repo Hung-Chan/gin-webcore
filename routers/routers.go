@@ -13,6 +13,13 @@ func InitRouter() *gin.Engine {
 
 	router := gin.Default()
 
+	auth := router.Group("auth")
+	{
+		auth.POST("/login", controllers.Login)
+		auth.GET("/info", controllers.Info)
+		auth.GET("/sidebarMenu", controllers.SidebarMenu)
+	}
+
 	// 帳號管理
 	admins := router.Group("admins")
 	{
@@ -96,13 +103,6 @@ func InitRouter() *gin.Engine {
 		menuSettings.PUT("", controllers.MenuSettingsCopy)
 		menuSettings.DELETE("/:id", controllers.MenuSettingsDelete)
 		menuSettings.PATCH("", controllers.MenuSettingsSort)
-	}
-
-	auth := router.Group("auth")
-	{
-		auth.POST("/login", controllers.Login)
-		auth.GET("/info", controllers.Info)
-		auth.GET("/sidebarMenu", controllers.SidebarMenu)
 	}
 
 	// IP白名單管理

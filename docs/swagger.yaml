@@ -1,17 +1,11 @@
 definitions:
-  auth.LoginInfo:
+  auth.Login:
     properties:
       account:
         example: admin
         type: string
-      created_at:
-        type: string
-      id:
-        type: integer
       password:
         example: qaz123
-        type: string
-      updated_at:
         type: string
     required:
     - account
@@ -61,7 +55,7 @@ paths:
         in: body
         name: data
         schema:
-          $ref: '#/definitions/auth.LoginInfo'
+          $ref: '#/definitions/auth.Login'
           type: object
       produces:
       - application/json

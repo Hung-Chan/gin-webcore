@@ -55,7 +55,7 @@
                         "in": "body",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/auth.LoginInfo"
+                            "$ref": "#/definitions/auth.Login"
                         }
                     }
                 ],
@@ -109,7 +109,7 @@
         }
     },
     "definitions": {
-        "auth.LoginInfo": {
+        "auth.Login": {
             "type": "object",
             "required": [
                 "account",
@@ -120,18 +120,9 @@
                     "type": "string",
                     "example": "admin"
                 },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
                 "password": {
                     "type": "string",
                     "example": "qaz123"
-                },
-                "updated_at": {
-                    "type": "string"
                 }
             }
         },
