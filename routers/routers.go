@@ -13,13 +13,6 @@ func InitRouter() *gin.Engine {
 
 	router := gin.Default()
 
-	auth := router.Group("auth")
-	{
-		auth.POST("/login", controllers.Login)
-		auth.GET("/info", controllers.Info)
-		auth.GET("/sidebarMenu", controllers.SidebarMenu)
-	}
-
 	// 帳號管理
 	admins := router.Group("admins")
 	{
@@ -56,11 +49,11 @@ func InitRouter() *gin.Engine {
 		adminLevels.GET("", controllers.AdminLevelsList)
 
 		// 操作api (新增、檢視、修改、複製、刪除)
-		adminLevels.POST("", controllers.AdminLevelsCreate)
-		adminLevels.GET("/view/:id", controllers.AdminLevelsView)
-		adminLevels.PATCH("/:id", controllers.AdminLevelsUpdate)
-		adminLevels.PUT("", controllers.AdminLevelsCopy)
-		adminLevels.DELETE("/:id", controllers.AdminLevelsDelete)
+		adminLevels.POST("", controllers.AdminLevelCreate)
+		adminLevels.GET("/view/:id", controllers.AdminLevelView)
+		adminLevels.PATCH("/:id", controllers.AdminLevelUpdate)
+		adminLevels.PUT("", controllers.AdminLevelCopy)
+		adminLevels.DELETE("/:id", controllers.AdminLevelDelete)
 	}
 
 	// 操作管理
@@ -103,6 +96,13 @@ func InitRouter() *gin.Engine {
 		menuSettings.PUT("", controllers.MenuSettingsCopy)
 		menuSettings.DELETE("/:id", controllers.MenuSettingsDelete)
 		menuSettings.PATCH("", controllers.MenuSettingsSort)
+	}
+
+	auth := router.Group("auth")
+	{
+		auth.POST("/login", controllers.Login)
+		auth.GET("/info", controllers.Info)
+		auth.GET("/sidebarMenu", controllers.SidebarMenu)
 	}
 
 	// IP白名單管理

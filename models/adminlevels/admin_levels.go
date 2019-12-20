@@ -2,11 +2,11 @@ package adminlevels
 
 type (
 
-	// AdminLevel .
-	AdminLevel struct {
-		Name   string `json:"name" validate:"required"`
-		Level  int    `json:"level" validate:"required"`
-		Enable int    `json:"enable"`
+	// AdminLevelModel .
+	AdminLevelModel struct {
+		Name   string `json:"name" validate:"required" example:"test"`
+		Level  int    `json:"level" validate:"required" example:"2"`
+		Enable *int   `json:"enable"`
 	}
 
 	// AdminLevelOption .

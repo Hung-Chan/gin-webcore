@@ -10,7 +10,7 @@ type (
 	// AdminLevel .
 	AdminLevel struct {
 		models.IDInfo
-		adminlevels.AdminLevel
+		adminlevels.AdminLevelModel
 	}
 
 	// AdminLevels .
@@ -18,16 +18,6 @@ type (
 
 	// AdminLevelOptions .
 	AdminLevelOptions []adminlevels.AdminLevelOption
-
-	// AdminLevelRepositoryManagement .
-	AdminLevelRepositoryManagement interface {
-		AdminLevelsList(page int, limit int, sortColumn string, sortDirection string, name string, enable int) interface{}
-		AdminLevelCreate()
-		AdminLevelView(id int) interface{}
-		AdminLevelUpdate(id int)
-		AdminLevelDelete(id int)
-		Total() int
-	}
 )
 
 var (
@@ -37,43 +27,87 @@ var (
 )
 
 // AdminLevelsList .
-func (adminLevel AdminLevel) AdminLevelsList(page int, limit int, sortColumn string, sortDirection string, name string, enable int) interface{} {
+func (adminLevel AdminLevel) AdminLevelsList(page int, limit int, sortColumn string, sortDirection string, name *string, enable *int) (AdminLevels, error) {
 	var adminLevels AdminLevels
 
 	res := db.Debug().Table(TableName)
 
-	if name != "" {
-		res = res.Where("name LIKE ?", "%"+name+"%")
+	if name != nil {
+		res = res.Where("name LIKE ?", "%"+*name+"%")
 	}
 
-	if enable != -1 {
+	if enable != nil {
 		res = res.Where("enable = ?", enable)
 	}
 
-	res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&adminLevels)
+	result := res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&adminLevels).Error
 
-	return adminLevels
+	if result != nil {
+		return nil, result
+	}
+
+	return adminLevels, nil
 }
 
 // AdminLevelCreate .
-func (adminLevel AdminLevel) AdminLevelCreate() {
-	db.Debug().Table(TableName).Create(&adminLevel)
+func (adminLevel AdminLevel) AdminLevelCreate() error {
+	createError := db.Debug().Table(TableName).Create(&adminLevel).Error
+
+	if createError != nil {
+		return createError
+	}
+
+	return nil
 }
 
 // AdminLevelView .
-func (adminLevel AdminLevel) AdminLevelView(id int) interface{} {
-	db.Debug().Table(TableName).Where("id = ? ", id).First(&adminLevel.AdminLevel)
-	return adminLevel.AdminLevel
+func (adminLevel AdminLevel) AdminLevelView(id int) (*adminlevels.AdminLevelModel, error) {
+	viewError := db.Debug().Table(TableName).Where("id = ? ", id).First(&adminLevel.AdminLevelModel).Error
+
+	if viewError != nil {
+		return nil, viewError
+	}
+
+	return &adminLevel.AdminLevelModel, nil
 }
 
 // AdminLevelUpdate .
-func (adminLevel AdminLevel) AdminLevelUpdate(id int) {
-	db.Debug().Model(adminLevel).Where("id = ? ", id).Update(&adminLevel.AdminLevel)
+func (adminLevel AdminLevel) AdminLevelUpdate(id int, flag bool) error {
+	var updateError error
+
+	if flag == true {
+		updateError = db.Debug().Model(adminLevel).Where("id = ? ", id).Update(&adminLevel.AdminLevelModel).Error
+	} else {
+		updateError = db.Debug().Model(adminLevel).Where("id = ? ", id).Omit("level").Update(&adminLevel.AdminLevelModel).Error
+	}
+
+	if updateError != nil {
+		return updateError
+	}
+
+	return nil
 }
 
 // AdminLevelDelete .
-func (adminLevel AdminLevel) AdminLevelDelete(id int) {
-	db.Debug().Table(TableName).Where("id = ? ", id).Delete(&adminLevel)
+func (adminLevel AdminLevel) AdminLevelDelete(id int) error {
+	deleteError := db.Debug().Table(TableName).Where("id = ? ", id).Delete(&adminLevel).Error
+
+	if deleteError != nil {
+		return deleteError
+	}
+
+	return nil
+}
+
+// AdminLevelCheckLevel .
+func (adminLevel AdminLevel) AdminLevelCheckLevel(id int) (*int, error) {
+	levelError := db.Debug().Table(TableName).Select("level").Where("id = ? ", id).Scan(&adminLevel.AdminLevelModel).Error
+
+	if levelError != nil {
+		return nil, levelError
+	}
+
+	return &adminLevel.Level, nil
 }
 
 // Total .

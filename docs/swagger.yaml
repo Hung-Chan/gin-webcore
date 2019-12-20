@@ -1,4 +1,18 @@
 definitions:
+  adminlevels.AdminLevelModel:
+    properties:
+      enable:
+        type: integer
+      level:
+        example: 2
+        type: integer
+      name:
+        example: test
+        type: string
+    required:
+    - level
+    - name
+    type: object
   auth.Login:
     properties:
       account:
@@ -28,6 +42,151 @@ info:
   title: Golang Gin-Webcore API
   version: "1.0"
 paths:
+  /admin-levels/:
+    get:
+      consumes:
+      - application/json
+      description: GET Admin Levels List
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: SortColumn
+        in: query
+        name: sortColumn
+        type: string
+      - description: SortDirection
+        in: query
+        name: sortDirection
+        type: string
+      - description: Name
+        in: query
+        name: name
+        type: string
+      - description: Enable
+        in: query
+        name: enable
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Levels List
+      tags:
+      - AdminLists
+    post:
+      consumes:
+      - application/json
+      description: GET Admin Level Create
+      parameters:
+      - description: Admin Level Create
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/adminlevels.AdminLevelModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Level Create
+      tags:
+      - AdminLists
+  /admin-levels/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: GET Admin Level Delete
+      parameters:
+      - description: Admin Level ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Level Delete
+      tags:
+      - AdminLists
+    get:
+      consumes:
+      - application/json
+      description: GET Admin Level View
+      parameters:
+      - description: Admin Level ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Level View
+      tags:
+      - AdminLists
+    patch:
+      consumes:
+      - application/json
+      description: GET Admin Level Update
+      parameters:
+      - description: Admin Level ID
+        in: path
+        name: id
+        type: integer
+      - description: Admin Level Update
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/adminlevels.AdminLevelModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Level Update
+      tags:
+      - AdminLists
   /auth/info:
     get:
       description: Get Admin Info
