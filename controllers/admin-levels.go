@@ -15,7 +15,7 @@ import (
 // AdminLevelsList .
 // @Summary Admin Levels List
 // @Description GET Admin Levels List
-// @Tags AdminLists
+// @Tags AdminLevels
 // @Accept  json
 // @Produce  json
 // @Param page query  int ture "Page"
@@ -64,10 +64,10 @@ func AdminLevelsList(context *gin.Context) {
 	response.ResultOk(200, "Success", result)
 }
 
-// AdminLevelsCreate .
+// AdminLevelCreate .
 // @Summary Admin Level Create
 // @Description GET Admin Level Create
-// @Tags AdminLists
+// @Tags AdminLevels
 // @Accept  json
 // @Produce  json
 // @Param data body adminlevels.AdminLevelModel ture "Admin Level Create"
@@ -103,10 +103,10 @@ func AdminLevelCreate(context *gin.Context) {
 	response.ResultOk(200, "Success", nil)
 }
 
-// AdminLevelsView .
+// AdminLevelView .
 // @Summary Admin Level View
 // @Description GET Admin Level View
-// @Tags AdminLists
+// @Tags AdminLevels
 // @Accept  json
 // @Produce  json
 // @Param id path int ture "Admin Level ID"
@@ -140,10 +140,10 @@ func AdminLevelView(context *gin.Context) {
 	response.ResultOk(200, "Success", result)
 }
 
-// AdminLevelsUpdate .
+// AdminLevelUpdate .
 // @Summary Admin Level Update
 // @Description GET Admin Level Update
-// @Tags AdminLists
+// @Tags AdminLevels
 // @Accept  json
 // @Produce  json
 // @Param id path int ture "Admin Level ID"
@@ -202,7 +202,7 @@ func AdminLevelUpdate(context *gin.Context) {
 	response.ResultOk(200, "Success", nil)
 }
 
-// AdminLevelsCopy .
+// AdminLevelCopy .
 func AdminLevelCopy(context *gin.Context) {
 
 	response := response.Gin{Context: context}
@@ -210,10 +210,10 @@ func AdminLevelCopy(context *gin.Context) {
 	response.ResultOk(200, "Success", "Data")
 }
 
-// AdminLevelsDelete .
+// AdminLevelDelete .
 // @Summary Admin Level Delete
 // @Description GET Admin Level Delete
-// @Tags AdminLists
+// @Tags AdminLevels
 // @Accept  json
 // @Produce  json
 // @Param id path int ture "Admin Level ID"
