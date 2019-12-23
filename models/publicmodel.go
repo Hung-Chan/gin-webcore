@@ -21,6 +21,7 @@ type QueryModelNew struct {
 	Enable        *int    `form:"enable" example:"1"`
 	Name          *string `form:"name" example:""`
 	IP            *string `form:"ip" example:""`
+	Subnet        *string `form:"subnet" example:""`
 }
 
 // IDInfo .
@@ -40,5 +41,6 @@ func NewQueryModel() *QueryModelNew {
 		Enable:        nil,
 		Name:          nil,
 		IP:            nil,
+		Subnet:        nil,
 	}
 }

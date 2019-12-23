@@ -10,21 +10,11 @@ type (
 	// IPSubnetWhitelisting .
 	IPSubnetWhitelisting struct {
 		models.IDInfo
-		ipsubnetwhitelistings.IPSubnetWhitelisting
+		ipsubnetwhitelistings.IPSubnetWhitelistingModel
 	}
 
 	// IPSubnetWhitelistings .
 	IPSubnetWhitelistings []IPSubnetWhitelisting
-
-	// IPSubnetWhitelistingsRepositoryManagement .
-	IPSubnetWhitelistingsRepositoryManagement interface {
-		IPSubnetWhitelistingsList(page int, limit int, sortColumn string, sortDirection string, name string, enable int) interface{}
-		IPSubnetWhitelistingCreate()
-		IPSubnetWhitelistingView(id int) interface{}
-		IPSubnetWhitelistingUpdate(id int)
-		IPSubnetWhitelistingDelete(id int)
-		Total() int
-	}
 )
 
 var (
@@ -34,44 +24,71 @@ var (
 )
 
 // IPSubnetWhitelistingsList .
-func (ipSubnetWhitelisting IPSubnetWhitelisting) IPSubnetWhitelistingsList(page int, limit int, sortColumn string, sortDirection string, name string, enable int) interface{} {
+func (ipSubnetWhitelisting IPSubnetWhitelisting) IPSubnetWhitelistingsList(page int, limit int, sortColumn string, sortDirection string, subnet *string, enable *int) (*IPSubnetWhitelistings, error) {
 	var ipSubnetWhitelistings IPSubnetWhitelistings
 
 	res := db.Debug().Table(TableName)
 
-	if name != "" {
-		res = res.Where("name LIKE ?", "%"+name+"%")
+	if subnet != nil {
+		res = res.Where("name LIKE ?", "%"+*subnet+"%")
 	}
 
-	if enable != -1 {
+	if enable != nil {
 		res = res.Where("enable = ?", enable)
 	}
 
-	res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&ipSubnetWhitelistings)
+	listError := res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&ipSubnetWhitelistings).Error
 
-	return ipSubnetWhitelistings
+	if listError != nil {
+		return nil, listError
+	}
+
+	return &ipSubnetWhitelistings, nil
 
 }
 
 // IPSubnetWhitelistingCreate .
-func (ipSubnetWhitelisting IPSubnetWhitelisting) IPSubnetWhitelistingCreate() {
-	db.Debug().Table(TableName).Create(&ipSubnetWhitelisting)
+func (ipSubnetWhitelisting IPSubnetWhitelisting) IPSubnetWhitelistingCreate() error {
+	createError := db.Debug().Table(TableName).Create(&ipSubnetWhitelisting).Error
+
+	if createError != nil {
+		return createError
+	}
+
+	return nil
 }
 
 // IPSubnetWhitelistingView .
-func (ipSubnetWhitelisting IPSubnetWhitelisting) IPSubnetWhitelistingView(id int) interface{} {
-	db.Debug().Table(TableName).Where("id = ? ", id).First(&ipSubnetWhitelisting.IPSubnetWhitelisting)
-	return ipSubnetWhitelisting.IPSubnetWhitelisting
+func (ipSubnetWhitelisting IPSubnetWhitelisting) IPSubnetWhitelistingView(id int) (*ipsubnetwhitelistings.IPSubnetWhitelistingModel, error) {
+	viewError := db.Debug().Table(TableName).Where("id = ? ", id).First(&ipSubnetWhitelisting.IPSubnetWhitelistingModel).Error
+
+	if viewError != nil {
+		return nil, viewError
+	}
+
+	return &ipSubnetWhitelisting.IPSubnetWhitelistingModel, nil
 }
 
 // IPSubnetWhitelistingUpdate .
-func (ipSubnetWhitelisting IPSubnetWhitelisting) IPSubnetWhitelistingUpdate(id int) {
-	db.Debug().Model(ipSubnetWhitelisting).Where("id = ? ", id).Update(&ipSubnetWhitelisting.IPSubnetWhitelisting)
+func (ipSubnetWhitelisting IPSubnetWhitelisting) IPSubnetWhitelistingUpdate(id int) error {
+	updateError := db.Debug().Model(ipSubnetWhitelisting).Where("id = ? ", id).Update(&ipSubnetWhitelisting.IPSubnetWhitelistingModel).Error
+
+	if updateError != nil {
+		return updateError
+	}
+
+	return nil
 }
 
 // IPSubnetWhitelistingDelete .
-func (ipSubnetWhitelisting IPSubnetWhitelisting) IPSubnetWhitelistingDelete(id int) {
-	db.Debug().Table(TableName).Where("id = ? ", id).Delete(&ipSubnetWhitelisting)
+func (ipSubnetWhitelisting IPSubnetWhitelisting) IPSubnetWhitelistingDelete(id int) error {
+	deleteError := db.Debug().Table(TableName).Where("id = ? ", id).Delete(&ipSubnetWhitelisting).Error
+
+	if deleteError != nil {
+		return deleteError
+	}
+
+	return nil
 }
 
 // Total .

@@ -551,6 +551,229 @@
                 }
             }
         },
+        "/ip-subnet-whitelistings/": {
+            "get": {
+                "description": "GET IP Subnet Whitelisting List",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IPSubnetWhitelistings"
+                ],
+                "summary": "IP Subnet Whitelisting List",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "SortColumn",
+                        "name": "sortColumn",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "SortDirection",
+                        "name": "sortDirection",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Subnet",
+                        "name": "subnet",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Enable",
+                        "name": "enable",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "GET IP Subnet Whitelisting Create",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IPSubnetWhitelistings"
+                ],
+                "summary": "IP Subnet Whitelisting Create",
+                "parameters": [
+                    {
+                        "description": "IP Subnet Whitelisting Create",
+                        "name": "data",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/ipsubnetwhitelistings.IPSubnetWhitelistingModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/ip-subnet-whitelistings/view/{id}": {
+            "get": {
+                "description": "GET IP Subnet Whitelisting View",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IPSubnetWhitelistings"
+                ],
+                "summary": "IP Subnet Whitelisting View",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "IP Subnet Whitelisting ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/ip-subnet-whitelistings/{id}": {
+            "delete": {
+                "description": "DELETE IP Subnet Whitelisting Delete",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IPSubnetWhitelistings"
+                ],
+                "summary": "IP Subnet Whitelisting Delete",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "IP Subnet Whitelisting ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "PATCH IP Subnet Whitelisting Update",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IPSubnetWhitelistings"
+                ],
+                "summary": "IP Subnet Whitelisting Update",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "IP Subnet Whitelisting ID",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "description": "IP Whitelisting Update",
+                        "name": "data",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/ipsubnetwhitelistings.IPSubnetWhitelistingModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
         "/ip-whitelistings/": {
             "get": {
                 "description": "GET IP Whitelisting List",
@@ -830,6 +1053,24 @@
                 "password": {
                     "type": "string",
                     "example": "qaz123"
+                }
+            }
+        },
+        "ipsubnetwhitelistings.IPSubnetWhitelistingModel": {
+            "type": "object",
+            "required": [
+                "subnet"
+            ],
+            "properties": {
+                "enable": {
+                    "type": "integer"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "subnet": {
+                    "type": "string",
+                    "example": "127.0.0.1/20"
                 }
             }
         },

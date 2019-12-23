@@ -39,6 +39,18 @@ definitions:
     - account
     - password
     type: object
+  ipsubnetwhitelistings.IPSubnetWhitelistingModel:
+    properties:
+      enable:
+        type: integer
+      remark:
+        type: string
+      subnet:
+        example: 127.0.0.1/20
+        type: string
+    required:
+    - subnet
+    type: object
   ipwhitelistings.IPWhitelistingModel:
     properties:
       enable:
@@ -423,6 +435,152 @@ paths:
       summary: Admin SidebarMenu
       tags:
       - Auth
+  /ip-subnet-whitelistings/:
+    get:
+      consumes:
+      - application/json
+      description: GET IP Subnet Whitelisting List
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: SortColumn
+        in: query
+        name: sortColumn
+        type: string
+      - description: SortDirection
+        in: query
+        name: sortDirection
+        type: string
+      - description: Subnet
+        in: query
+        name: subnet
+        type: string
+      - description: Enable
+        in: query
+        name: enable
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: IP Subnet Whitelisting List
+      tags:
+      - IPSubnetWhitelistings
+    post:
+      consumes:
+      - application/json
+      description: GET IP Subnet Whitelisting Create
+      parameters:
+      - description: IP Subnet Whitelisting Create
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/ipsubnetwhitelistings.IPSubnetWhitelistingModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: IP Subnet Whitelisting Create
+      tags:
+      - IPSubnetWhitelistings
+  /ip-subnet-whitelistings/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: DELETE IP Subnet Whitelisting Delete
+      parameters:
+      - description: IP Subnet Whitelisting ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: IP Subnet Whitelisting Delete
+      tags:
+      - IPSubnetWhitelistings
+    patch:
+      consumes:
+      - application/json
+      description: PATCH IP Subnet Whitelisting Update
+      parameters:
+      - description: IP Subnet Whitelisting ID
+        in: path
+        name: id
+        type: integer
+      - description: IP Whitelisting Update
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/ipsubnetwhitelistings.IPSubnetWhitelistingModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: IP Subnet Whitelisting Update
+      tags:
+      - IPSubnetWhitelistings
+  /ip-subnet-whitelistings/view/{id}:
+    get:
+      consumes:
+      - application/json
+      description: GET IP Subnet Whitelisting View
+      parameters:
+      - description: IP Subnet Whitelisting ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: IP Subnet Whitelisting View
+      tags:
+      - IPSubnetWhitelistings
   /ip-whitelistings/:
     get:
       consumes:
