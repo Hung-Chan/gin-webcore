@@ -39,6 +39,18 @@ definitions:
     - account
     - password
     type: object
+  ipwhitelistings.IPWhitelistingModel:
+    properties:
+      enable:
+        type: integer
+      ip:
+        example: 127.0.0.1
+        type: string
+      remark:
+        type: string
+    required:
+    - ip
+    type: object
   response.response:
     properties:
       code:
@@ -411,4 +423,150 @@ paths:
       summary: Admin SidebarMenu
       tags:
       - Auth
+  /ip-whitelistings/:
+    get:
+      consumes:
+      - application/json
+      description: GET IP Whitelisting List
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: SortColumn
+        in: query
+        name: sortColumn
+        type: string
+      - description: SortDirection
+        in: query
+        name: sortDirection
+        type: string
+      - description: Name
+        in: query
+        name: name
+        type: string
+      - description: Enable
+        in: query
+        name: enable
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: IP Whitelisting List
+      tags:
+      - IPWhitelistings
+    post:
+      consumes:
+      - application/json
+      description: GET IP Whitelisting Create
+      parameters:
+      - description: IP Whitelisting Create
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/ipwhitelistings.IPWhitelistingModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: IP Whitelisting Create
+      tags:
+      - IPWhitelistings
+  /ip-whitelistings/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: DELETE IP Whitelisting Delete
+      parameters:
+      - description: IP Whitelisting ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: IP Whitelisting Delete
+      tags:
+      - IPWhitelistings
+    patch:
+      consumes:
+      - application/json
+      description: PATCH IP Whitelisting Update
+      parameters:
+      - description: IP Whitelisting ID
+        in: path
+        name: id
+        type: integer
+      - description: IP Whitelisting Update
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/ipwhitelistings.IPWhitelistingModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: IP Whitelisting Update
+      tags:
+      - IPWhitelistings
+  /ip-whitelistings/view/{id}:
+    get:
+      consumes:
+      - application/json
+      description: GET IP Whitelisting View
+      parameters:
+      - description: IP Whitelisting ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: IP Whitelisting View
+      tags:
+      - IPWhitelistings
 swagger: "2.0"

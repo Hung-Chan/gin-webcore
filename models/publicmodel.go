@@ -20,6 +20,7 @@ type QueryModelNew struct {
 	SortDirection string  `form:"sortDirection" example:"asc"`
 	Enable        *int    `form:"enable" example:"1"`
 	Name          *string `form:"name" example:""`
+	IP            *string `form:"ip" example:""`
 }
 
 // IDInfo .
@@ -38,5 +39,6 @@ func NewQueryModel() *QueryModelNew {
 		SortDirection: "asc",
 		Enable:        nil,
 		Name:          nil,
+		IP:            nil,
 	}
 }

@@ -550,6 +550,229 @@
                     }
                 }
             }
+        },
+        "/ip-whitelistings/": {
+            "get": {
+                "description": "GET IP Whitelisting List",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IPWhitelistings"
+                ],
+                "summary": "IP Whitelisting List",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "SortColumn",
+                        "name": "sortColumn",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "SortDirection",
+                        "name": "sortDirection",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Enable",
+                        "name": "enable",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "GET IP Whitelisting Create",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IPWhitelistings"
+                ],
+                "summary": "IP Whitelisting Create",
+                "parameters": [
+                    {
+                        "description": "IP Whitelisting Create",
+                        "name": "data",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/ipwhitelistings.IPWhitelistingModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/ip-whitelistings/view/{id}": {
+            "get": {
+                "description": "GET IP Whitelisting View",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IPWhitelistings"
+                ],
+                "summary": "IP Whitelisting View",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "IP Whitelisting ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/ip-whitelistings/{id}": {
+            "delete": {
+                "description": "DELETE IP Whitelisting Delete",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IPWhitelistings"
+                ],
+                "summary": "IP Whitelisting Delete",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "IP Whitelisting ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "PATCH IP Whitelisting Update",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IPWhitelistings"
+                ],
+                "summary": "IP Whitelisting Update",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "IP Whitelisting ID",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "description": "IP Whitelisting Update",
+                        "name": "data",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/ipwhitelistings.IPWhitelistingModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -607,6 +830,24 @@
                 "password": {
                     "type": "string",
                     "example": "qaz123"
+                }
+            }
+        },
+        "ipwhitelistings.IPWhitelistingModel": {
+            "type": "object",
+            "required": [
+                "ip"
+            ],
+            "properties": {
+                "enable": {
+                    "type": "integer"
+                },
+                "ip": {
+                    "type": "string",
+                    "example": "127.0.0.1"
+                },
+                "remark": {
+                    "type": "string"
                 }
             }
         },

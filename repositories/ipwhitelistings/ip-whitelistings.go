@@ -10,21 +10,11 @@ type (
 	// IPWhitelisting .
 	IPWhitelisting struct {
 		models.IDInfo
-		ipwhitelistings.IPWhitelisting
+		ipwhitelistings.IPWhitelistingModel
 	}
 
 	// IPWhitelistings .
 	IPWhitelistings []IPWhitelisting
-
-	// IPWhitelistingsRepositoryManagement .
-	IPWhitelistingsRepositoryManagement interface {
-		IPWhitelistingsList(page int, limit int, sortColumn string, sortDirection string, name string, enable int) interface{}
-		IPWhitelistingCreate()
-		IPWhitelistingView(id int) interface{}
-		IPWhitelistingUpdate(id int)
-		IPWhitelistingDelete(id int)
-		Total() int
-	}
 )
 
 var (
@@ -34,44 +24,70 @@ var (
 )
 
 // IPWhitelistingsList .
-func (ipWhitelisting IPWhitelisting) IPWhitelistingsList(page int, limit int, sortColumn string, sortDirection string, name string, enable int) interface{} {
+func (ipWhitelisting IPWhitelisting) IPWhitelistingsList(page int, limit int, sortColumn string, sortDirection string, ip *string, enable *int) (*IPWhitelistings, error) {
 	var ipWhitelistings IPWhitelistings
 
 	res := db.Debug().Table(TableName)
 
-	if name != "" {
-		res = res.Where("name LIKE ?", "%"+name+"%")
+	if ip != nil {
+		res = res.Where("name LIKE ?", "%"+*ip+"%")
 	}
 
-	if enable != -1 {
+	if enable != nil {
 		res = res.Where("enable = ?", enable)
 	}
 
-	res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&ipWhitelistings)
+	listError := res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&ipWhitelistings).Error
 
-	return ipWhitelistings
+	if listError != nil {
+		return nil, listError
+	}
+	return &ipWhitelistings, nil
 
 }
 
 // IPWhitelistingCreate .
-func (ipWhitelisting IPWhitelisting) IPWhitelistingCreate() {
-	db.Debug().Table(TableName).Create(&ipWhitelisting)
+func (ipWhitelisting IPWhitelisting) IPWhitelistingCreate() error {
+	createError := db.Debug().Table(TableName).Create(&ipWhitelisting).Error
+
+	if createError != nil {
+		return createError
+	}
+
+	return nil
 }
 
 // IPWhitelistingView .
-func (ipWhitelisting IPWhitelisting) IPWhitelistingView(id int) interface{} {
-	db.Debug().Table(TableName).Where("id = ? ", id).First(&ipWhitelisting.IPWhitelisting)
-	return ipWhitelisting.IPWhitelisting
+func (ipWhitelisting IPWhitelisting) IPWhitelistingView(id int) (*ipwhitelistings.IPWhitelistingModel, error) {
+	viewError := db.Debug().Table(TableName).Where("id = ? ", id).First(&ipWhitelisting.IPWhitelistingModel).Error
+
+	if viewError != nil {
+		return nil, viewError
+	}
+
+	return &ipWhitelisting.IPWhitelistingModel, nil
 }
 
 // IPWhitelistingUpdate .
-func (ipWhitelisting IPWhitelisting) IPWhitelistingUpdate(id int) {
-	db.Debug().Model(ipWhitelisting).Where("id = ? ", id).Update(&ipWhitelisting.IPWhitelisting)
+func (ipWhitelisting IPWhitelisting) IPWhitelistingUpdate(id int) error {
+	updateError := db.Debug().Model(ipWhitelisting).Where("id = ? ", id).Update(&ipWhitelisting.IPWhitelistingModel).Error
+
+	if updateError != nil {
+		return updateError
+	}
+
+	return nil
 }
 
 // IPWhitelistingDelete .
-func (ipWhitelisting IPWhitelisting) IPWhitelistingDelete(id int) {
-	db.Debug().Table(TableName).Where("id = ? ", id).Delete(&ipWhitelisting)
+func (ipWhitelisting IPWhitelisting) IPWhitelistingDelete(id int) error {
+	deleteError := db.Debug().Table(TableName).Where("id = ? ", id).Delete(&ipWhitelisting).Error
+
+	if deleteError != nil {
+		return deleteError
+	}
+
+	return nil
 }
 
 // Total .
