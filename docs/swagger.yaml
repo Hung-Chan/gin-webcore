@@ -1,4 +1,18 @@
 definitions:
+  adminaccesses.AdminAccessModel:
+    properties:
+      code:
+        example: test
+        type: string
+      enable:
+        type: integer
+      name:
+        example: test
+        type: string
+    required:
+    - code
+    - name
+    type: object
   adminlevels.AdminLevelModel:
     properties:
       enable:
@@ -42,6 +56,152 @@ info:
   title: Golang Gin-Webcore API
   version: "1.0"
 paths:
+  /admin-accesses/:
+    get:
+      consumes:
+      - application/json
+      description: GET Admin Access List
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: SortColumn
+        in: query
+        name: sortColumn
+        type: string
+      - description: SortDirection
+        in: query
+        name: sortDirection
+        type: string
+      - description: Name
+        in: query
+        name: name
+        type: string
+      - description: Enable
+        in: query
+        name: enable
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Access List
+      tags:
+      - AdminAccesses
+    post:
+      consumes:
+      - application/json
+      description: GET Admin Access Create
+      parameters:
+      - description: Admin Access Create
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/adminaccesses.AdminAccessModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Access Create
+      tags:
+      - AdminAccesses
+  /admin-accesses/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: DELETE Admin Access Delete
+      parameters:
+      - description: Admin Access ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Access Delete
+      tags:
+      - AdminAccesses
+    patch:
+      consumes:
+      - application/json
+      description: PATCH Admin Access Update
+      parameters:
+      - description: Admin Access ID
+        in: path
+        name: id
+        type: integer
+      - description: Admin Access Update
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/adminaccesses.AdminAccessModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Access Update
+      tags:
+      - AdminAccesses
+  /admin-accesses/view/{id}:
+    get:
+      consumes:
+      - application/json
+      description: GET Admin Access View
+      parameters:
+      - description: Admin Access ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Access View
+      tags:
+      - AdminAccesses
   /admin-levels/:
     get:
       consumes:
@@ -85,7 +245,7 @@ paths:
             $ref: '#/definitions/response.response'
       summary: Admin Levels List
       tags:
-      - AdminLists
+      - AdminLevels
     post:
       consumes:
       - application/json
@@ -110,7 +270,7 @@ paths:
             $ref: '#/definitions/response.response'
       summary: Admin Level Create
       tags:
-      - AdminLists
+      - AdminLevels
   /admin-levels/{id}:
     delete:
       consumes:
@@ -134,7 +294,7 @@ paths:
             $ref: '#/definitions/response.response'
       summary: Admin Level Delete
       tags:
-      - AdminLists
+      - AdminLevels
     get:
       consumes:
       - application/json
@@ -157,7 +317,7 @@ paths:
             $ref: '#/definitions/response.response'
       summary: Admin Level View
       tags:
-      - AdminLists
+      - AdminLevels
     patch:
       consumes:
       - application/json
@@ -186,7 +346,7 @@ paths:
             $ref: '#/definitions/response.response'
       summary: Admin Level Update
       tags:
-      - AdminLists
+      - AdminLevels
   /auth/info:
     get:
       description: Get Admin Info

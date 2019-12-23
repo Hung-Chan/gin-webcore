@@ -1,10 +1,10 @@
 package adminaccesses
 
 type (
-	// AdminAccess .
-	AdminAccess struct {
-		Name   string `json:"name" validate:"required"`
-		Code   string `json:"code" validate:"required"`
+	// AdminAccessModel .
+	AdminAccessModel struct {
+		Name   string `json:"name" validate:"required" example:"test"`
+		Code   string `json:"code" validate:"required" example:"test"`
 		Enable *int   `json:"enable"`
 	}
 )

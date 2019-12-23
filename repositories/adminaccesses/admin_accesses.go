@@ -10,24 +10,14 @@ type (
 	// AdminAccess .
 	AdminAccess struct {
 		models.IDInfo
-		adminaccesses.AdminAccess
+		adminaccesses.AdminAccessModel
 	}
-
-	// AdminAccessesOption .
-	AdminAccessesOption []adminaccesses.AdminAccess
 
 	// AdminAccesses .
 	AdminAccesses []AdminAccess
 
-	// AdminAccessRepositoryManagement .
-	AdminAccessRepositoryManagement interface {
-		AdminAccessesList(page int, limit int, sortColumn string, sortDirection string, name string, enable int) interface{}
-		AdminAccessCreate()
-		AdminAccessView(id int) interface{}
-		AdminAccessUpdate(id int)
-		AdminAccessDelete(id int)
-		Total()
-	}
+	// AdminAccessesOption .
+	AdminAccessesOption []adminaccesses.AdminAccessModel
 )
 
 var (
@@ -37,43 +27,69 @@ var (
 )
 
 // AdminAccessesList .
-func (adminAccess AdminAccess) AdminAccessesList(page int, limit int, sortColumn string, sortDirection string, name string, enable int) interface{} {
+func (adminAccess AdminAccess) AdminAccessesList(page int, limit int, sortColumn string, sortDirection string, name *string, enable *int) (*AdminAccesses, error) {
 	var adminAccesses AdminAccesses
 
 	res := db.Debug().Table(TableName)
 
-	if name != "" {
-		res = res.Where("name LIKE ?", "%"+name+"%")
+	if name != nil {
+		res = res.Where("name LIKE ?", "%"+*name+"%")
 	}
 
-	if enable != -1 {
+	if enable != nil {
 		res = res.Where("enable = ?", enable)
 	}
 
-	res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&adminAccesses)
+	listError := res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&adminAccesses).Error
 
-	return adminAccesses
+	if listError != nil {
+		return nil, listError
+	}
+	return &adminAccesses, nil
 }
 
 // AdminAccessCreate .
-func (adminAccess AdminAccess) AdminAccessCreate() {
-	db.Debug().Table(TableName).Create(&adminAccess)
+func (adminAccess AdminAccess) AdminAccessCreate() error {
+	createError := db.Debug().Table(TableName).Create(&adminAccess).Error
+
+	if createError != nil {
+		return createError
+	}
+
+	return nil
 }
 
 // AdminAccessView .
-func (adminAccess AdminAccess) AdminAccessView(id int) interface{} {
-	db.Debug().Table(TableName).Where("id = ? ", id).First(&adminAccess.AdminAccess)
-	return adminAccess.AdminAccess
+func (adminAccess AdminAccess) AdminAccessView(id int) (*adminaccesses.AdminAccessModel, error) {
+	viewError := db.Debug().Table(TableName).Where("id = ? ", id).First(&adminAccess.AdminAccessModel).Error
+
+	if viewError != nil {
+		return nil, viewError
+	}
+
+	return &adminAccess.AdminAccessModel, nil
 }
 
 // AdminAccessUpdate .
-func (adminAccess AdminAccess) AdminAccessUpdate(id int) {
-	db.Debug().Model(adminAccess).Where("id = ? ", id).Update(&adminAccess.AdminAccess)
+func (adminAccess AdminAccess) AdminAccessUpdate(id int) error {
+	updateError := db.Debug().Model(adminAccess).Where("id = ? ", id).Update(&adminAccess.AdminAccessModel).Error
+
+	if updateError != nil {
+		return updateError
+	}
+
+	return nil
 }
 
 // AdminAccessDelete .
-func (adminAccess AdminAccess) AdminAccessDelete(id int) {
-	db.Debug().Table(TableName).Where("id = ? ", id).Delete(&adminAccess)
+func (adminAccess AdminAccess) AdminAccessDelete(id int) error {
+	deleteError := db.Debug().Table(TableName).Where("id = ? ", id).Delete(&adminAccess).Error
+
+	if deleteError != nil {
+		return deleteError
+	}
+
+	return nil
 }
 
 // Total .

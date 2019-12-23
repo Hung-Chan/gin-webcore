@@ -9,6 +9,229 @@
     },
     "host": "localhost:1002",
     "paths": {
+        "/admin-accesses/": {
+            "get": {
+                "description": "GET Admin Access List",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminAccesses"
+                ],
+                "summary": "Admin Access List",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "SortColumn",
+                        "name": "sortColumn",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "SortDirection",
+                        "name": "sortDirection",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Enable",
+                        "name": "enable",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "GET Admin Access Create",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminAccesses"
+                ],
+                "summary": "Admin Access Create",
+                "parameters": [
+                    {
+                        "description": "Admin Access Create",
+                        "name": "data",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/adminaccesses.AdminAccessModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin-accesses/view/{id}": {
+            "get": {
+                "description": "GET Admin Access View",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminAccesses"
+                ],
+                "summary": "Admin Access View",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Admin Access ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin-accesses/{id}": {
+            "delete": {
+                "description": "DELETE Admin Access Delete",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminAccesses"
+                ],
+                "summary": "Admin Access Delete",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Admin Access ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "PATCH Admin Access Update",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminAccesses"
+                ],
+                "summary": "Admin Access Update",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Admin Access ID",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Admin Access Update",
+                        "name": "data",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/adminaccesses.AdminAccessModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
         "/admin-levels/": {
             "get": {
                 "description": "GET Admin Levels List",
@@ -19,7 +242,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "AdminLists"
+                    "AdminLevels"
                 ],
                 "summary": "Admin Levels List",
                 "parameters": [
@@ -84,7 +307,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "AdminLists"
+                    "AdminLevels"
                 ],
                 "summary": "Admin Level Create",
                 "parameters": [
@@ -124,7 +347,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "AdminLists"
+                    "AdminLevels"
                 ],
                 "summary": "Admin Level View",
                 "parameters": [
@@ -159,7 +382,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "AdminLists"
+                    "AdminLevels"
                 ],
                 "summary": "Admin Level Delete",
                 "parameters": [
@@ -194,7 +417,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "AdminLists"
+                    "AdminLevels"
                 ],
                 "summary": "Admin Level Update",
                 "parameters": [
@@ -330,6 +553,26 @@
         }
     },
     "definitions": {
+        "adminaccesses.AdminAccessModel": {
+            "type": "object",
+            "required": [
+                "code",
+                "name"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "test"
+                },
+                "enable": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "test"
+                }
+            }
+        },
         "adminlevels.AdminLevelModel": {
             "type": "object",
             "required": [
