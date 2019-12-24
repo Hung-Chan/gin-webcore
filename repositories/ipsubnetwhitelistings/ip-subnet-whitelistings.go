@@ -30,7 +30,7 @@ func (ipSubnetWhitelisting IPSubnetWhitelisting) IPSubnetWhitelistingsList(page 
 	res := db.Debug().Table(TableName)
 
 	if subnet != nil {
-		res = res.Where("name LIKE ?", "%"+*subnet+"%")
+		res = res.Where("subnet LIKE ?", "%"+*subnet+"%")
 	}
 
 	if enable != nil {

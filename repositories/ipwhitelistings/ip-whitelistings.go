@@ -30,7 +30,7 @@ func (ipWhitelisting IPWhitelisting) IPWhitelistingsList(page int, limit int, so
 	res := db.Debug().Table(TableName)
 
 	if ip != nil {
-		res = res.Where("name LIKE ?", "%"+*ip+"%")
+		res = res.Where("ip LIKE ?", "%"+*ip+"%")
 	}
 
 	if enable != nil {
