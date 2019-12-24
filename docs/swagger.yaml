@@ -75,6 +75,18 @@ definitions:
     required:
     - ip
     type: object
+  menugroups.MenuGroupModel:
+    properties:
+      enable:
+        type: integer
+      name:
+        example: test
+        type: string
+      sort:
+        type: integer
+    required:
+    - name
+    type: object
   response.response:
     properties:
       code:
@@ -885,4 +897,150 @@ paths:
       summary: IP Whitelisting View
       tags:
       - IPWhitelistings
+  /menu-groups/:
+    get:
+      consumes:
+      - application/json
+      description: GET Menu Groups List
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: SortColumn
+        in: query
+        name: sortColumn
+        type: string
+      - description: SortDirection
+        in: query
+        name: sortDirection
+        type: string
+      - description: Name
+        in: query
+        name: name
+        type: string
+      - description: Enable
+        in: query
+        name: enable
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Menu Groups List
+      tags:
+      - MenuGroups
+    post:
+      consumes:
+      - application/json
+      description: GET Menu Group Create
+      parameters:
+      - description: Menu Group Create
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/menugroups.MenuGroupModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Menu Group Create
+      tags:
+      - MenuGroups
+  /menu-groups/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: DELETE Menu Group Delete
+      parameters:
+      - description: Menu Group ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Menu Group Delete
+      tags:
+      - MenuGroups
+    patch:
+      consumes:
+      - application/json
+      description: PATCH Menu Group Update
+      parameters:
+      - description: Menu Group ID
+        in: path
+        name: id
+        type: integer
+      - description: Menu Group Update
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/menugroups.MenuGroupModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Menu Group Update
+      tags:
+      - MenuGroups
+  /menu-groups/view/{id}:
+    get:
+      consumes:
+      - application/json
+      description: GET Menu Group View
+      parameters:
+      - description: Menu Group ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Menu Group View
+      tags:
+      - MenuGroups
 swagger: "2.0"
