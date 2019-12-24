@@ -13,17 +13,28 @@ import (
 )
 
 // AreaBlacklistingsList .
+// @Summary Area Blacklistings List
+// @Description GET Area Blacklistings List
+// @Tags AreaBlacklistings
+// @Accept  json
+// @Produce  json
+// @Param page query  int ture "Page"
+// @Param limit query  int ture "Limit"
+// @Param sortColumn query  string ture "SortColumn"
+// @Param sortDirection query  string ture "SortDirection"
+// @Param country query  string false "Country"
+// @Param enable query  int false "Enable"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /area-blacklistings/ [get]
 func AreaBlacklistingsList(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
 	result := make(map[string]interface{})
-	var areaBlacklistingRepository = /*areablacklistings.AreaBlacklistingsRepositoryManagement*/ new(areablacklistings.AreaBlacklisting)
+	var areaBlacklistingRepository = new(areablacklistings.AreaBlacklisting)
 
-	queryModel := models.QueryModel{
-		Name:   "",
-		Enable: -1,
-	}
+	queryModel := models.NewQueryModel()
 
 	if err := context.ShouldBind(&queryModel); err != nil {
 		response.ResultFail(1001, "data bind error")
@@ -34,10 +45,15 @@ func AreaBlacklistingsList(context *gin.Context) {
 	limit := queryModel.Limit
 	sortColumn := queryModel.SortColumn
 	sortDirection := queryModel.SortDirection
-	name := queryModel.Name
+	country := queryModel.Country
 	enable := queryModel.Enable
 
-	data := areaBlacklistingRepository.AreaBlacklistingsList(page, limit, sortColumn, sortDirection, name, enable)
+	data, err := areaBlacklistingRepository.AreaBlacklistingsList(page, limit, sortColumn, sortDirection, country, enable)
+
+	if err != nil {
+		response.ResultFail(99999, err.Error())
+		return
+	}
 
 	result["list"] = data
 	result["total"] = areaBlacklistingRepository.Total()
@@ -47,76 +63,123 @@ func AreaBlacklistingsList(context *gin.Context) {
 }
 
 // AreaBlacklistingCreate .
+// @Summary Area Blacklisting Create
+// @Description GET Area Blacklisting Create
+// @Tags AreaBlacklistings
+// @Accept  json
+// @Produce  json
+// @Param data body areablacklistings.AreaBlacklistingModel ture "Area Blacklisting Create"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /area-blacklistings/ [post]
 func AreaBlacklistingCreate(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var areaBlacklistingRepository = /*ipsubnetwhitelistings.AreaBlacklistingsRepositoryManagement*/ new(areablacklistings.AreaBlacklisting)
+	var areaBlacklistingRepository = new(areablacklistings.AreaBlacklisting)
 
-	if err := context.ShouldBind(&areaBlacklistingRepository.AreaBlacklisting); err != nil {
+	if err := context.ShouldBind(&areaBlacklistingRepository.AreaBlacklistingModel); err != nil {
 		response.ResultFail(1001, "data bind error")
 		return
 	}
 
-	if checkData := validate.VdeInfo(&areaBlacklistingRepository.AreaBlacklisting); checkData != nil {
+	if checkData := validate.VdeInfo(&areaBlacklistingRepository.AreaBlacklistingModel); checkData != nil {
 		response.ResultFail(200, checkData.Error())
 		return
 	}
 
-	areaBlacklistingRepository.AreaBlacklistingCreate()
+	resultError := areaBlacklistingRepository.AreaBlacklistingCreate()
+
+	if resultError != nil {
+		response.ResultFail(99999, resultError.Error())
+		return
+	}
 
 	fmt.Println("新增地區黑名單管理", time.Since(s))
-	response.ResultOk(200, "Success", "Data")
+	response.ResultOk(200, "Success", nil)
 }
 
 // AreaBlacklistingView .
+// @Summary Area Blacklisting View
+// @Description GET Area Blacklisting View
+// @Tags AreaBlacklistings
+// @Accept  json
+// @Produce  json
+// @Param id path int ture "Area Blacklisting View"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /area-blacklistings/view/{id} [get]
 func AreaBlacklistingView(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var areaBlacklistingRepository = /*ipsubnetwhitelistings.AreaBlacklistingsRepositoryManagement*/ new(areablacklistings.AreaBlacklisting)
+	var areaBlacklistingRepository = new(areablacklistings.AreaBlacklisting)
 
-	idStr := context.Param("id")
-	id, err := strconv.Atoi(idStr)
+	// id 型態轉換
+	idParam := context.Param("id")
+	id, idError := strconv.Atoi(idParam)
 
-	if err != nil {
+	if idError != nil {
 		response.ResultFail(1002, "id Conversion failed")
+		return
 	}
 
-	result := areaBlacklistingRepository.AreaBlacklistingView(id)
+	result, resultError := areaBlacklistingRepository.AreaBlacklistingView(id)
+
+	if resultError != nil {
+		response.ResultFail(99999, resultError.Error())
+		return
+	}
 
 	fmt.Println("檢視地區黑單管理", time.Since(s))
 	response.ResultOk(200, "Success", result)
 }
 
 // AreaBlacklistingUpdate .
+// @Summary Area Blacklisting Update
+// @Description GET Area Blacklisting Update
+// @Tags AreaBlacklistings
+// @Accept  json
+// @Produce  json
+// @Param id path int ture "Area Blacklisting ID"
+// @Param data body areablacklistings.AreaBlacklistingModel ture "Area Blacklisting Update"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /area-blacklistings/{id} [patch]
 func AreaBlacklistingUpdate(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var areaBlacklistingRepository = /*ipsubnetwhitelistings.AreaBlacklistingsRepositoryManagement*/ new(areablacklistings.AreaBlacklisting)
+	var areaBlacklistingRepository = new(areablacklistings.AreaBlacklisting)
 
-	idStr := context.Param("id")
-	id, err := strconv.Atoi(idStr)
+	// id 型態轉換
+	idParam := context.Param("id")
+	id, idError := strconv.Atoi(idParam)
 
-	if err != nil {
+	if idError != nil {
 		response.ResultFail(1002, "id Conversion failed")
+		return
 	}
 
-	if err := context.ShouldBind(&areaBlacklistingRepository.AreaBlacklisting); err != nil {
+	if err := context.ShouldBind(&areaBlacklistingRepository.AreaBlacklistingModel); err != nil {
 		response.ResultFail(1001, "data bind error")
 		return
 	}
 
-	if checkData := validate.VdeInfo(&areaBlacklistingRepository.AreaBlacklisting); checkData != nil {
+	if checkData := validate.VdeInfo(&areaBlacklistingRepository.AreaBlacklistingModel); checkData != nil {
 		response.ResultFail(200, checkData.Error())
 		return
 	}
 
-	areaBlacklistingRepository.AreaBlacklistingUpdate(id)
+	resultError := areaBlacklistingRepository.AreaBlacklistingUpdate(id)
+
+	if resultError != nil {
+		response.ResultFail(99999, resultError.Error())
+		return
+	}
 
 	fmt.Println("修改地區黑名單管理", time.Since(s))
-	response.ResultOk(200, "Success", "Data")
+	response.ResultOk(200, "Success", nil)
 }
 
 // AreaBlacklistingCopy .
@@ -128,21 +191,37 @@ func AreaBlacklistingCopy(context *gin.Context) {
 }
 
 // AreaBlacklistingDelete .
+// @Summary Area Blacklisting Delete
+// @Description GET Area Blacklisting Delete
+// @Tags AreaBlacklistings
+// @Accept  json
+// @Produce  json
+// @Param id path int ture "Area Blacklisting ID"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /area-blacklistings/{id} [delete]
 func AreaBlacklistingDelete(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var areaBlacklistingRepository = /*ipsubnetwhitelistings.AreaBlacklistingsRepositoryManagement*/ new(areablacklistings.AreaBlacklisting)
+	var areaBlacklistingRepository = new(areablacklistings.AreaBlacklisting)
 
-	idStr := context.Param("id")
-	id, err := strconv.Atoi(idStr)
+	// id 型態轉換
+	idParam := context.Param("id")
+	id, idError := strconv.Atoi(idParam)
 
-	if err != nil {
+	if idError != nil {
 		response.ResultFail(1002, "id Conversion failed")
+		return
 	}
 
-	areaBlacklistingRepository.AreaBlacklistingDelete(id)
+	resultError := areaBlacklistingRepository.AreaBlacklistingDelete(id)
+
+	if resultError != nil {
+		response.ResultFail(99999, resultError.Error())
+		return
+	}
 
 	fmt.Println("刪除地區黑名單管理", time.Since(s))
-	response.ResultOk(200, "Success", "Data")
+	response.ResultOk(200, "Success", nil)
 }

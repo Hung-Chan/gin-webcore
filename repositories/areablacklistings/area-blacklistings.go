@@ -10,21 +10,11 @@ type (
 	// AreaBlacklisting .
 	AreaBlacklisting struct {
 		models.IDInfo
-		areablacklistings.AreaBlacklisting
+		areablacklistings.AreaBlacklistingModel
 	}
 
 	// AreaBlacklistings .
 	AreaBlacklistings []AreaBlacklisting
-
-	// AreaBlacklistingsRepositoryManagement .
-	AreaBlacklistingsRepositoryManagement interface {
-		AreaBlacklistingsList(page int, limit int, sortColumn string, sortDirection string, name string, enable int) interface{}
-		AreaBlacklistingCreate()
-		AreaBlacklistingView(id int) interface{}
-		AreaBlacklistingUpdate(id int)
-		AreaBlacklistingDelete(id int)
-		Total() int
-	}
 )
 
 var (
@@ -34,44 +24,70 @@ var (
 )
 
 // AreaBlacklistingsList .
-func (areaBlacklisting AreaBlacklisting) AreaBlacklistingsList(page int, limit int, sortColumn string, sortDirection string, name string, enable int) interface{} {
+func (areaBlacklisting AreaBlacklisting) AreaBlacklistingsList(page int, limit int, sortColumn string, sortDirection string, country *string, enable *int) (*AreaBlacklistings, error) {
 	var areaBlacklistings AreaBlacklistings
 
 	res := db.Debug().Table(TableName)
 
-	if name != "" {
-		res = res.Where("name LIKE ?", "%"+name+"%")
+	if country != nil {
+		res = res.Where("country LIKE ?", "%"+*country+"%")
 	}
 
-	if enable != -1 {
+	if enable != nil {
 		res = res.Where("enable = ?", enable)
 	}
 
-	res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&areaBlacklistings)
+	listError := res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&areaBlacklistings).Error
 
-	return areaBlacklistings
+	if listError != nil {
+		return nil, listError
+	}
 
+	return &areaBlacklistings, nil
 }
 
 // AreaBlacklistingCreate .
-func (areaBlacklisting AreaBlacklisting) AreaBlacklistingCreate() {
-	db.Debug().Table(TableName).Create(&areaBlacklisting)
+func (areaBlacklisting AreaBlacklisting) AreaBlacklistingCreate() error {
+	createError := db.Debug().Table(TableName).Create(&areaBlacklisting).Error
+
+	if createError != nil {
+		return createError
+	}
+
+	return nil
 }
 
 // AreaBlacklistingView .
-func (areaBlacklisting AreaBlacklisting) AreaBlacklistingView(id int) interface{} {
-	db.Debug().Table(TableName).Where("id = ? ", id).First(&areaBlacklisting.AreaBlacklisting)
-	return areaBlacklisting.AreaBlacklisting
+func (areaBlacklisting AreaBlacklisting) AreaBlacklistingView(id int) (*areablacklistings.AreaBlacklistingModel, error) {
+	viewError := db.Debug().Table(TableName).Where("id = ? ", id).First(&areaBlacklisting.AreaBlacklistingModel).Error
+
+	if viewError != nil {
+		return nil, viewError
+	}
+
+	return &areaBlacklisting.AreaBlacklistingModel, nil
 }
 
 // AreaBlacklistingUpdate .
-func (areaBlacklisting AreaBlacklisting) AreaBlacklistingUpdate(id int) {
-	db.Debug().Model(areaBlacklisting).Where("id = ? ", id).Update(&areaBlacklisting.AreaBlacklisting)
+func (areaBlacklisting AreaBlacklisting) AreaBlacklistingUpdate(id int) error {
+	updateError := db.Debug().Model(areaBlacklisting).Where("id = ? ", id).Update(&areaBlacklisting.AreaBlacklistingModel).Error
+
+	if updateError != nil {
+		return updateError
+	}
+
+	return nil
 }
 
 // AreaBlacklistingDelete .
-func (areaBlacklisting AreaBlacklisting) AreaBlacklistingDelete(id int) {
-	db.Debug().Table(TableName).Where("id = ? ", id).Delete(&areaBlacklisting)
+func (areaBlacklisting AreaBlacklisting) AreaBlacklistingDelete(id int) error {
+	deleteError := db.Debug().Table(TableName).Where("id = ? ", id).Delete(&areaBlacklisting).Error
+
+	if deleteError != nil {
+		return deleteError
+	}
+
+	return nil
 }
 
 // Total .

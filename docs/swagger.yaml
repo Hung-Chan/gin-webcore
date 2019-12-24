@@ -27,6 +27,18 @@ definitions:
     - level
     - name
     type: object
+  areablacklistings.AreaBlacklistingModel:
+    properties:
+      country:
+        example: TW
+        type: string
+      enable:
+        type: integer
+      remark:
+        type: string
+    required:
+    - country
+    type: object
   auth.Login:
     properties:
       account:
@@ -371,6 +383,152 @@ paths:
       summary: Admin Level Update
       tags:
       - AdminLevels
+  /area-blacklistings/:
+    get:
+      consumes:
+      - application/json
+      description: GET Area Blacklistings List
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: SortColumn
+        in: query
+        name: sortColumn
+        type: string
+      - description: SortDirection
+        in: query
+        name: sortDirection
+        type: string
+      - description: Country
+        in: query
+        name: country
+        type: string
+      - description: Enable
+        in: query
+        name: enable
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Area Blacklistings List
+      tags:
+      - AreaBlacklistings
+    post:
+      consumes:
+      - application/json
+      description: GET Area Blacklisting Create
+      parameters:
+      - description: Area Blacklisting Create
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/areablacklistings.AreaBlacklistingModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Area Blacklisting Create
+      tags:
+      - AreaBlacklistings
+  /area-blacklistings/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: GET Area Blacklisting Delete
+      parameters:
+      - description: Area Blacklisting ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Area Blacklisting Delete
+      tags:
+      - AreaBlacklistings
+    patch:
+      consumes:
+      - application/json
+      description: GET Area Blacklisting Update
+      parameters:
+      - description: Area Blacklisting ID
+        in: path
+        name: id
+        type: integer
+      - description: Area Blacklisting Update
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/areablacklistings.AreaBlacklistingModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Area Blacklisting Update
+      tags:
+      - AreaBlacklistings
+  /area-blacklistings/view/{id}:
+    get:
+      consumes:
+      - application/json
+      description: GET Area Blacklisting View
+      parameters:
+      - description: Area Blacklisting View
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Area Blacklisting View
+      tags:
+      - AreaBlacklistings
   /auth/info:
     get:
       description: Get Admin Info
