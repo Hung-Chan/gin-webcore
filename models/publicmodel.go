@@ -23,6 +23,10 @@ type QueryModelNew struct {
 	IP            *string `form:"ip" example:""`
 	Subnet        *string `form:"subnet" example:""`
 	Country       *string `form:"country" example:""`
+	Group         *int    `form:"group" example:""`
+	Level         *int    `form:"level" example:""`
+	NameItem      *string `form:"nameItem" example:"account"`
+	AccountOrName *string `form:"accountOrName" example:""`
 }
 
 // IDInfo .
@@ -44,5 +48,9 @@ func NewQueryModel() *QueryModelNew {
 		IP:            nil,
 		Subnet:        nil,
 		Country:       nil,
+		Group:         nil,
+		Level:         nil,
+		NameItem:      nil,
+		AccountOrName: nil,
 	}
 }

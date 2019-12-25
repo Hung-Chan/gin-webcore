@@ -13,6 +13,35 @@ definitions:
     - code
     - name
     type: object
+  administrators.AdministratorModel:
+    properties:
+      account:
+        example: test
+        type: string
+      admin_id:
+        type: integer
+      enable:
+        type: integer
+      group_id:
+        example: 1
+        type: integer
+      level_id:
+        example: 1
+        type: integer
+      name:
+        example: test
+        type: string
+      password:
+        example: qaz123
+        type: string
+      remark:
+        type: string
+    required:
+    - account
+    - group_id
+    - level_id
+    - name
+    type: object
   adminlevels.AdminLevelModel:
     properties:
       enable:
@@ -254,7 +283,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: GET Admin Levels List
+      description: GET Administrators List
       parameters:
       - description: Page
         in: query
@@ -272,9 +301,21 @@ paths:
         in: query
         name: sortDirection
         type: string
-      - description: Name
+      - description: Level
         in: query
-        name: name
+        name: level
+        type: integer
+      - description: Group
+        in: query
+        name: group
+        type: integer
+      - description: NameItem
+        in: query
+        name: nameItem
+        type: string
+      - description: AccountOrName
+        in: query
+        name: accountOrName
         type: string
       - description: Enable
         in: query
@@ -291,9 +332,9 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/response.response'
-      summary: Admin Levels List
+      summary: Administrators List
       tags:
-      - AdminLevels
+      - Administrators
     post:
       consumes:
       - application/json
@@ -395,6 +436,165 @@ paths:
       summary: Admin Level Update
       tags:
       - AdminLevels
+  /admins/:
+    post:
+      consumes:
+      - application/json
+      description: POST Administrator Create
+      parameters:
+      - description: Administrator Create
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/administrators.AdministratorModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Administrator Create
+      tags:
+      - Administrators
+  /admins/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Administrator Delete
+      parameters:
+      - description: Administrator ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Administrator Delete
+      tags:
+      - Administrators
+    get:
+      consumes:
+      - application/json
+      description: GET Administrator View
+      parameters:
+      - description: Administrator ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Administrator View
+      tags:
+      - Administrators
+    patch:
+      consumes:
+      - application/json
+      description: PATCH Administrator Update
+      parameters:
+      - description: Administrator ID
+        in: path
+        name: id
+        type: integer
+      - description: Administrator Update
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/administrators.AdministratorModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Administrator Update
+      tags:
+      - Administrators
+  /admins/group-permission/{id}:
+    get:
+      consumes:
+      - application/json
+      description: GET Administrator Group Permission
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Administrator Group Permission
+      tags:
+      - Administrators
+  /admins/groups:
+    get:
+      consumes:
+      - application/json
+      description: GET Administrator Groups Option
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Administrator Groups Option
+      tags:
+      - Administrators
+  /admins/levels:
+    get:
+      consumes:
+      - application/json
+      description: GET Administrator Levels Option
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Administrator Levels Option
+      tags:
+      - Administrators
   /area-blacklistings/:
     get:
       consumes:

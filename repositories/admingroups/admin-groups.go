@@ -85,11 +85,39 @@ func (adminGroup AdminGroup) Total() int {
 	return count
 }
 
-// AdmingroupOption .
-func (adminGroup AdminGroup) AdmingroupOption() AdminGroupOptions {
+// AdminGroupOption .
+func (adminGroup AdminGroup) AdminGroupOption() (*AdminGroupOptions, error) {
 	var adminGroupOptions AdminGroupOptions
 
-	db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&adminGroupOptions)
+	optionError := db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&adminGroupOptions).Error
 
-	return adminGroupOptions
+	if optionError != nil {
+		return nil, optionError
+	}
+
+	return &adminGroupOptions, nil
+}
+
+// NewAdmingroupView .
+func (adminGroup AdminGroup) NewAdmingroupView(id int) (*admingroups.AdminGroup, error) {
+	newView := db.Debug().Table(TableName).Where("id = ? ", id).First(&adminGroup.AdminGroup).Error
+
+	if newView != nil {
+		return nil, newView
+	}
+
+	return &adminGroup.AdminGroup, nil
+}
+
+// GetPermission .
+func (adminGroup AdminGroup) GetPermission(id int) (*admingroups.Permission, error) {
+	var permission admingroups.Permission
+
+	permissionError := db.Debug().Table("admin_groups").Where("id = ?", id).Scan(&permission).Error
+
+	if permissionError != nil {
+		return nil, permissionError
+	}
+
+	return &permission, nil
 }

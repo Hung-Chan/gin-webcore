@@ -16,17 +16,17 @@ func InitRouter() *gin.Engine {
 	// 帳號管理
 	admins := router.Group("admins")
 	{
-		admins.GET("", controllers.AdminsList)
-		admins.GET("/groups", controllers.AdminsGroups)
-		admins.GET("/levels", controllers.AdminsLevels)
-		admins.GET("/group-permission/:id", controllers.AdminsGroupPermission)
+		admins.GET("", controllers.AdministratorsList)
+		admins.GET("/groups", controllers.AdministratorGroups)
+		admins.GET("/levels", controllers.AdministratorLevels)
+		admins.GET("/group-permission/:id", controllers.AdministratorGroupPermission)
 
 		// 操作api (新增、檢視、修改、複製、刪除)
-		admins.POST("", controllers.AdminsCreate)
-		admins.GET("/view/:id", controllers.AdminsView)
-		admins.PATCH("/:id", controllers.AdminsUpdate)
-		admins.PUT("", controllers.AdminsCopy)
-		admins.DELETE("/:id", controllers.AdminsDelete)
+		admins.POST("", controllers.AdministratorCreate)
+		admins.GET("/view/:id", controllers.AdministratorView)
+		admins.PATCH("/:id", controllers.AdministratorUpdate)
+		admins.PUT("", controllers.AdministratorCopy)
+		admins.DELETE("/:id", controllers.AdministratorDelete)
 	}
 
 	// 群組管理

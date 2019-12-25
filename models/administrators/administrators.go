@@ -1,23 +1,15 @@
 package administrators
 
-import (
-	"encoding/json"
-)
-
 type (
-	// Administrator .
-	Administrator struct {
-		Name     string `json:"name"`
-		Account  string `json:"account"`
-		Password string `json:"password"`
-		GroupID  *int   `json:"group_id"`
-		LevelID  *int   `json:"level_id"`
+	// AdministratorModel .
+	AdministratorModel struct {
+		Name     string `json:"name" validate:"required" example:"test"`
+		Account  string `json:"account" validate:"required" example:"test"`
+		Password string `json:"password" example:"qaz123"`
+		GroupID  *int   `json:"group_id" validate:"required" example:"1"`
+		LevelID  *int   `json:"level_id" validate:"required" example:"1"`
 		Enable   *int   `json:"enable"`
 		Remark   string `json:"remark"`
-	}
-
-	// NewPermission .
-	NewPermission struct {
-		Permission json.RawMessage `json:"permission"`
+		AdminID  int    `json:"admin_id"`
 	}
 )

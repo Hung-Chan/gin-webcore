@@ -120,10 +120,14 @@ func (adminLevel AdminLevel) Total() int {
 }
 
 // AdminLevelOption .
-func (adminLevel AdminLevel) AdminLevelOption() AdminLevelOptions {
+func (adminLevel AdminLevel) AdminLevelOption() (*AdminLevelOptions, error) {
 	var adminLevelOptions AdminLevelOptions
 
-	db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&adminLevelOptions)
+	optionError := db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&adminLevelOptions).Error
 
-	return adminLevelOptions
+	if optionError != nil {
+		return nil, optionError
+	}
+
+	return &adminLevelOptions, nil
 }

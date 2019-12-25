@@ -15,18 +15,33 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AdminsList .
-func AdminsList(context *gin.Context) {
+// AdministratorsList .
+// @Summary Administrators List
+// @Description GET Administrators List
+// @Tags Administrators
+// @Accept json
+// @Produce json
+// @Param page query int ture "Page"
+// @Param limit query int ture "Limit"
+// @Param sortColumn query string ture "SortColumn"
+// @Param sortDirection query string ture "SortDirection"
+// @Param level query int false "Level"
+// @Param group query int false "Group"
+// @Param nameItem query string false "NameItem"
+// @Param accountOrName query string false "AccountOrName"
+// @Param enable query int false "Enable"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admin-levels/ [get]
+func AdministratorsList(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
 	result := make(map[string]interface{})
-	var adminsRepository = /*administrators.AdminGroupFuncManagement*/ new(administrators.Administrator)
 
-	queryModel := models.QueryModel{
-		Name:   "",
-		Enable: -1,
-	}
+	var administratorsRepository = new(administrators.Administrator)
+
+	queryModel := models.NewQueryModel()
 
 	if err := context.ShouldBind(&queryModel); err != nil {
 		response.ResultFail(1001, "data bind error")
@@ -37,167 +52,273 @@ func AdminsList(context *gin.Context) {
 	limit := queryModel.Limit
 	sortColumn := queryModel.SortColumn
 	sortDirection := queryModel.SortDirection
-	name := queryModel.Name
+	group := queryModel.Group
+	level := queryModel.Level
+	nameItem := queryModel.NameItem
+	accountOrName := queryModel.AccountOrName
 	enable := queryModel.Enable
 
-	data := adminsRepository.AdministratorsList(page, limit, sortColumn, sortDirection, name, enable)
+	data, err := administratorsRepository.AdministratorsList(page, limit, sortColumn, sortDirection, group, level, nameItem, accountOrName, enable)
+
+	if err != nil {
+		response.ResultFail(11111, err.Error())
+		return
+	}
 
 	result["list"] = data
-	result["total"] = adminsRepository.Total()
+	result["total"] = administratorsRepository.Total()
 
 	fmt.Println("列表帳號管理", time.Since(s))
 	response.ResultOk(200, "Success", result)
 }
 
-// AdminsGroups .
-func AdminsGroups(context *gin.Context) {
+// AdministratorGroups .
+// @Summary Administrator Groups Option
+// @Description GET Administrator Groups Option
+// @Tags Administrators
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admins/groups [get]
+func AdministratorGroups(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var adminGroupRepository = /*admingroups.AdminGroupFuncManagement*/ new(admingroups.AdminGroup)
+	var adminGroupRepository = new(admingroups.AdminGroup)
 
-	result := adminGroupRepository.AdmingroupOption()
+	result, resultError := adminGroupRepository.AdminGroupOption()
+
+	if resultError != nil {
+		response.ResultFail(11111, resultError.Error())
+		return
+	}
 
 	fmt.Println("群組選單", time.Since(s))
 	response.ResultOk(200, "Success", result)
 }
 
-// AdminsLevels .
-func AdminsLevels(context *gin.Context) {
+// AdministratorLevels .
+// @Summary Administrator Levels Option
+// @Description GET Administrator Levels Option
+// @Tags Administrators
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admins/levels [get]
+func AdministratorLevels(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var adminLevelRepository = /*adminlevels.AdminLevelRepositoryManagement*/ new(adminlevels.AdminLevel)
+	var adminLevelRepository = new(adminlevels.AdminLevel)
 
-	result := adminLevelRepository.AdminLevelOption()
+	result, resultError := adminLevelRepository.AdminLevelOption()
+
+	if resultError != nil {
+		response.ResultFail(11111, resultError.Error())
+		return
+	}
 
 	fmt.Println("層級選單", time.Since(s))
 	response.ResultOk(200, "Success", result)
 }
 
-// AdminsGroupPermission .
-func AdminsGroupPermission(context *gin.Context) {
+// AdministratorGroupPermission .
+// @Summary Administrator Group Permission
+// @Description GET Administrator Group Permission
+// @Tags Administrators
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admins/group-permission/{id} [get]
+func AdministratorGroupPermission(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var adminsRepository = /*administrators.AdminGroupFuncManagement*/ new(administrators.Administrator)
+	var adminGroupsRepository = new(admingroups.AdminGroup)
 
-	idStr := context.Param("id")
-	id, err := strconv.Atoi(idStr)
+	// id 型態轉換
+	idParam := context.Param("id")
+	id, idError := strconv.Atoi(idParam)
 
-	if err != nil {
+	if idError != nil {
 		response.ResultFail(1002, "id Conversion failed")
+		return
 	}
 
-	result := adminsRepository.GetPermission(id)
+	result, resultError := adminGroupsRepository.GetPermission(id)
+
+	if resultError != nil {
+		response.ResultFail(11111, resultError.Error())
+		return
+	}
 
 	fmt.Println("群組權限", time.Since(s))
 	response.ResultOk(200, "Success", result)
 }
 
-// AdminsCreate .
-func AdminsCreate(context *gin.Context) {
+// AdministratorCreate .
+// @Summary Administrator Create
+// @Description POST Administrator Create
+// @Tags Administrators
+// @Accept  json
+// @Produce  json
+// @Param data body administrators.AdministratorModel ture "Administrator Create"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admins/ [post]
+func AdministratorCreate(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var adminsRepository = /*administrators.AdminGroupFuncManagement*/ new(administrators.Administrator)
+	var administratorsRepository = new(administrators.Administrator)
 
-	if err := context.ShouldBind(&adminsRepository.Administrator); err != nil {
+	if err := context.ShouldBind(&administratorsRepository.AdministratorModel); err != nil {
 		response.ResultFail(1001, "data bind error")
 		return
 	}
 
-	if checkData := validate.VdeInfo(&adminsRepository.Administrator); checkData != nil {
+	if checkData := validate.VdeInfo(&administratorsRepository.AdministratorModel); checkData != nil {
 		response.ResultFail(200, checkData.Error())
 		return
 	}
 
-	if adminsRepository.Password == "" {
+	if administratorsRepository.Password == "" {
 		response.ResultFail(200, "password is required .")
 		return
 	}
 
 	// 密碼加密
-	hashPassword, err := utils.HashPassword(adminsRepository.Password)
+	hashPassword, err := utils.HashPassword(administratorsRepository.Password)
 	if err != nil {
 		response.ResultFail(200, "HashPassword error")
 		return
 	}
 
-	adminsRepository.Password = hashPassword
-	adminsRepository.AdministratorCreate()
+	administratorsRepository.Password = hashPassword
+	administratorsRepository.AdminID = 1
+	resultError := administratorsRepository.AdministratorCreate()
+
+	if resultError != nil {
+		response.ResultFail(11111, resultError.Error())
+		return
+	}
 
 	fmt.Println("新增帳號管理", time.Since(s))
 	response.ResultOk(200, "Success", nil)
 }
 
-// AdminsView .
-func AdminsView(context *gin.Context) {
+// AdministratorView .
+// @Summary Administrator View
+// @Description GET Administrator View
+// @Tags Administrators
+// @Accept  json
+// @Produce  json
+// @Param id path int ture "Administrator ID"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admins/{id} [get]
+func AdministratorView(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var adminsRepository = /*administrators.AdminGroupFuncManagement*/ new(administrators.Administrator)
+	var administratorsRepository = new(administrators.Administrator)
+	var adminGroupsRepository = new(admingroups.AdminGroup)
 
-	idStr := context.Param("id")
-	id, err := strconv.Atoi(idStr)
+	// id 型態轉換
+	idParam := context.Param("id")
+	id, idError := strconv.Atoi(idParam)
 
-	if err != nil {
+	if idError != nil {
 		response.ResultFail(1002, "id Conversion failed")
+		return
 	}
 
-	result := adminsRepository.AdministratorView(id)
+	// 取得帳號資料
+	viewResult, viewResultError := administratorsRepository.AdministratorView(id)
 
-	permission := adminsRepository.GetPermission(*result.GroupID)
+	if viewResultError != nil {
+		response.ResultFail(11111, viewResultError.Error())
+		return
+	}
+
+	// 取得此帳號的群組資料
+	permission, permissionError := adminGroupsRepository.NewAdmingroupView(*viewResult.GroupID)
+
+	if permissionError != nil {
+		response.ResultFail(11111, permissionError.Error())
+		return
+	}
+
+	// 將帳號資料跟權限資料合併
 	fmt.Println(permission)
-	// mapPermission := utils.StructToMap(permission)
 
 	fmt.Println("檢視帳號管理", time.Since(s))
-	response.ResultOk(200, "Success", result)
+	response.ResultOk(200, "Success", viewResult)
 }
 
-// AdminsUpdate .
-func AdminsUpdate(context *gin.Context) {
+// AdministratorUpdate .
+// @Summary Administrator Update
+// @Description PATCH Administrator Update
+// @Tags Administrators
+// @Accept  json
+// @Produce  json
+// @Param id path int ture "Administrator ID"
+// @Param data body administrators.AdministratorModel ture "Administrator Update"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admins/{id} [patch]
+func AdministratorUpdate(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var adminsRepository = /*administrators.AdminGroupFuncManagement*/ new(administrators.Administrator)
+	var administratorsRepository = new(administrators.Administrator)
 
-	idStr := context.Param("id")
-	id, err := strconv.Atoi(idStr)
+	// id 型態轉換
+	idParam := context.Param("id")
+	id, idError := strconv.Atoi(idParam)
 
-	if err != nil {
+	if idError != nil {
 		response.ResultFail(1002, "id Conversion failed")
+		return
 	}
 
-	if err := context.ShouldBind(&adminsRepository.Administrator); err != nil {
+	if err := context.ShouldBind(&administratorsRepository.AdministratorModel); err != nil {
 		response.ResultFail(1001, "data bind error")
 		return
 	}
 
-	if checkData := validate.VdeInfo(&adminsRepository.Administrator); checkData != nil {
+	if checkData := validate.VdeInfo(&administratorsRepository.AdministratorModel); checkData != nil {
 		response.ResultFail(200, checkData.Error())
 		return
 	}
 
-	if adminsRepository.Password != "" {
+	if administratorsRepository.Password != "" {
 		// 密碼加密
-		hashPassword, err := utils.HashPassword(adminsRepository.Password)
+		hashPassword, err := utils.HashPassword(administratorsRepository.Password)
 		if err != nil {
 			response.ResultFail(200, "HashPassword error")
 			return
 		}
 
-		adminsRepository.Password = hashPassword
+		administratorsRepository.Password = hashPassword
 	}
 
-	adminsRepository.AdministratorUpdate(id)
+	resultError := administratorsRepository.AdministratorUpdate(id)
+
+	if resultError != nil {
+		response.ResultFail(11111, resultError.Error())
+		return
+	}
 
 	fmt.Println("修改帳號管理", time.Since(s))
 	response.ResultOk(200, "Success", nil)
 }
 
-// AdminsCopy .
-func AdminsCopy(context *gin.Context) {
+// AdministratorCopy .
+func AdministratorCopy(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
@@ -205,21 +326,37 @@ func AdminsCopy(context *gin.Context) {
 	response.ResultOk(200, "Success", "Data")
 }
 
-// AdminsDelete .
-func AdminsDelete(context *gin.Context) {
+// AdministratorDelete .
+// @Summary Administrator Delete
+// @Description Delete Administrator Delete
+// @Tags Administrators
+// @Accept  json
+// @Produce  json
+// @Param id path int ture "Administrator ID"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admins/{id} [delete]
+func AdministratorDelete(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var adminsRepository = /*administrators.AdminGroupFuncManagement*/ new(administrators.Administrator)
+	var administratorsRepository = new(administrators.Administrator)
 
-	idStr := context.Param("id")
-	id, err := strconv.Atoi(idStr)
+	// id 型態轉換
+	idParam := context.Param("id")
+	id, idError := strconv.Atoi(idParam)
 
-	if err != nil {
+	if idError != nil {
 		response.ResultFail(1002, "id Conversion failed")
+		return
 	}
 
-	adminsRepository.AdministratorDelete(id)
+	resultError := administratorsRepository.AdministratorDelete(id)
+
+	if resultError != nil {
+		response.ResultFail(11111, resultError.Error())
+		return
+	}
 
 	fmt.Println("刪除帳號管理", time.Since(s))
 	response.ResultOk(200, "Success", nil)

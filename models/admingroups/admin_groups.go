@@ -18,4 +18,9 @@ type (
 		ID   int    `json:"id"`
 		Name string `json:"name"`
 	}
+
+	// Permission .
+	Permission struct {
+		Permission json.RawMessage `json:"permission"`
+	}
 )
