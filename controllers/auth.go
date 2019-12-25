@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gin-webcore/middleware"
+	"gin-webcore/repositories/admingroups"
 	"gin-webcore/repositories/administrators"
 	"gin-webcore/repositories/auth"
 	"gin-webcore/repositories/menusettings"
@@ -88,11 +89,17 @@ func Info(context *gin.Context) {
 	result := make(map[string]interface{})
 	response := response.Gin{Context: context}
 
-	var adminsRepository = /*administrators.AdminGroupFuncManagement*/ new(administrators.Administrator)
+	var adminsRepository = new(administrators.Administrator)
+	var adminGroupsRepository = new(admingroups.AdminGroup)
 
 	// 預設登入者是最高權限
 	data := adminsRepository.AdministratorFindByID(1)
-	res := adminsRepository.GetPermission(*data.GroupID)
+	res, resError := adminGroupsRepository.GetPermission(*data.GroupID)
+
+	if resError != nil {
+		response.ResultFail(14714, resError.Error())
+		return
+	}
 
 	permission := make(map[string]interface{})
 
