@@ -26,7 +26,7 @@ import (
 // @Param enable query  int false "Enable"
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
-// @Router /admin-accesses/ [get]
+// @Router /admin-accesses [get]
 func AdminAccessesList(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
@@ -65,14 +65,14 @@ func AdminAccessesList(context *gin.Context) {
 
 // AdminAccessCreate .
 // @Summary Admin Access Create
-// @Description GET Admin Access Create
+// @Description POST Admin Access Create
 // @Tags AdminAccesses
 // @Accept  json
 // @Produce  json
 // @Param data body adminaccesses.AdminAccessModel ture "Admin Access Create"
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
-// @Router /admin-accesses/ [post]
+// @Router /admin-accesses [post]
 func AdminAccessCreate(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
