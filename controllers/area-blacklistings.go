@@ -26,7 +26,7 @@ import (
 // @Param enable query  int false "Enable"
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
-// @Router /area-blacklistings/ [get]
+// @Router /area-blacklistings [get]
 func AreaBlacklistingsList(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
@@ -64,14 +64,14 @@ func AreaBlacklistingsList(context *gin.Context) {
 
 // AreaBlacklistingCreate .
 // @Summary Area Blacklisting Create
-// @Description GET Area Blacklisting Create
+// @Description POST Area Blacklisting Create
 // @Tags AreaBlacklistings
 // @Accept  json
 // @Produce  json
 // @Param data body areablacklistings.AreaBlacklistingModel ture "Area Blacklisting Create"
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
-// @Router /area-blacklistings/ [post]
+// @Router /area-blacklistings [post]
 func AreaBlacklistingCreate(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
@@ -137,7 +137,7 @@ func AreaBlacklistingView(context *gin.Context) {
 
 // AreaBlacklistingUpdate .
 // @Summary Area Blacklisting Update
-// @Description GET Area Blacklisting Update
+// @Description PATCH Area Blacklisting Update
 // @Tags AreaBlacklistings
 // @Accept  json
 // @Produce  json
@@ -192,7 +192,7 @@ func AreaBlacklistingCopy(context *gin.Context) {
 
 // AreaBlacklistingDelete .
 // @Summary Area Blacklisting Delete
-// @Description GET Area Blacklisting Delete
+// @Description DELETE Area Blacklisting Delete
 // @Tags AreaBlacklistings
 // @Accept  json
 // @Produce  json
