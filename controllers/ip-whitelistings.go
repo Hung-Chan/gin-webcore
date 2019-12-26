@@ -26,7 +26,7 @@ import (
 // @Param enable query  int false "Enable"
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
-// @Router /ip-whitelistings/ [get]
+// @Router /ip-whitelistings [get]
 func IPWhitelistingsList(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
@@ -64,14 +64,14 @@ func IPWhitelistingsList(context *gin.Context) {
 
 // IPWhitelistingCreate .
 // @Summary IP Whitelisting Create
-// @Description GET IP Whitelisting Create
+// @Description POST IP Whitelisting Create
 // @Tags IPWhitelistings
 // @Accept  json
 // @Produce  json
 // @Param data body ipwhitelistings.IPWhitelistingModel ture "IP Whitelisting Create"
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
-// @Router /ip-whitelistings/ [post]
+// @Router /ip-whitelistings [post]
 func IPWhitelistingCreate(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
