@@ -32,7 +32,7 @@ import (
 // @Param enable query int false "Enable"
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
-// @Router /admin-levels/ [get]
+// @Router /admins [get]
 func AdministratorsList(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
@@ -328,7 +328,7 @@ func AdministratorCopy(context *gin.Context) {
 
 // AdministratorDelete .
 // @Summary Administrator Delete
-// @Description Delete Administrator Delete
+// @Description DELETE Administrator Delete
 // @Tags Administrators
 // @Accept  json
 // @Produce  json
