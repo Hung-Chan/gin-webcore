@@ -26,7 +26,7 @@ import (
 // @Param enable query  int false "Enable"
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
-// @Router /admin-levels/ [get]
+// @Router /admin-levels [get]
 func AdminLevelsList(context *gin.Context) {
 	s := time.Now()
 
@@ -66,14 +66,14 @@ func AdminLevelsList(context *gin.Context) {
 
 // AdminLevelCreate .
 // @Summary Admin Level Create
-// @Description GET Admin Level Create
+// @Description POST Admin Level Create
 // @Tags AdminLevels
 // @Accept  json
 // @Produce  json
 // @Param data body adminlevels.AdminLevelModel ture "Admin Level Create"
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
-// @Router /admin-levels/ [post]
+// @Router /admin-levels [post]
 func AdminLevelCreate(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
@@ -142,7 +142,7 @@ func AdminLevelView(context *gin.Context) {
 
 // AdminLevelUpdate .
 // @Summary Admin Level Update
-// @Description GET Admin Level Update
+// @Description PATCH Admin Level Update
 // @Tags AdminLevels
 // @Accept  json
 // @Produce  json
@@ -212,7 +212,7 @@ func AdminLevelCopy(context *gin.Context) {
 
 // AdminLevelDelete .
 // @Summary Admin Level Delete
-// @Description GET Admin Level Delete
+// @Description DELETE Admin Level Delete
 // @Tags AdminLevels
 // @Accept  json
 // @Produce  json
