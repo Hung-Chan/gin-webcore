@@ -26,7 +26,7 @@ import (
 // @Param enable query  int false "Enable"
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
-// @Router /menu-groups/ [get]
+// @Router /menu-groups [get]
 func MenuGroupsList(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
@@ -66,14 +66,14 @@ func MenuGroupsList(context *gin.Context) {
 
 // MenuGroupCreate .
 // @Summary Menu Group Create
-// @Description GET Menu Group Create
+// @Description POST Menu Group Create
 // @Tags MenuGroups
 // @Accept  json
 // @Produce  json
 // @Param data body menugroups.MenuGroupModel ture "Menu Group Create"
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
-// @Router /menu-groups/ [post]
+// @Router /menu-groups [post]
 func MenuGroupCreate(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
