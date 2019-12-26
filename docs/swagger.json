@@ -232,9 +232,9 @@
                 }
             }
         },
-        "/admin-levels/": {
+        "/admin-groups": {
             "get": {
-                "description": "GET Administrators List",
+                "description": "GET Admin Groups List",
                 "consumes": [
                     "application/json"
                 ],
@@ -242,9 +242,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Administrators"
+                    "AdminGroups"
                 ],
-                "summary": "Administrators List",
+                "summary": "Admin Groups List",
                 "parameters": [
                     {
                         "type": "integer",
@@ -271,27 +271,263 @@
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "description": "Level",
-                        "name": "level",
+                        "type": "string",
+                        "description": "Name",
+                        "name": "name",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Group",
-                        "name": "group",
+                        "description": "Enable",
+                        "name": "enable",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin-groups/": {
+            "post": {
+                "description": "POST Admin Group Create",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminGroups"
+                ],
+                "summary": "Admin Group Create",
+                "parameters": [
+                    {
+                        "description": "Admin Group Create",
+                        "name": "data",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/admingroups.AdminGroupModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin-groups/permission": {
+            "get": {
+                "description": "GET Admin Groups Permission",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminGroups"
+                ],
+                "summary": "Admin Groups Permission",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin-groups/view/{id}": {
+            "get": {
+                "description": "GET Admin Group View",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminGroups"
+                ],
+                "summary": "Admin Group View",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Admin Group ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin-groups/{id}": {
+            "delete": {
+                "description": "DELETE Admin Group Delete",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminGroups"
+                ],
+                "summary": "Admin Group Delete",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Admin Group ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "PATCH Admin Group Update",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminGroups"
+                ],
+                "summary": "Admin Group Update",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Admin Group ID",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Admin Group Update",
+                        "name": "data",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/admingroups.AdminGroupModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin-levels/": {
+            "get": {
+                "description": "GET Admin Levels List",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AdminLevels"
+                ],
+                "summary": "Admin Levels List",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "NameItem",
-                        "name": "nameItem",
+                        "description": "SortColumn",
+                        "name": "sortColumn",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "AccountOrName",
-                        "name": "accountOrName",
+                        "description": "SortDirection",
+                        "name": "sortDirection",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Name",
+                        "name": "name",
                         "in": "query"
                     },
                     {
@@ -1721,6 +1957,28 @@
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string",
+                    "example": "test"
+                }
+            }
+        },
+        "admingroups.AdminGroupModel": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "enable": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "test"
+                },
+                "permission": {
+                    "type": "string"
+                },
+                "remark": {
                     "type": "string",
                     "example": "test"
                 }

@@ -10,7 +10,7 @@ type (
 	// AdminGroup .
 	AdminGroup struct {
 		models.IDInfo
-		admingroups.AdminGroup
+		admingroups.AdminGroupModel
 	}
 
 	// AdminGroups .
@@ -18,11 +18,6 @@ type (
 
 	// AdminGroupOptions .
 	AdminGroupOptions []admingroups.AdminGroupOption
-
-	// AdminGroupFuncManagement .
-	AdminGroupFuncManagement interface {
-		AdmingroupCreate()
-	}
 )
 
 var (
@@ -31,49 +26,71 @@ var (
 	TableName = "admin_groups"
 )
 
-// NewAdminGroupAPI .
-func NewAdminGroupAPI() AdminGroupFuncManagement {
-	return &AdminGroup{}
-}
-
 // AdminGroupsList .
-func (adminGroup AdminGroup) AdminGroupsList(page int, limit int, sortColumn string, sortDirection string, name string, enable int) AdminGroups {
+func (adminGroup AdminGroup) AdminGroupsList(page int, limit int, sortColumn string, sortDirection string, name *string, enable *int) (*AdminGroups, error) {
 	var adminGroups AdminGroups
 
 	res := db.Debug().Table(TableName)
 
-	if name != "" {
-		res = res.Where("name LIKE ?", "%"+name+"%")
+	if name != nil {
+		res = res.Where("name LIKE ?", "%"+*name+"%")
 	}
 
-	if enable != -1 {
+	if enable != nil {
 		res = res.Where("enable = ?", enable)
 	}
 
-	res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&adminGroups)
+	listError := res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&adminGroups).Error
 
-	return adminGroups
+	if listError != nil {
+		return nil, listError
+	}
+
+	return &adminGroups, nil
 }
 
 // AdmingroupCreate .
-func (adminGroup AdminGroup) AdmingroupCreate() {
-	db.Debug().Table(TableName).Create(&adminGroup)
+func (adminGroup AdminGroup) AdmingroupCreate() error {
+	createError := db.Debug().Table(TableName).Create(&adminGroup).Error
+
+	if createError != nil {
+		return createError
+	}
+
+	return nil
 }
 
 // AdmingroupView .
-func (adminGroup AdminGroup) AdmingroupView(id int) interface{} {
-	db.Debug().Table(TableName).Where("id = ? ", id).First(&adminGroup.AdminGroup)
-	return adminGroup.AdminGroup
+func (adminGroup AdminGroup) AdmingroupView(id int) (*admingroups.AdminGroupModel, error) {
+	viewError := db.Debug().Table(TableName).Where("id = ? ", id).First(&adminGroup.AdminGroupModel).Error
+
+	if viewError != nil {
+		return nil, viewError
+	}
+
+	return &adminGroup.AdminGroupModel, nil
 }
 
 // AdmingroupUpdate .
-func (adminGroup AdminGroup) AdmingroupUpdate(id int) {
-	db.Debug().Model(adminGroup).Where("id = ? ", id).Update(&adminGroup.AdminGroup)
+func (adminGroup AdminGroup) AdmingroupUpdate(id int) error {
+	updateError := db.Debug().Model(adminGroup).Where("id = ? ", id).Update(&adminGroup.AdminGroupModel).Error
+
+	if updateError != nil {
+		return updateError
+	}
+
+	return nil
 }
 
 // AdmingroupDelete .
-func (adminGroup AdminGroup) AdmingroupDelete(id int) {
-	db.Debug().Table(TableName).Where("id = ? ", id).Delete(&adminGroup)
+func (adminGroup AdminGroup) AdmingroupDelete(id int) error {
+	deleteError := db.Debug().Table(TableName).Where("id = ? ", id).Delete(&adminGroup).Error
+
+	if deleteError != nil {
+		return deleteError
+	}
+
+	return nil
 }
 
 // Total .
@@ -99,14 +116,14 @@ func (adminGroup AdminGroup) AdminGroupOption() (*AdminGroupOptions, error) {
 }
 
 // NewAdmingroupView .
-func (adminGroup AdminGroup) NewAdmingroupView(id int) (*admingroups.AdminGroup, error) {
-	newView := db.Debug().Table(TableName).Where("id = ? ", id).First(&adminGroup.AdminGroup).Error
+func (adminGroup AdminGroup) NewAdmingroupView(id int) (*admingroups.AdminGroupModel, error) {
+	newView := db.Debug().Table(TableName).Where("id = ? ", id).First(&adminGroup.AdminGroupModel).Error
 
 	if newView != nil {
 		return nil, newView
 	}
 
-	return &adminGroup.AdminGroup, nil
+	return &adminGroup.AdminGroupModel, nil
 }
 
 // GetPermission .

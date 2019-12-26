@@ -16,15 +16,27 @@ import (
 )
 
 // AdminGroupsList .
+// @Summary Admin Groups List
+// @Description GET Admin Groups List
+// @Tags AdminGroups
+// @Accept  json
+// @Produce  json
+// @Param page query  int ture "Page"
+// @Param limit query  int ture "Limit"
+// @Param sortColumn query  string ture "SortColumn"
+// @Param sortDirection query  string ture "SortDirection"
+// @Param name query  string false "Name"
+// @Param enable query  int false "Enable"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admin-groups [get]
 func AdminGroupsList(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
 	result := make(map[string]interface{})
-	queryModel := models.QueryModel{
-		Name:   "",
-		Enable: -1,
-	}
+
+	queryModel := models.NewQueryModel()
 
 	if err := context.ShouldBind(&queryModel); err != nil {
 		response.ResultFail(1001, "data bind error")
@@ -38,124 +50,195 @@ func AdminGroupsList(context *gin.Context) {
 	name := queryModel.Name
 	enable := queryModel.Enable
 
-	var adminGroupRepository = /*admingroups.AdminGroupFuncManagement*/ new(admingroups.AdminGroup)
+	var adminGroupsRepository = new(admingroups.AdminGroup)
 
-	data := adminGroupRepository.AdminGroupsList(page, limit, sortColumn, sortDirection, name, enable)
+	data, err := adminGroupsRepository.AdminGroupsList(page, limit, sortColumn, sortDirection, name, enable)
+
+	if err != nil {
+		response.ResultFail(12321, err.Error())
+		return
+	}
 
 	result["list"] = data
-	result["total"] = adminGroupRepository.Total()
+	result["total"] = adminGroupsRepository.Total()
 
 	fmt.Println("列表群組", time.Since(s))
 	response.ResultOk(200, "Success", result)
 }
 
 // AdminGroupsPermission .
+// @Summary Admin Groups Permission
+// @Description GET Admin Groups Permission
+// @Tags AdminGroups
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admin-groups/permission [get]
 func AdminGroupsPermission(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var menuSettingRepository = new(menusettings.MenuSetting)
-	var adminAccessRepository = new(adminaccesses.AdminAccess)
+	var menuSettingsRepository = new(menusettings.MenuSetting)
+	var adminAccessesRepository = new(adminaccesses.AdminAccess)
 
-	result := menuSettingRepository.GetPermission()
+	// 取得 MenuSettings
+	resultPermission, resultPermissionError := menuSettingsRepository.GetPermission()
 
-	access := adminAccessRepository.GetAccess()
-	fmt.Println(access)
+	if resultPermissionError != nil {
+		response.ResultFail(12321, resultPermissionError.Error())
+		return
+	}
+
+	access, accessError := adminAccessesRepository.GetAccess()
+
+	if accessError != nil {
+		response.ResultFail(12321, accessError.Error())
+		return
+	}
 
 	accessToArray := make(map[string]string)
 
-	for _, value := range access {
+	for _, value := range *access {
 		accessToArray[value.Code] = value.Name
 	}
-	fmt.Println(accessToArray)
 
-	for index, _ := range result {
+	for index := range resultPermission {
 		accessToJSON, err := json.Marshal(accessToArray)
+		fmt.Println(accessToJSON)
 		if err != nil {
 			response.ResultFail(200, "Error")
+			return
 		}
-		result[index].Access = accessToJSON
+		resultPermission[index].Access = accessToJSON
 	}
 
 	fmt.Println("取得權限列表", time.Since(s))
-	response.ResultOk(200, "Success", result)
+	response.ResultOk(200, "Success", resultPermission)
 }
 
-// AdminGroupsCreate .
-func AdminGroupsCreate(context *gin.Context) {
+// AdminGroupCreate .
+// @Summary Admin Group Create
+// @Description POST Admin Group Create
+// @Tags AdminGroups
+// @Accept  json
+// @Produce  json
+// @Param data body admingroups.AdminGroupModel ture "Admin Group Create"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admin-groups [post]
+func AdminGroupCreate(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var adminGroupRepository = /*admingroups.AdminGroupFuncManagement*/ new(admingroups.AdminGroup)
+	var adminGroupsRepository = new(admingroups.AdminGroup)
 
-	if err := context.ShouldBind(&adminGroupRepository.AdminGroup); err != nil {
+	if err := context.ShouldBind(&adminGroupsRepository.AdminGroupModel); err != nil {
 		response.ResultFail(1001, "data bind error")
 		return
 	}
 
-	if checkData := validate.VdeInfo(&adminGroupRepository.AdminGroup); checkData != nil {
+	if checkData := validate.VdeInfo(&adminGroupsRepository.AdminGroupModel); checkData != nil {
 		response.ResultFail(200, checkData.Error())
 		return
 	}
 
-	adminGroupRepository.AdmingroupCreate()
+	resultError := adminGroupsRepository.AdmingroupCreate()
+
+	if resultError != nil {
+		response.ResultFail(12321, resultError.Error())
+		return
+	}
 
 	fmt.Println("新增群組", time.Since(s))
 	response.ResultOk(200, "Success", nil)
 }
 
-// AdminGroupsView .
-func AdminGroupsView(context *gin.Context) {
+// AdminGroupView .
+// @Summary Admin Group View
+// @Description GET Admin Group View
+// @Tags AdminGroups
+// @Accept  json
+// @Produce  json
+// @Param id path int ture "Admin Group ID"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admin-groups/view/{id} [get]
+func AdminGroupView(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var adminGroupRepository = /*admingroups.AdminGroupFuncManagement*/ new(admingroups.AdminGroup)
+	var adminGroupsRepository = new(admingroups.AdminGroup)
 
-	idStr := context.Param("id")
-	id, err := strconv.Atoi(idStr)
+	// id 型態轉換
+	idParam := context.Param("id")
+	id, idError := strconv.Atoi(idParam)
 
-	if err != nil {
+	if idError != nil {
 		response.ResultFail(1002, "id Conversion failed")
+		return
 	}
 
-	result := adminGroupRepository.AdmingroupView(id)
+	result, resultError := adminGroupsRepository.AdmingroupView(id)
+
+	if resultError != nil {
+		response.ResultFail(12321, resultError.Error())
+		return
+	}
 
 	fmt.Println("檢視群組", time.Since(s))
 	response.ResultOk(200, "Success", result)
 }
 
-// AdminGroupsUpdate .
-func AdminGroupsUpdate(context *gin.Context) {
+// AdminGroupUpdate .
+// @Summary Admin Group Update
+// @Description PATCH Admin Group Update
+// @Tags AdminGroups
+// @Accept  json
+// @Produce  json
+// @Param id path int ture "Admin Group ID"
+// @Param data body admingroups.AdminGroupModel ture "Admin Group Update"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admin-groups/{id} [patch]
+func AdminGroupUpdate(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var adminGroupRepository = /*admingroups.AdminGroupFuncManagement*/ new(admingroups.AdminGroup)
+	var adminGroupsRepository = new(admingroups.AdminGroup)
 
-	idStr := context.Param("id")
-	id, err := strconv.Atoi(idStr)
+	// id 型態轉換
+	idParam := context.Param("id")
+	id, idError := strconv.Atoi(idParam)
 
-	if err != nil {
+	if idError != nil {
 		response.ResultFail(1002, "id Conversion failed")
+		return
 	}
 
-	if err := context.ShouldBind(&adminGroupRepository.AdminGroup); err != nil {
+	if err := context.ShouldBind(&adminGroupsRepository.AdminGroupModel); err != nil {
 		response.ResultFail(1001, "data bind error")
 		return
 	}
 
-	if checkData := validate.VdeInfo(&adminGroupRepository.AdminGroup); checkData != nil {
+	if checkData := validate.VdeInfo(&adminGroupsRepository.AdminGroupModel); checkData != nil {
 		response.ResultFail(200, checkData.Error())
 		return
 	}
 
-	adminGroupRepository.AdmingroupUpdate(id)
+	resultError := adminGroupsRepository.AdmingroupUpdate(id)
+
+	if resultError != nil {
+		response.ResultFail(12321, resultError.Error())
+		return
+	}
 
 	fmt.Println("修改群組", time.Since(s))
 	response.ResultOk(200, "Success", nil)
 }
 
-// AdminGroupsCopy .
-func AdminGroupsCopy(context *gin.Context) {
+// AdminGroupCopy .
+func AdminGroupCopy(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
@@ -163,21 +246,37 @@ func AdminGroupsCopy(context *gin.Context) {
 	response.ResultOk(200, "Success", "Data")
 }
 
-// AdminGroupsDelete .
-func AdminGroupsDelete(context *gin.Context) {
+// AdminGroupDelete .
+// @Summary Admin Group Delete
+// @Description DELETE Admin Group Delete
+// @Tags AdminGroups
+// @Accept  json
+// @Produce  json
+// @Param id path int ture "Admin Group ID"
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /admin-groups/{id} [delete]
+func AdminGroupDelete(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var adminGroupRepository = /*admingroups.AdminGroupFuncManagement*/ new(admingroups.AdminGroup)
+	var adminGroupsRepository = new(admingroups.AdminGroup)
 
-	idStr := context.Param("id")
-	id, err := strconv.Atoi(idStr)
+	// id 型態轉換
+	idParam := context.Param("id")
+	id, idError := strconv.Atoi(idParam)
 
-	if err != nil {
+	if idError != nil {
 		response.ResultFail(1002, "id Conversion failed")
+		return
 	}
 
-	adminGroupRepository.AdmingroupDelete(id)
+	resultError := adminGroupsRepository.AdmingroupDelete(id)
+
+	if resultError != nil {
+		response.ResultFail(12321, resultError.Error())
+		return
+	}
 
 	fmt.Println("刪除群組", time.Since(s))
 	response.ResultOk(200, "Success", nil)

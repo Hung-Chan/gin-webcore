@@ -13,6 +13,21 @@ definitions:
     - code
     - name
     type: object
+  admingroups.AdminGroupModel:
+    properties:
+      enable:
+        type: integer
+      name:
+        example: test
+        type: string
+      permission:
+        type: string
+      remark:
+        example: test
+        type: string
+    required:
+    - name
+    type: object
   administrators.AdministratorModel:
     properties:
       account:
@@ -279,11 +294,11 @@ paths:
       summary: Admin Access View
       tags:
       - AdminAccesses
-  /admin-levels/:
+  /admin-groups:
     get:
       consumes:
       - application/json
-      description: GET Administrators List
+      description: GET Admin Groups List
       parameters:
       - description: Page
         in: query
@@ -301,21 +316,9 @@ paths:
         in: query
         name: sortDirection
         type: string
-      - description: Level
+      - description: Name
         in: query
-        name: level
-        type: integer
-      - description: Group
-        in: query
-        name: group
-        type: integer
-      - description: NameItem
-        in: query
-        name: nameItem
-        type: string
-      - description: AccountOrName
-        in: query
-        name: accountOrName
+        name: name
         type: string
       - description: Enable
         in: query
@@ -332,9 +335,175 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/response.response'
-      summary: Administrators List
+      summary: Admin Groups List
       tags:
-      - Administrators
+      - AdminGroups
+  /admin-groups/:
+    post:
+      consumes:
+      - application/json
+      description: POST Admin Group Create
+      parameters:
+      - description: Admin Group Create
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/admingroups.AdminGroupModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Group Create
+      tags:
+      - AdminGroups
+  /admin-groups/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: DELETE Admin Group Delete
+      parameters:
+      - description: Admin Group ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Group Delete
+      tags:
+      - AdminGroups
+    patch:
+      consumes:
+      - application/json
+      description: PATCH Admin Group Update
+      parameters:
+      - description: Admin Group ID
+        in: path
+        name: id
+        type: integer
+      - description: Admin Group Update
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/admingroups.AdminGroupModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Group Update
+      tags:
+      - AdminGroups
+  /admin-groups/permission:
+    get:
+      consumes:
+      - application/json
+      description: GET Admin Groups Permission
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Groups Permission
+      tags:
+      - AdminGroups
+  /admin-groups/view/{id}:
+    get:
+      consumes:
+      - application/json
+      description: GET Admin Group View
+      parameters:
+      - description: Admin Group ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Group View
+      tags:
+      - AdminGroups
+  /admin-levels/:
+    get:
+      consumes:
+      - application/json
+      description: GET Admin Levels List
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: SortColumn
+        in: query
+        name: sortColumn
+        type: string
+      - description: SortDirection
+        in: query
+        name: sortDirection
+        type: string
+      - description: Name
+        in: query
+        name: name
+        type: string
+      - description: Enable
+        in: query
+        name: enable
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Admin Levels List
+      tags:
+      - AdminLevels
     post:
       consumes:
       - application/json

@@ -5,11 +5,11 @@ import (
 )
 
 type (
-	// AdminGroup .
-	AdminGroup struct {
-		Name       string          `json:"name" validate:"required"`
+	// AdminGroupModel .
+	AdminGroupModel struct {
+		Name       string          `json:"name" validate:"required" example:"test"`
 		Permission json.RawMessage `json:"permission"`
-		Remark     string          `json:"remark"`
+		Remark     string          `json:"remark" example:"test"`
 		Enable     *int            `json:"enable"`
 	}
 

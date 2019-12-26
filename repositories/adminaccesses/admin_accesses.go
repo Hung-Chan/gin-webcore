@@ -102,10 +102,14 @@ func (adminAccess AdminAccess) Total() int {
 }
 
 // GetAccess .
-func (adminAccess AdminAccess) GetAccess() AdminAccessesOption {
+func (adminAccess AdminAccess) GetAccess() (*AdminAccessesOption, error) {
 	var adminAccessesOption AdminAccessesOption
 
-	db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&adminAccessesOption)
+	optionError := db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&adminAccessesOption).Error
 
-	return adminAccessesOption
+	if optionError != nil {
+		return nil, optionError
+	}
+
+	return &adminAccessesOption, nil
 }

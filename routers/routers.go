@@ -36,11 +36,11 @@ func InitRouter() *gin.Engine {
 		adminGroups.GET("/permission", controllers.AdminGroupsPermission)
 
 		// 操作api (新增、檢視、修改、複製、刪除)
-		adminGroups.POST("", controllers.AdminGroupsCreate)
-		adminGroups.GET("/view/:id", controllers.AdminGroupsView)
-		adminGroups.PATCH("/:id", controllers.AdminGroupsUpdate)
-		adminGroups.PUT("", controllers.AdminGroupsCopy)
-		adminGroups.DELETE("/:id", controllers.AdminGroupsDelete)
+		adminGroups.POST("", controllers.AdminGroupCreate)
+		adminGroups.GET("/view/:id", controllers.AdminGroupView)
+		adminGroups.PATCH("/:id", controllers.AdminGroupUpdate)
+		adminGroups.PUT("", controllers.AdminGroupCopy)
+		adminGroups.DELETE("/:id", controllers.AdminGroupDelete)
 	}
 
 	// 層級管理
