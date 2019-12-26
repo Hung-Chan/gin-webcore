@@ -26,7 +26,7 @@ import (
 // @Param enable query  int false "Enable"
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
-// @Router /ip-subnet-whitelistings/ [get]
+// @Router /ip-subnet-whitelistings [get]
 func IPSubnetWhitelistingsList(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
@@ -64,14 +64,14 @@ func IPSubnetWhitelistingsList(context *gin.Context) {
 
 // IPSubnetWhitelistingCreate .
 // @Summary IP Subnet Whitelisting Create
-// @Description GET IP Subnet Whitelisting Create
+// @Description POST IP Subnet Whitelisting Create
 // @Tags IPSubnetWhitelistings
 // @Accept  json
 // @Produce  json
 // @Param data body ipsubnetwhitelistings.IPSubnetWhitelistingModel ture "IP Subnet Whitelisting Create"
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
-// @Router /ip-subnet-whitelistings/ [post]
+// @Router /ip-subnet-whitelistings [post]
 func IPSubnetWhitelistingCreate(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
