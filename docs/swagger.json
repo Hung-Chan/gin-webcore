@@ -9,7 +9,7 @@
     },
     "host": "localhost:1002",
     "paths": {
-        "/admin-accesses/": {
+        "/admin-accesses": {
             "get": {
                 "description": "GET Admin Access List",
                 "consumes": [
@@ -76,7 +76,7 @@
                 }
             },
             "post": {
-                "description": "GET Admin Access Create",
+                "description": "POST Admin Access Create",
                 "consumes": [
                     "application/json"
                 ],
@@ -297,9 +297,7 @@
                         }
                     }
                 }
-            }
-        },
-        "/admin-groups/": {
+            },
             "post": {
                 "description": "POST Admin Group Create",
                 "consumes": [
@@ -486,7 +484,7 @@
                 }
             }
         },
-        "/admin-levels/": {
+        "/admin-levels": {
             "get": {
                 "description": "GET Admin Levels List",
                 "consumes": [
@@ -553,7 +551,7 @@
                 }
             },
             "post": {
-                "description": "GET Admin Level Create",
+                "description": "POST Admin Level Create",
                 "consumes": [
                     "application/json"
                 ],
@@ -628,7 +626,7 @@
                 }
             },
             "delete": {
-                "description": "GET Admin Level Delete",
+                "description": "DELETE Admin Level Delete",
                 "consumes": [
                     "application/json"
                 ],
@@ -663,7 +661,7 @@
                 }
             },
             "patch": {
-                "description": "GET Admin Level Update",
+                "description": "PATCH Admin Level Update",
                 "consumes": [
                     "application/json"
                 ],
@@ -689,6 +687,91 @@
                             "type": "object",
                             "$ref": "#/definitions/adminlevels.AdminLevelModel"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admins": {
+            "get": {
+                "description": "GET Administrators List",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Administrators"
+                ],
+                "summary": "Administrators List",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "SortColumn",
+                        "name": "sortColumn",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "SortDirection",
+                        "name": "sortDirection",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Level",
+                        "name": "level",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Group",
+                        "name": "group",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "NameItem",
+                        "name": "nameItem",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "AccountOrName",
+                        "name": "accountOrName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Enable",
+                        "name": "enable",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -871,7 +954,7 @@
                 }
             },
             "delete": {
-                "description": "Delete Administrator Delete",
+                "description": "DELETE Administrator Delete",
                 "consumes": [
                     "application/json"
                 ],
@@ -950,7 +1033,7 @@
                 }
             }
         },
-        "/area-blacklistings/": {
+        "/area-blacklistings": {
             "get": {
                 "description": "GET Area Blacklistings List",
                 "consumes": [
@@ -1017,7 +1100,7 @@
                 }
             },
             "post": {
-                "description": "GET Area Blacklisting Create",
+                "description": "POST Area Blacklisting Create",
                 "consumes": [
                     "application/json"
                 ],
@@ -1094,7 +1177,7 @@
         },
         "/area-blacklistings/{id}": {
             "delete": {
-                "description": "GET Area Blacklisting Delete",
+                "description": "DELETE Area Blacklisting Delete",
                 "consumes": [
                     "application/json"
                 ],
@@ -1129,7 +1212,7 @@
                 }
             },
             "patch": {
-                "description": "GET Area Blacklisting Update",
+                "description": "PATCH Area Blacklisting Update",
                 "consumes": [
                     "application/json"
                 ],
@@ -1271,7 +1354,7 @@
                 }
             }
         },
-        "/ip-subnet-whitelistings/": {
+        "/ip-subnet-whitelistings": {
             "get": {
                 "description": "GET IP Subnet Whitelisting List",
                 "consumes": [
@@ -1338,7 +1421,7 @@
                 }
             },
             "post": {
-                "description": "GET IP Subnet Whitelisting Create",
+                "description": "POST IP Subnet Whitelisting Create",
                 "consumes": [
                     "application/json"
                 ],
@@ -1494,7 +1577,7 @@
                 }
             }
         },
-        "/ip-whitelistings/": {
+        "/ip-whitelistings": {
             "get": {
                 "description": "GET IP Whitelisting List",
                 "consumes": [
@@ -1561,7 +1644,7 @@
                 }
             },
             "post": {
-                "description": "GET IP Whitelisting Create",
+                "description": "POST IP Whitelisting Create",
                 "consumes": [
                     "application/json"
                 ],
@@ -1717,7 +1800,7 @@
                 }
             }
         },
-        "/menu-groups/": {
+        "/menu-groups": {
             "get": {
                 "description": "GET Menu Groups List",
                 "consumes": [
@@ -1784,7 +1867,7 @@
                 }
             },
             "post": {
-                "description": "GET Menu Group Create",
+                "description": "POST Menu Group Create",
                 "consumes": [
                     "application/json"
                 ],

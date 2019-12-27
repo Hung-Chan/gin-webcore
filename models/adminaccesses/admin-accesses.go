@@ -7,4 +7,10 @@ type (
 		Code   string `json:"code" validate:"required" example:"test"`
 		Enable *int   `json:"enable"`
 	}
+
+	// AdminAccessOption .
+	AdminAccessOption struct {
+		ID   int    `json:"id"`
+		Code string `json:"code"`
+	}
 )

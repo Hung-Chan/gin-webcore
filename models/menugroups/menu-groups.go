@@ -7,4 +7,10 @@ type (
 		Enable *int   `json:"enable"`
 		Sort   int    `json:"sort"`
 	}
+
+	// MenuGroupOption .
+	MenuGroupOption struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	}
 )

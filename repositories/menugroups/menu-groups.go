@@ -17,6 +17,9 @@ type (
 
 	// MenuGroups .
 	MenuGroups []MenuGroup
+
+	// MenuGroupOptions .
+	MenuGroupOptions []menugroups.MenuGroupOption
 )
 
 // TableName Set .
@@ -128,4 +131,17 @@ func (menuGroup *MenuGroup) Total() int {
 	db.Debug().Table(TableName).Count(&total)
 
 	return total
+}
+
+// MenuGroupOptions .
+func (menuGroup *MenuGroup) MenuGroupOptions() (*MenuGroupOptions, error) {
+	var menuGroupOptions MenuGroupOptions
+
+	optionError := db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&menuGroupOptions).Error
+
+	if optionError != nil {
+		return nil, optionError
+	}
+
+	return &menuGroupOptions, nil
 }

@@ -148,7 +148,7 @@ info:
   title: Golang Gin-Webcore API
   version: "1.0"
 paths:
-  /admin-accesses/:
+  /admin-accesses:
     get:
       consumes:
       - application/json
@@ -195,7 +195,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: GET Admin Access Create
+      description: POST Admin Access Create
       parameters:
       - description: Admin Access Create
         in: body
@@ -338,7 +338,6 @@ paths:
       summary: Admin Groups List
       tags:
       - AdminGroups
-  /admin-groups/:
     post:
       consumes:
       - application/json
@@ -460,7 +459,7 @@ paths:
       summary: Admin Group View
       tags:
       - AdminGroups
-  /admin-levels/:
+  /admin-levels:
     get:
       consumes:
       - application/json
@@ -507,7 +506,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: GET Admin Level Create
+      description: POST Admin Level Create
       parameters:
       - description: Admin Level Create
         in: body
@@ -533,7 +532,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: GET Admin Level Delete
+      description: DELETE Admin Level Delete
       parameters:
       - description: Admin Level ID
         in: path
@@ -579,7 +578,7 @@ paths:
     patch:
       consumes:
       - application/json
-      description: GET Admin Level Update
+      description: PATCH Admin Level Update
       parameters:
       - description: Admin Level ID
         in: path
@@ -605,6 +604,62 @@ paths:
       summary: Admin Level Update
       tags:
       - AdminLevels
+  /admins:
+    get:
+      consumes:
+      - application/json
+      description: GET Administrators List
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: SortColumn
+        in: query
+        name: sortColumn
+        type: string
+      - description: SortDirection
+        in: query
+        name: sortDirection
+        type: string
+      - description: Level
+        in: query
+        name: level
+        type: integer
+      - description: Group
+        in: query
+        name: group
+        type: integer
+      - description: NameItem
+        in: query
+        name: nameItem
+        type: string
+      - description: AccountOrName
+        in: query
+        name: accountOrName
+        type: string
+      - description: Enable
+        in: query
+        name: enable
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Administrators List
+      tags:
+      - Administrators
   /admins/:
     post:
       consumes:
@@ -635,7 +690,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: Delete Administrator Delete
+      description: DELETE Administrator Delete
       parameters:
       - description: Administrator ID
         in: path
@@ -764,7 +819,7 @@ paths:
       summary: Administrator Levels Option
       tags:
       - Administrators
-  /area-blacklistings/:
+  /area-blacklistings:
     get:
       consumes:
       - application/json
@@ -811,7 +866,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: GET Area Blacklisting Create
+      description: POST Area Blacklisting Create
       parameters:
       - description: Area Blacklisting Create
         in: body
@@ -837,7 +892,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: GET Area Blacklisting Delete
+      description: DELETE Area Blacklisting Delete
       parameters:
       - description: Area Blacklisting ID
         in: path
@@ -860,7 +915,7 @@ paths:
     patch:
       consumes:
       - application/json
-      description: GET Area Blacklisting Update
+      description: PATCH Area Blacklisting Update
       parameters:
       - description: Area Blacklisting ID
         in: path
@@ -974,7 +1029,7 @@ paths:
       summary: Admin SidebarMenu
       tags:
       - Auth
-  /ip-subnet-whitelistings/:
+  /ip-subnet-whitelistings:
     get:
       consumes:
       - application/json
@@ -1021,7 +1076,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: GET IP Subnet Whitelisting Create
+      description: POST IP Subnet Whitelisting Create
       parameters:
       - description: IP Subnet Whitelisting Create
         in: body
@@ -1120,7 +1175,7 @@ paths:
       summary: IP Subnet Whitelisting View
       tags:
       - IPSubnetWhitelistings
-  /ip-whitelistings/:
+  /ip-whitelistings:
     get:
       consumes:
       - application/json
@@ -1167,7 +1222,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: GET IP Whitelisting Create
+      description: POST IP Whitelisting Create
       parameters:
       - description: IP Whitelisting Create
         in: body
@@ -1266,7 +1321,7 @@ paths:
       summary: IP Whitelisting View
       tags:
       - IPWhitelistings
-  /menu-groups/:
+  /menu-groups:
     get:
       consumes:
       - application/json
@@ -1313,7 +1368,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: GET Menu Group Create
+      description: POST Menu Group Create
       parameters:
       - description: Menu Group Create
         in: body

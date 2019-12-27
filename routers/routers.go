@@ -86,15 +86,15 @@ func InitRouter() *gin.Engine {
 	menuSettings := router.Group("menu-settings")
 	{
 		menuSettings.GET("", controllers.MenuSettingsList)
-		menuSettings.GET("/groups", controllers.MenuSettingsGroups)
-		menuSettings.GET("/accesses", controllers.MenuSettingsAccesses)
+		menuSettings.GET("/groups", controllers.MenuGroupsOption)
+		menuSettings.GET("/accesses", controllers.MenuAccessesOption)
 
 		// 操作api (新增、檢視、修改、複製、刪除)
-		menuSettings.POST("", controllers.MenuSettingsCreate)
-		menuSettings.GET("/view/:id", controllers.MenuSettingsView)
-		menuSettings.PATCH("/:id", controllers.MenuSettingsUpdate)
-		menuSettings.PUT("", controllers.MenuSettingsCopy)
-		menuSettings.DELETE("/:id", controllers.MenuSettingsDelete)
+		menuSettings.POST("", controllers.MenuSettingCreate)
+		menuSettings.GET("/view/:id", controllers.MenuSettingView)
+		menuSettings.PATCH("/:id", controllers.MenuSettingUpdate)
+		menuSettings.PUT("", controllers.MenuSettingCopy)
+		menuSettings.DELETE("/:id", controllers.MenuSettingDelete)
 		menuSettings.PATCH("", controllers.MenuSettingsSort)
 	}
 

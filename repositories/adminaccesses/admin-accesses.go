@@ -18,6 +18,9 @@ type (
 
 	// AdminAccessesOption .
 	AdminAccessesOption []adminaccesses.AdminAccessModel
+
+	// AdminAccessOptions .
+	AdminAccessOptions []adminaccesses.AdminAccessOption
 )
 
 var (
@@ -112,4 +115,17 @@ func (adminAccess AdminAccess) GetAccess() (*AdminAccessesOption, error) {
 	}
 
 	return &adminAccessesOption, nil
+}
+
+// AdminAccessesOption .
+func (adminAccess AdminAccess) AdminAccessesOption() (*AdminAccessOptions, error) {
+	var adminAccessOptions AdminAccessOptions
+
+	optionError := db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&adminAccessOptions).Error
+
+	if optionError != nil {
+		return nil, optionError
+	}
+
+	return &adminAccessOptions, nil
 }

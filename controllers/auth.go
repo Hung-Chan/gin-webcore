@@ -128,7 +128,7 @@ func SidebarMenu(context *gin.Context) {
 	s := time.Now()
 	response := response.Gin{Context: context}
 
-	var menusettingService menusettings.MenuSettingsManagement = new(menusettings.MenuSetting)
+	var menusettingService = new(menusettings.MenuSetting)
 
 	data := menusettingService.SidebarMenu()
 
