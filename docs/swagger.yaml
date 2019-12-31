@@ -131,6 +131,27 @@ definitions:
     required:
     - name
     type: object
+  menusettings.MenusettingModel:
+    properties:
+      access:
+        type: string
+      code:
+        type: string
+      enable:
+        type: integer
+      group_id:
+        type: integer
+      icolor:
+        type: string
+      icon:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: integer
+      sort:
+        type: integer
+    type: object
   response.response:
     properties:
       code:
@@ -1467,4 +1488,163 @@ paths:
       summary: Menu Group View
       tags:
       - MenuGroups
+  /menu-settings:
+    get:
+      consumes:
+      - application/json
+      description: GET Menu Settings List
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Menu Settings List
+      tags:
+      - MenuSettings
+    post:
+      consumes:
+      - application/json
+      description: POST Menu Setting Create
+      parameters:
+      - description: Menu Setting Create
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/menusettings.MenusettingModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Menu Setting Create
+      tags:
+      - MenuSettings
+  /menu-settings/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: DELETE Menu Setting Delete
+      parameters:
+      - description: Menu Setting ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Menu Setting Delete
+      tags:
+      - MenuSettings
+    patch:
+      consumes:
+      - application/json
+      description: PATCH Menu Setting Update
+      parameters:
+      - description: Menu Setting ID
+        in: path
+        name: id
+        type: integer
+      - description: Menu Setting Update
+        in: body
+        name: data
+        schema:
+          $ref: '#/definitions/menusettings.MenusettingModel'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Menu Setting Update
+      tags:
+      - MenuSettings
+  /menu-settings/accesses:
+    get:
+      consumes:
+      - application/json
+      description: GET Menu Accesses Option
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Menu Accesses Option
+      tags:
+      - MenuSettings
+  /menu-settings/groups:
+    get:
+      consumes:
+      - application/json
+      description: GET Menu Groups Option
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Menu Groups Option
+      tags:
+      - MenuSettings
+  /menu-settings/view/{id}:
+    get:
+      consumes:
+      - application/json
+      description: GET Menu Setting View
+      parameters:
+      - description: Menu Setting ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.response'
+      summary: Menu Setting View
+      tags:
+      - MenuSettings
 swagger: "2.0"

@@ -12,12 +12,18 @@ import (
 )
 
 // MenuSettingsList .
+// @Summary Menu Settings List
+// @Description GET Menu Settings List
+// @Tags MenuSettings
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /menu-settings [get]
 func MenuSettingsList(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var menuSettingsRepository = new(menusettings.MenuSetting)
-
-	result := make(map[string]interface{})
 
 	data, err := menuSettingsRepository.MenuSettingsList()
 
@@ -26,8 +32,24 @@ func MenuSettingsList(context *gin.Context) {
 		return
 	}
 
-	result["list"] = data
-	// result["total"] = menuSettingsRepository.Total()
+	var result []interface{}
+
+	for _, v := range *data {
+		var save = make(map[string]interface{})
+
+		save["id"] = *v.ID
+		save["group_name"] = v.MenuGroups.Name
+		save["name"] = v.Name
+		save["code"] = v.Code
+		save["icon"] = v.Icon
+		save["icolor"] = v.Icolor
+		save["code"] = v.Code
+		save["enable"] = v.Enable
+		save["updated_at"] = v.UpdatedAt
+		save["children"] = v.Children
+
+		result = append(result, save)
+	}
 
 	response.ResultOk(200, "Success", result)
 }

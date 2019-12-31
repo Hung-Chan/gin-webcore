@@ -2022,6 +2022,249 @@
                     }
                 }
             }
+        },
+        "/menu-settings": {
+            "get": {
+                "description": "GET Menu Settings List",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MenuSettings"
+                ],
+                "summary": "Menu Settings List",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "POST Menu Setting Create",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MenuSettings"
+                ],
+                "summary": "Menu Setting Create",
+                "parameters": [
+                    {
+                        "description": "Menu Setting Create",
+                        "name": "data",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/menusettings.MenusettingModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/menu-settings/accesses": {
+            "get": {
+                "description": "GET Menu Accesses Option",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MenuSettings"
+                ],
+                "summary": "Menu Accesses Option",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/menu-settings/groups": {
+            "get": {
+                "description": "GET Menu Groups Option",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MenuSettings"
+                ],
+                "summary": "Menu Groups Option",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/menu-settings/view/{id}": {
+            "get": {
+                "description": "GET Menu Setting View",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MenuSettings"
+                ],
+                "summary": "Menu Setting View",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Menu Setting ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/menu-settings/{id}": {
+            "delete": {
+                "description": "DELETE Menu Setting Delete",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MenuSettings"
+                ],
+                "summary": "Menu Setting Delete",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Menu Setting ID",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "PATCH Menu Setting Update",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MenuSettings"
+                ],
+                "summary": "Menu Setting Update",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Menu Setting ID",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Menu Setting Update",
+                        "name": "data",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/menusettings.MenusettingModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -2210,6 +2453,38 @@
                 "name": {
                     "type": "string",
                     "example": "test"
+                },
+                "sort": {
+                    "type": "integer"
+                }
+            }
+        },
+        "menusettings.MenusettingModel": {
+            "type": "object",
+            "properties": {
+                "access": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "enable": {
+                    "type": "integer"
+                },
+                "group_id": {
+                    "type": "integer"
+                },
+                "icolor": {
+                    "type": "string"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "integer"
                 },
                 "sort": {
                     "type": "integer"

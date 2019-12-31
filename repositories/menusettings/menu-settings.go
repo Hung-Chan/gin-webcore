@@ -65,6 +65,7 @@ func (menuSetting MenuSetting) MenuSettingsList() (*MenuSettings, error) {
 	if listError != nil {
 		return nil, listError
 	}
+
 	return &menuSettings, nil
 }
 
