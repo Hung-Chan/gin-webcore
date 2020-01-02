@@ -18,6 +18,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// AdminID Save ID .
+type AdminID struct {
+	ID int
+}
+
+// SetAdminID .
+func (adminID *AdminID) SetAdminID(id int) {
+	adminID.ID = id
+}
+
+// GetAdminID .
+func (adminID AdminID) GetAdminID() int {
+	return adminID.ID
+}
+
+var adminID AdminID
+
 // Login godoc
 // @Summary Admin Login
 // @Description Admin Login
@@ -78,6 +95,8 @@ func Login(context *gin.Context) {
 		response.ResultError(http.StatusBadRequest, "Token紀錄失敗")
 		return
 	}
+
+	adminID.SetAdminID(*adminInfo.ID)
 
 	result["accessToken"] = token
 	result["tokenType"] = "bearer"
