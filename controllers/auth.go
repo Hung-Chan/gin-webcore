@@ -135,13 +135,13 @@ func Info(context *gin.Context) {
 	// 取得登入者權限
 	res, resError := adminGroupsRepository.GetPermission(*data.GroupID)
 	if resError != nil {
-		response.ResultFail(http.StatusBadRequest, resError.Error())
+		response.ResultError(http.StatusBadRequest, resError.Error())
 		return
 	}
 
 	permission := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(res.Permission), &permission); err != nil {
-		response.ResultFail(http.StatusBadRequest, err.Error())
+		response.ResultError(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -149,7 +149,7 @@ func Info(context *gin.Context) {
 	result["enable"] = data.Enable
 	result["permissions"] = permission
 
-	response.ResultOk(200, "Success", result)
+	response.ResultSuccess(200, "Success", result)
 }
 
 // SidebarMenu godoc
