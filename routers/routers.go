@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"gin-webcore/middleware"
 	"gin-webcore/controllers"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +13,18 @@ import (
 func InitRouter() *gin.Engine {
 
 	router := gin.Default()
+
+	router.POST("/auth/login", controllers.Login)
+
+	router.Use(middleware.Jwt())
+	{
+		auth := router.Group("auth")
+		{
+			auth.GET("/info", controllers.Info)
+			auth.GET("/sidebarMenu", controllers.SidebarMenu)
+		}
+	}
+
 
 	// 帳號管理
 	admins := router.Group("admins")
@@ -96,13 +109,6 @@ func InitRouter() *gin.Engine {
 		menuSettings.PUT("", controllers.MenuSettingCopy)
 		menuSettings.DELETE("/:id", controllers.MenuSettingDelete)
 		menuSettings.PATCH("", controllers.MenuSettingsSort)
-	}
-
-	auth := router.Group("auth")
-	{
-		auth.POST("/login", controllers.Login)
-		auth.GET("/info", controllers.Info)
-		auth.GET("/sidebarMenu", controllers.SidebarMenu)
 	}
 
 	// IP白名單管理
