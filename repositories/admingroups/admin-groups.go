@@ -130,7 +130,10 @@ func (adminGroup AdminGroup) NewAdmingroupView(id int) (*admingroups.AdminGroupM
 func (adminGroup AdminGroup) GetPermission(id int) (*admingroups.Permission, error) {
 	var permission admingroups.Permission
 
-	permissionError := db.Debug().Table("admin_groups").Where("id = ?", id).Scan(&permission).Error
+	permissionError := db.Table(TableName).
+		Where("id = ?", id).
+		Scan(&permission).
+		Error
 
 	if permissionError != nil {
 		return nil, permissionError

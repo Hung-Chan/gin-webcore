@@ -114,26 +114,36 @@ func Login(context *gin.Context) {
 // @Failure 400 {object} response.response
 // @Router /auth/info [get]
 func Info(context *gin.Context) {
-	s := time.Now()
+
+	// result 存放回傳參數
 	result := make(map[string]interface{})
+
 	response := response.Gin{Context: context}
 
 	var adminsRepository = new(administrators.Administrator)
 	var adminGroupsRepository = new(admingroups.AdminGroup)
 
-	// 預設登入者是最高權限
-	data := adminsRepository.AdministratorFindByID(1)
-	res, resError := adminGroupsRepository.GetPermission(*data.GroupID)
+	// 取得登入者ID
+	id := adminID.GetAdminID()
 
+	// 取得登入者資料
+	data, dataError := adminsRepository.AdministratorFindByID(id)
+
+	if dataError != nil {
+		response.ResultError(http.StatusBadRequest, dataError.Error())
+		return
+	}
+
+	// 取得登入者權限
+	res, resError := adminGroupsRepository.GetPermission(*data.GroupID)
 	if resError != nil {
-		response.ResultFail(14714, resError.Error())
+		response.ResultFail(http.StatusBadRequest, resError.Error())
 		return
 	}
 
 	permission := make(map[string]interface{})
-
 	if err := json.Unmarshal([]byte(res.Permission), &permission); err != nil {
-		response.ResultFail(200, "Permission parse error")
+		response.ResultFail(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -141,7 +151,6 @@ func Info(context *gin.Context) {
 	result["enable"] = data.Enable
 	result["permissions"] = permission
 
-	fmt.Println("取得登入者資訊", time.Since(s))
 	response.ResultOk(200, "Success", result)
 }
 

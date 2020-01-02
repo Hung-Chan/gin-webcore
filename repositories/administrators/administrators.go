@@ -32,10 +32,19 @@ var (
 )
 
 // AdministratorFindByID .
-func (administrator Administrator) AdministratorFindByID(id int) administrators.AdministratorModel {
+func (administrator Administrator) AdministratorFindByID(id int) (*administrators.AdministratorModel, error) {
 
-	db.Debug().Table(TableName).Where("id = ?", id).Find(&administrator.AdministratorModel)
-	return administrator.AdministratorModel
+	err := db.Table(TableName).
+		Select([]string{"name", "group_id", "enable"}).
+		Where("id = ?", id).
+		Find(&administrator.AdministratorModel).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &administrator.AdministratorModel, nil
 }
 
 // AdministratorsList .
