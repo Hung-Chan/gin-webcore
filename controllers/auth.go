@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	// "gin-webcore/middleware"
@@ -13,7 +12,6 @@ import (
 	"gin-webcore/response"
 	"gin-webcore/utils"
 	"gin-webcore/validate"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -163,13 +161,17 @@ func Info(context *gin.Context) {
 // @Failure 400 {object} response.response
 // @Router /auth/sidebarMenu [get]
 func SidebarMenu(context *gin.Context) {
-	s := time.Now()
+
 	response := response.Gin{Context: context}
 
 	var menusettingService = new(menusettings.MenuSetting)
 
-	data := menusettingService.SidebarMenu()
+	result, resultError := menusettingService.SidebarMenu()
 
-	fmt.Println("取得選單資料", time.Since(s))
-	response.ResultOk(200, "Success", data)
+	if resultError != nil {
+		response.ResultError(http.StatusBadRequest, resultError.Error())
+		return
+	}
+
+	response.ResultSuccess(200, "Success", result)
 }

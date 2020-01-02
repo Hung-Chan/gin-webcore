@@ -32,12 +32,22 @@ var (
 )
 
 // SidebarMenu .
-func (menuSetting MenuSetting) SidebarMenu() MenuSettings {
+func (menuSetting MenuSetting) SidebarMenu() (*MenuSettings, error) {
 	var menuSettings MenuSettings
-	db.Debug().Table(TableName).Where("enable =? ", 1).Preload("Children", func(db *gorm.DB) *gorm.DB {
-		return db.Table(TableName).Select("*")
-	}).Find(&menuSettings)
-	return menuSettings
+
+	err := db.Table(TableName).
+		Where("enable =? ", 1).
+		Preload("Children", func(db *gorm.DB) *gorm.DB {
+			return db.Table(TableName).Select("*")
+		}).
+		Find(&menuSettings).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &menuSettings, nil
 }
 
 // GetPermission .
