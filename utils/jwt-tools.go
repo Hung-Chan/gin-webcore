@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -18,7 +20,7 @@ func GenerateToken(account string) (string, error) {
 	claims := Claims{
 		account,
 		jwt.StandardClaims{
-			ExpiresAt: 3600,
+			ExpiresAt: time.Now().Add(time.Minute * 60).Unix(),
 		},
 	}
 
@@ -35,7 +37,7 @@ func ParseToken(token string) (*Claims, error) {
 		return secret, nil
 	})
 
-	if tokenClaims != nil {
+	if tokenClaims != nil && err == nil {
 		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
 			return claims, nil
 		}

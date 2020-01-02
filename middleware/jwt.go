@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"gin-webcore/message"
 	"gin-webcore/response"
 	"gin-webcore/utils"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -13,26 +14,32 @@ import (
 func Jwt() gin.HandlerFunc {
 	return func(context *gin.Context) {
 
-		var code int = message.Success
+		var code int = http.StatusOK
+		var message string = "Success"
 
 		response := response.Gin{Context: context}
 		// token .
-		token := context.Query("token")
+		authorization := context.Request.Header.Get("Authorization")
 
-		if token != "" {
-			code = message.TokenEmptyString
+		token := strings.Fields(authorization)[1]
+
+		if token == "" {
+			code = http.StatusForbidden
+			message = "Token 遺失"
 		} else {
 			claims, err := utils.ParseToken(token)
 
 			if err != nil {
-				code = message.TokenParseError
+				code = http.StatusForbidden
+				message = "Token 錯誤"
 			} else if time.Now().Unix() > claims.ExpiresAt {
-				code = message.TokenTimeout
+				code = http.StatusForbidden
+				message = "Token 時效已過期"
 			}
 		}
 
-		if code != message.Success {
-			response.ResultError(code)
+		if code != 200 {
+			response.ResultError(http.StatusForbidden, message)
 
 			context.Abort()
 			return
