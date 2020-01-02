@@ -39,3 +39,14 @@ func (auth *Auth) UpdateToken(id int, token string) error {
 
 	return nil
 }
+
+// CleanToken .
+func (auth *Auth) CleanToken(id int) error {
+	err := db.Table(administrators.TableName).Where("id = ?", id).Update("token", "").Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

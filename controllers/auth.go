@@ -175,3 +175,30 @@ func SidebarMenu(context *gin.Context) {
 
 	response.ResultSuccess(200, "Success", result)
 }
+
+// Logout .
+// @Summary Admin Logout
+// @Description Post Logout
+// @Tags Auth
+// @Produce  json
+// @Success 200 {object} response.response
+// @Failure 400 {object} response.response
+// @Router /auth/logout [post]
+func Logout(context *gin.Context) {
+
+	response := response.Gin{Context: context}
+
+	// AuthRepository 調用
+	var authRepository = new(auth.Auth)
+
+	id := adminID.GetAdminID()
+
+	err := authRepository.CleanToken(id)
+
+	if err != nil {
+		response.ResultError(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	response.ResultSuccess(200, "Success", nil)
+}

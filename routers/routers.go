@@ -22,6 +22,7 @@ func InitRouter() *gin.Engine {
 		{
 			auth.GET("/info", controllers.Info)
 			auth.GET("/sidebarMenu", controllers.SidebarMenu)
+			auth.POST("/logout", controllers.Logout)
 		}
 	}
 
