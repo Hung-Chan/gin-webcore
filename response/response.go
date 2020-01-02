@@ -1,7 +1,6 @@
 package response
 
 import (
-	"gin-webcore/message"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -38,19 +37,19 @@ func (gin Gin) ResultFail(code int, message string) {
 }
 
 // Result .
-func (gin *Gin) Result(code int, data interface{}) {
-	gin.Context.JSON(http.StatusUnauthorized, response{
+func (gin *Gin) ResultSuccess(code int, message string, data interface{}) {
+	gin.Context.JSON(code, response{
 		Code:    code,
-		Message: message.ErrorMessage(code),
+		Message: message,
 		Data:    data,
 	})
 }
 
 // ResultError .
-func (gin *Gin) ResultError(code int) {
-	gin.Context.JSON(http.StatusUnauthorized, response{
+func (gin *Gin) ResultError(code int, message string) {
+	gin.Context.JSON(code, response{
 		Code:    code,
-		Message: message.ErrorMessage(code),
+		Message: message,
 		Data:    nil,
 	})
 }

@@ -7,27 +7,30 @@ import (
 	"gin-webcore/repositories/administrators"
 )
 
-// AuthRepository .
-type AuthRepository struct {
+// Auth struct .
+type Auth struct {
 	models.IDInfo
 	auth.Login
 }
 
 var db = database.DB
 
-// GetAccount .
-func (authRepository AuthRepository) GetAccount() (*AuthRepository, error) {
-	err := db.Debug().Table(administrators.TableName).Where("account = ?", authRepository.Account).Find(&authRepository).Error
+// GetAccount 登入帳號檢查使用 .
+func (auth Auth) GetAccount() (*Auth, error) {
+	err := db.Debug().Table(administrators.TableName).
+		Where("account = ?", auth.Account).
+		Where("enable = ?", 1).
+		Find(&auth).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &authRepository, nil
+	return &auth, nil
 }
 
 // UpdateToken .
-func (authRepository AuthRepository) UpdateToken(id int, token string) error {
+func (auth *Auth) UpdateToken(id int, token string) error {
 	err := db.Table(administrators.TableName).Where("id = ?", id).Update("token", token).Error
 
 	if err != nil {

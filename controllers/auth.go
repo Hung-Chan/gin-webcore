@@ -3,7 +3,9 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"gin-webcore/middleware"
+	"net/http"
+
+	// "gin-webcore/middleware"
 	"gin-webcore/repositories/admingroups"
 	"gin-webcore/repositories/administrators"
 	"gin-webcore/repositories/auth"
@@ -28,43 +30,52 @@ import (
 // @Failure 400 {object} response.response
 // @Router /auth/login [post]
 func Login(context *gin.Context) {
-	s := time.Now()
 
+	// result 存放回傳參數
 	result := make(map[string]interface{})
+
+	// reponse 調用 struct
 	response := response.Gin{Context: context}
 
-	var loginRepository = new(auth.AuthRepository)
+	// AuthRepository 調用
+	var authRepository = new(auth.Auth)
 
-	if bindError := context.ShouldBind(&loginRepository.Login); bindError != nil {
-		response.ResultFail(99999, "Data bind error")
+	// 登入資料綁定
+	if bindError := context.ShouldBind(&authRepository.Login); bindError != nil {
+		response.ResultError(http.StatusBadRequest, bindError.Error())
 		return
 	}
 
-	if checkData := validate.VdeInfo(&loginRepository.Login); checkData != nil {
-		response.ResultFail(200, checkData.Error())
+	// 登入資料驗證
+	if checkData := validate.VdeInfo(&authRepository.Login); checkData != nil {
+		response.ResultError(http.StatusBadRequest, checkData.Error())
 		return
 	}
 
-	adminInfo, adminInfoError := loginRepository.GetAccount()
+	// 檢查帳號
+	adminInfo, adminInfoError := authRepository.GetAccount()
 	if adminInfoError != nil {
-		response.ResultFail(10007, "account not found")
+		response.ResultError(http.StatusBadRequest, "查無此帳號")
 		return
 	}
 
-	adminCheckPassword := utils.CheckHashPassword(adminInfo.Password, loginRepository.Password)
+	// 密碼比對
+	adminCheckPassword := utils.CheckHashPassword(adminInfo.Password, authRepository.Password)
 	if adminCheckPassword == false {
-		response.ResultFail(10008, "Password error")
+		response.ResultError(http.StatusBadRequest, "密碼錯誤")
 		return
 	}
 
-	token, tokenError := middleware.GenerateToken(adminInfo.Account)
+	// 產生Token
+	token, tokenError := utils.GenerateToken(adminInfo.Account)
 	if tokenError != nil {
-		response.ResultFail(10011, "Token error")
+		response.ResultError(http.StatusBadRequest, "Token錯誤")
 		return
 	}
 
-	if updateTokenError := loginRepository.UpdateToken(*adminInfo.ID, token); updateTokenError != nil {
-		response.ResultFail(10012, "Token write error")
+	// 紀錄Token
+	if updateTokenError := authRepository.UpdateToken(*adminInfo.ID, token); updateTokenError != nil {
+		response.ResultError(http.StatusBadRequest, "Token紀錄失敗")
 		return
 	}
 
@@ -72,8 +83,7 @@ func Login(context *gin.Context) {
 	result["tokenType"] = "bearer"
 	result["expiresIn"] = 3600
 
-	fmt.Println("登入功能取得Token", time.Since(s))
-	response.ResultOk(200, "Success", result)
+	response.ResultSuccess(http.StatusOK, "Success", result)
 }
 
 // Info godoc
