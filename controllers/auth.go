@@ -18,16 +18,16 @@ import (
 
 // AdminID Save ID .
 type AdminID struct {
-	ID int
+	ID *int
 }
 
 // SetAdminID .
-func (adminID *AdminID) SetAdminID(id int) {
+func (adminID *AdminID) SetAdminID(id *int) {
 	adminID.ID = id
 }
 
 // GetAdminID .
-func (adminID AdminID) GetAdminID() int {
+func (adminID AdminID) GetAdminID() *int {
 	return adminID.ID
 }
 
@@ -94,7 +94,7 @@ func Login(context *gin.Context) {
 		return
 	}
 
-	adminID.SetAdminID(*adminInfo.ID)
+	adminID.SetAdminID(adminInfo.ID)
 
 	result["accessToken"] = token
 	result["tokenType"] = "bearer"
@@ -125,7 +125,7 @@ func Info(context *gin.Context) {
 	id := adminID.GetAdminID()
 
 	// 取得登入者資料
-	data, dataError := adminsRepository.AdministratorFindByID(id)
+	data, dataError := adminsRepository.AdministratorFindByID(*id)
 
 	if dataError != nil {
 		response.ResultError(http.StatusBadRequest, dataError.Error())
@@ -193,7 +193,7 @@ func Logout(context *gin.Context) {
 
 	id := adminID.GetAdminID()
 
-	err := authRepository.CleanToken(id)
+	err := authRepository.CleanToken(*id)
 
 	if err != nil {
 		response.ResultError(http.StatusBadRequest, err.Error())
