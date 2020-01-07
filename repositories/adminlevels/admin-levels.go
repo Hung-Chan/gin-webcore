@@ -3,7 +3,10 @@ package adminlevels
 import (
 	"gin-webcore/database"
 	"gin-webcore/models"
+	"gin-webcore/models/administrators"
 	"gin-webcore/models/adminlevels"
+
+	"github.com/jinzhu/gorm"
 )
 
 type (
@@ -11,6 +14,8 @@ type (
 	AdminLevel struct {
 		models.IDInfo
 		adminlevels.AdminLevelModel
+		AdminID       *int                         `json:"admin_id"`
+		Administrator administrators.Administrator `gorm:"ForeignKey:ID;AssociationForeignKey:AdminID"`
 	}
 
 	// AdminLevels .
@@ -26,32 +31,37 @@ var (
 	TableName = "admin_levels"
 )
 
-// AdminLevelsList .
-func (adminLevel AdminLevel) AdminLevelsList(page int, limit int, sortColumn string, sortDirection string, name *string, enable *int) (AdminLevels, error) {
-	var adminLevels AdminLevels
+// AdminLevelsList 層級列表 .
+func (adminLevel AdminLevel) AdminLevelsList(page int, limit int, sortColumn string, sortDirection string, name *string, enable *int) (*AdminLevels, int, error) {
+	var (
+		adminLevels AdminLevels
+		count       int = 0
+	)
 
-	res := db.Debug().Table(TableName)
+	result := db.Table(TableName)
 
 	if name != nil {
-		res = res.Where("name LIKE ?", "%"+*name+"%")
+		result = result.Where("name LIKE ?", "%"+*name+"%")
 	}
 
 	if enable != nil {
-		res = res.Where("enable = ?", enable)
+		result = result.Where("enable = ?", enable)
 	}
 
-	result := res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&adminLevels).Error
+	resultError := result.Order(sortColumn+" "+sortDirection).Offset((page-1)*limit).Count(&count).Limit(limit).Preload("Administrator", func(db *gorm.DB) *gorm.DB {
+		return db.Select([]string{"id", "name"})
+	}).Find(&adminLevels).Error
 
-	if result != nil {
-		return nil, result
+	if resultError != nil {
+		return nil, 0, resultError
 	}
 
-	return adminLevels, nil
+	return &adminLevels, count, nil
 }
 
-// AdminLevelCreate .
-func (adminLevel AdminLevel) AdminLevelCreate() error {
-	createError := db.Debug().Table(TableName).Create(&adminLevel).Error
+// AdminLevelCreate 層級新增 .
+func (adminLevel *AdminLevel) AdminLevelCreate() error {
+	createError := db.Table(TableName).Create(adminLevel).Error
 
 	if createError != nil {
 		return createError
@@ -60,9 +70,20 @@ func (adminLevel AdminLevel) AdminLevelCreate() error {
 	return nil
 }
 
-// AdminLevelView .
+// AdminLevelCodeCheck 層級代碼檢查 .
+func (adminLevel AdminLevel) AdminLevelCodeCheck(level int) error {
+	checkError := db.Where("level = ?", level).Find(&adminLevel).Error
+
+	if checkError != nil && db.RecordNotFound() {
+		return checkError
+	}
+
+	return nil
+}
+
+// AdminLevelView 層級檢視 .
 func (adminLevel AdminLevel) AdminLevelView(id int) (*adminlevels.AdminLevelModel, error) {
-	viewError := db.Debug().Table(TableName).Where("id = ? ", id).First(&adminLevel.AdminLevelModel).Error
+	viewError := db.Table(TableName).Where("id = ? ", id).First(&adminLevel.AdminLevelModel).Error
 
 	if viewError != nil {
 		return nil, viewError
@@ -71,15 +92,15 @@ func (adminLevel AdminLevel) AdminLevelView(id int) (*adminlevels.AdminLevelMode
 	return &adminLevel.AdminLevelModel, nil
 }
 
-// AdminLevelUpdate .
+// AdminLevelUpdate 層級修改 .
 func (adminLevel AdminLevel) AdminLevelUpdate(id int, flag bool) error {
-	var updateError error
+	result := db.Model(adminLevel).Where("id = ? ", id)
 
-	if flag == true {
-		updateError = db.Debug().Model(adminLevel).Where("id = ? ", id).Update(&adminLevel.AdminLevelModel).Error
-	} else {
-		updateError = db.Debug().Model(adminLevel).Where("id = ? ", id).Omit("level").Update(&adminLevel.AdminLevelModel).Error
+	if flag != true {
+		result = result.Omit("level")
 	}
+
+	updateError := result.Update(&adminLevel.AdminLevelModel).Error
 
 	if updateError != nil {
 		return updateError
@@ -88,9 +109,9 @@ func (adminLevel AdminLevel) AdminLevelUpdate(id int, flag bool) error {
 	return nil
 }
 
-// AdminLevelDelete .
+// AdminLevelDelete 層級刪除 .
 func (adminLevel AdminLevel) AdminLevelDelete(id int) error {
-	deleteError := db.Debug().Table(TableName).Where("id = ? ", id).Delete(&adminLevel).Error
+	deleteError := db.Table(TableName).Where("id = ? ", id).Delete(&adminLevel).Error
 
 	if deleteError != nil {
 		return deleteError
@@ -101,7 +122,7 @@ func (adminLevel AdminLevel) AdminLevelDelete(id int) error {
 
 // AdminLevelCheckLevel .
 func (adminLevel AdminLevel) AdminLevelCheckLevel(id int) (*int, error) {
-	levelError := db.Debug().Table(TableName).Select("level").Where("id = ? ", id).Scan(&adminLevel.AdminLevelModel).Error
+	levelError := db.Table(TableName).Select("level").Where("id = ? ", id).Scan(&adminLevel.AdminLevelModel).Error
 
 	if levelError != nil {
 		return nil, levelError
@@ -110,16 +131,7 @@ func (adminLevel AdminLevel) AdminLevelCheckLevel(id int) (*int, error) {
 	return &adminLevel.Level, nil
 }
 
-// Total .
-func (adminLevel AdminLevel) Total() int {
-	var count int
-
-	db.Debug().Table(TableName).Count(&count)
-
-	return count
-}
-
-// AdminLevelOption .
+// AdminLevelOption 層級選項 .
 func (adminLevel AdminLevel) AdminLevelOption() (*AdminLevelOptions, error) {
 	var adminLevelOptions AdminLevelOptions
 

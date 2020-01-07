@@ -24,8 +24,23 @@ func InitRouter() *gin.Engine {
 			auth.GET("/sidebarMenu", controllers.SidebarMenu)
 			auth.POST("/logout", controllers.Logout)
 		}
-	}
 
+		// 層級管理
+		adminLevels := router.Group("admin-levels")
+		{
+			var adminLevelControllers controllers.AdminLevelController
+
+			adminLevels.GET("", adminLevelControllers.AdminLevelsList)
+
+			// 操作api (新增、檢視、修改、複製、刪除)
+			adminLevels.POST("", adminLevelControllers.AdminLevelCreate)
+			adminLevels.GET("/view/:id", adminLevelControllers.AdminLevelView)
+			adminLevels.PATCH("/:id", adminLevelControllers.AdminLevelUpdate)
+			adminLevels.PUT("", adminLevelControllers.AdminLevelCopy)
+			adminLevels.DELETE("/:id", adminLevelControllers.AdminLevelDelete)
+		}
+
+	}
 
 	// 帳號管理
 	admins := router.Group("admins")
@@ -57,18 +72,7 @@ func InitRouter() *gin.Engine {
 		adminGroups.DELETE("/:id", controllers.AdminGroupDelete)
 	}
 
-	// 層級管理
-	adminLevels := router.Group("admin-levels")
-	{
-		adminLevels.GET("", controllers.AdminLevelsList)
 
-		// 操作api (新增、檢視、修改、複製、刪除)
-		adminLevels.POST("", controllers.AdminLevelCreate)
-		adminLevels.GET("/view/:id", controllers.AdminLevelView)
-		adminLevels.PATCH("/:id", controllers.AdminLevelUpdate)
-		adminLevels.PUT("", controllers.AdminLevelCopy)
-		adminLevels.DELETE("/:id", controllers.AdminLevelDelete)
-	}
 
 	// 操作管理
 	adminAccesses := router.Group("admin-accesses")

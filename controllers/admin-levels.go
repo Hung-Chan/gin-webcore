@@ -1,16 +1,19 @@
 package controllers
 
 import (
-	"fmt"
 	"gin-webcore/models"
 	"gin-webcore/repositories/adminlevels"
 	"gin-webcore/response"
 	"gin-webcore/validate"
+	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+// AdminLevelController .
+type AdminLevelController struct {
+}
 
 // AdminLevelsList .
 // @Summary Admin Levels List
@@ -27,22 +30,21 @@ import (
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /admin-levels [get]
-func AdminLevelsList(context *gin.Context) {
-	s := time.Now()
-
+func (adminLevelController AdminLevelController) AdminLevelsList(context *gin.Context) {
 	response := response.Gin{Context: context}
-
-	result := make(map[string]interface{})
 
 	var adminLevelRepository = new(adminlevels.AdminLevel)
 
+	// 初始化 query 參數
 	queryModel := models.NewQueryModel()
 
+	// 綁定 query 資料
 	if err := context.ShouldBind(&queryModel); err != nil {
-		response.ResultFail(1001, "data bind error")
+		response.ResultError(http.StatusBadRequest, "資料綁定失敗"+err.Error())
 		return
 	}
 
+	// 查詢資料重新定義參數
 	page := queryModel.Page
 	limit := queryModel.Limit
 	sortColumn := queryModel.SortColumn
@@ -50,18 +52,35 @@ func AdminLevelsList(context *gin.Context) {
 	name := queryModel.Name
 	enable := queryModel.Enable
 
-	data, err := adminLevelRepository.AdminLevelsList(page, limit, sortColumn, sortDirection, name, enable)
+	// 查詢資料
+	data, total, err := adminLevelRepository.AdminLevelsList(page, limit, sortColumn, sortDirection, name, enable)
 
 	if err != nil {
-		response.ResultFail(55555, err.Error())
+		response.ResultError(http.StatusBadRequest, "層級列表資料查詢失敗"+err.Error())
 		return
 	}
 
-	result["list"] = data
-	result["total"] = adminLevelRepository.Total()
+	var result = make(map[string]interface{})
+	var res []interface{}
 
-	fmt.Println("列表層級", time.Since(s))
-	response.ResultOk(200, "Success", result)
+	for _, v := range *data {
+		var save = make(map[string]interface{})
+
+		save["id"] = *v.ID
+		save["name"] = v.Name
+		save["level"] = v.Level
+		save["enable"] = v.Enable
+		save["updated_at"] = v.UpdatedAt
+		save["updated_id"] = v.Administrator.ID
+		save["updated_name"] = v.Administrator.Name
+
+		res = append(res, save)
+	}
+
+	result["list"] = res
+	result["total"] = total
+
+	response.ResultSuccess(200, "Success", result)
 }
 
 // AdminLevelCreate .
@@ -74,33 +93,41 @@ func AdminLevelsList(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /admin-levels [post]
-func AdminLevelCreate(context *gin.Context) {
-	s := time.Now()
+func (adminLevelController AdminLevelController) AdminLevelCreate(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var adminLevelRepository = new(adminlevels.AdminLevel)
 
 	// 資料綁定 struct
 	if err := context.ShouldBind(&adminLevelRepository.AdminLevelModel); err != nil {
-		response.ResultFail(1001, "data bind error")
+		response.ResultError(http.StatusBadRequest, "資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	// 資料驗證 struct
 	if checkData := validate.VdeInfo(&adminLevelRepository.AdminLevelModel); checkData != nil {
-		response.ResultFail(200, checkData.Error())
+		response.ResultError(http.StatusBadRequest, "資料驗證錯誤: "+checkData.Error())
 		return
 	}
+
+	// 檢查層級代碼
+	level := adminLevelRepository.AdminLevelCodeCheck(adminLevelRepository.Level)
+	if level != nil {
+		response.ResultError(http.StatusBadRequest, "層級代碼已存在")
+		return
+	}
+
+	// 取得修改者ID
+	adminLevelRepository.AdminID = adminID.GetAdminID()
 
 	resultError := adminLevelRepository.AdminLevelCreate()
 
 	if resultError != nil {
-		response.ResultFail(55555, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "層級新增失敗"+resultError.Error())
 		return
 	}
 
-	fmt.Println("新增層級", time.Since(s))
-	response.ResultOk(200, "Success", nil)
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // AdminLevelView .
@@ -113,9 +140,7 @@ func AdminLevelCreate(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /admin-levels/{id} [get]
-func AdminLevelView(context *gin.Context) {
-	s := time.Now()
-
+func (adminLevelController AdminLevelController) AdminLevelView(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var adminLevelsRepository = new(adminlevels.AdminLevel)
@@ -125,19 +150,18 @@ func AdminLevelView(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 		return
 	}
 
 	result, resultError := adminLevelsRepository.AdminLevelView(id)
 
 	if resultError != nil {
-		response.ResultFail(1002, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "層級檢視查詢失敗: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("檢視層級", time.Since(s))
-	response.ResultOk(200, "Success", result)
+	response.ResultSuccess(200, "Success", result)
 }
 
 // AdminLevelUpdate .
@@ -151,8 +175,7 @@ func AdminLevelView(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /admin-levels/{id} [patch]
-func AdminLevelUpdate(context *gin.Context) {
-	s := time.Now()
+func (adminLevelController AdminLevelController) AdminLevelUpdate(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var adminLevelRepository = new(adminlevels.AdminLevel)
@@ -162,28 +185,30 @@ func AdminLevelUpdate(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 		return
 	}
 
+	// 檢查層級代碼是否存在
 	level, levelError := adminLevelRepository.AdminLevelCheckLevel(id)
 	if levelError != nil {
-		response.ResultFail(55555, levelError.Error())
+		response.ResultError(http.StatusBadRequest, "查詢層級資料: "+levelError.Error())
 		return
 	}
 
 	// 修改資料綁定 struct
 	if err := context.ShouldBind(&adminLevelRepository.AdminLevelModel); err != nil {
-		response.ResultFail(1001, "data bind error")
+		response.ResultError(http.StatusBadRequest, "資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	// 資料驗證 struct
 	if checkData := validate.VdeInfo(&adminLevelRepository.AdminLevelModel); checkData != nil {
-		response.ResultFail(200, checkData.Error())
+		response.ResultError(http.StatusBadRequest, "資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
+	// 層級代碼檢查是否與原本相同
 	var flag bool
 	if adminLevelRepository.Level != *level {
 		flag = true
@@ -191,23 +216,29 @@ func AdminLevelUpdate(context *gin.Context) {
 		flag = false
 	}
 
-	resultError := adminLevelRepository.AdminLevelUpdate(id, flag)
-
-	if resultError != nil {
-		response.ResultFail(55555, resultError.Error())
+	// 層級代碼是否存在(修改層級代碼改變時)
+	levelEr := adminLevelRepository.AdminLevelCodeCheck(adminLevelRepository.Level)
+	if levelEr != nil {
+		response.ResultError(http.StatusBadRequest, "層級代碼已存在: "+levelEr.Error())
 		return
 	}
 
-	fmt.Println("修改層級", time.Since(s))
-	response.ResultOk(200, "Success", nil)
+	resultError := adminLevelRepository.AdminLevelUpdate(id, flag)
+
+	if resultError != nil {
+		response.ResultError(http.StatusBadRequest, "層級資料修改: "+resultError.Error())
+		return
+	}
+
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // AdminLevelCopy .
-func AdminLevelCopy(context *gin.Context) {
+func (adminLevelController AdminLevelController) AdminLevelCopy(context *gin.Context) {
 
 	response := response.Gin{Context: context}
 
-	response.ResultOk(200, "Success", "Data")
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // AdminLevelDelete .
@@ -220,8 +251,7 @@ func AdminLevelCopy(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /admin-levels/{id} [delete]
-func AdminLevelDelete(context *gin.Context) {
-	s := time.Now()
+func (adminLevelController AdminLevelController) AdminLevelDelete(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var adminLevelRepository = new(adminlevels.AdminLevel)
@@ -231,17 +261,16 @@ func AdminLevelDelete(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 		return
 	}
 
 	resultError := adminLevelRepository.AdminLevelDelete(id)
 
 	if resultError != nil {
-		response.ResultFail(55555, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "刪除失敗: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("刪除層級", time.Since(s))
-	response.ResultOk(200, "Success", nil)
+	response.ResultSuccess(200, "Success", nil)
 }

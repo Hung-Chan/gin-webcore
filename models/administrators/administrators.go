@@ -12,4 +12,10 @@ type (
 		Remark   string `json:"remark"`
 		AdminID  int    `json:"admin_id"`
 	}
+
+	// Administrator .
+	Administrator struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	}
 )
