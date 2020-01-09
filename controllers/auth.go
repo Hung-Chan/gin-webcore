@@ -16,23 +16,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AdminID Save ID .
-type AdminID struct {
-	ID *int
-}
-
-// SetAdminID .
-func (adminID *AdminID) SetAdminID(id *int) {
-	adminID.ID = id
-}
-
-// GetAdminID .
-func (adminID AdminID) GetAdminID() *int {
-	return adminID.ID
-}
-
-var adminID AdminID
-
 // Login godoc
 // @Summary Admin Login
 // @Description Admin Login
@@ -82,7 +65,7 @@ func Login(context *gin.Context) {
 	}
 
 	// 產生Token
-	token, tokenError := utils.GenerateToken(adminInfo.Account)
+	token, tokenError := utils.GenerateToken(adminInfo.Account, *adminInfo.ID)
 	if tokenError != nil {
 		response.ResultError(http.StatusBadRequest, "Token錯誤")
 		return
@@ -93,8 +76,6 @@ func Login(context *gin.Context) {
 		response.ResultError(http.StatusBadRequest, "Token紀錄失敗")
 		return
 	}
-
-	adminID.SetAdminID(adminInfo.ID)
 
 	result["accessToken"] = token
 	result["tokenType"] = "bearer"
@@ -121,11 +102,15 @@ func Info(context *gin.Context) {
 	var adminsRepository = new(administrators.Administrator)
 	var adminGroupsRepository = new(admingroups.AdminGroup)
 
-	// 取得登入者ID
-	id := adminID.GetAdminID()
+	// 取得修改者ID
+	adminID, adminIDError := context.Get("adminID")
+	if adminIDError != true {
+		response.ResultError(http.StatusBadRequest, "操作者ID取得失敗")
+		return
+	}
 
 	// 取得登入者資料
-	data, dataError := adminsRepository.AdministratorFindByID(*id)
+	data, dataError := adminsRepository.AdministratorFindByID(adminID.(int))
 
 	if dataError != nil {
 		response.ResultError(http.StatusBadRequest, dataError.Error())
@@ -191,9 +176,14 @@ func Logout(context *gin.Context) {
 	// AuthRepository 調用
 	var authRepository = new(auth.Auth)
 
-	id := adminID.GetAdminID()
+	// 取得修改者ID
+	adminID, adminIDError := context.Get("adminID")
+	if adminIDError != true {
+		response.ResultError(http.StatusBadRequest, "操作者ID取得失敗")
+		return
+	}
 
-	err := authRepository.CleanToken(*id)
+	err := authRepository.CleanToken(adminID.(int))
 
 	if err != nil {
 		response.ResultError(http.StatusBadRequest, err.Error())

@@ -118,7 +118,13 @@ func (adminLevelController AdminLevelController) AdminLevelCreate(context *gin.C
 	}
 
 	// 取得修改者ID
-	adminLevelRepository.AdminID = adminID.GetAdminID()
+	adminID, adminIDError := context.Get("adminID")
+	if adminIDError != true {
+		response.ResultError(http.StatusBadRequest, "新增操作者ID取得失敗")
+		return
+	}
+
+	adminLevelRepository.AdminID = adminID.(int)
 
 	resultError := adminLevelRepository.AdminLevelCreate()
 
@@ -222,6 +228,15 @@ func (adminLevelController AdminLevelController) AdminLevelUpdate(context *gin.C
 		response.ResultError(http.StatusBadRequest, "層級代碼已存在: "+levelEr.Error())
 		return
 	}
+
+	// 取得修改者ID
+	adminID, adminIDError := context.Get("adminID")
+	if adminIDError != true {
+		response.ResultError(http.StatusBadRequest, "修改操作者ID取得失敗")
+		return
+	}
+
+	adminLevelRepository.AdminID = adminID.(int)
 
 	resultError := adminLevelRepository.AdminLevelUpdate(id, flag)
 

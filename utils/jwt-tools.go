@@ -9,16 +9,18 @@ import (
 // Claims .
 type Claims struct {
 	Account string `json:"account"`
+	ID      int    `json:"id"`
 	jwt.StandardClaims
 }
 
 var secret = []byte("secret")
 
 // GenerateToken .
-func GenerateToken(account string) (string, error) {
+func GenerateToken(account string, id int) (string, error) {
 
 	claims := Claims{
 		account,
+		id,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Minute * 60).Unix(),
 		},

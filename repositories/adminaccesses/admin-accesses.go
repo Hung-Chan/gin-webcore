@@ -14,7 +14,7 @@ type (
 	AdminAccess struct {
 		models.IDInfo
 		adminaccesses.AdminAccessModel
-		AdminID       *int                         `json:"admin_id"`
+		AdminID       int                          `json:"admin_id"`
 		Administrator administrators.Administrator `gorm:"ForeignKey:ID;AssociationForeignKey:AdminID"`
 	}
 

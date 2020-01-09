@@ -114,7 +114,13 @@ func (adminAccessController AdminAccessController) AdminAccessCreate(context *gi
 	}
 
 	// 取得修改者ID
-	adminAccessRepository.AdminID = adminID.GetAdminID()
+	adminID, adminIDError := context.Get("adminID")
+	if adminIDError != true {
+		response.ResultError(http.StatusBadRequest, "新增操作者ID取得失敗")
+		return
+	}
+
+	adminAccessRepository.AdminID = adminID.(int)
 
 	resultError := adminAccessRepository.AdminAccessCreate()
 
@@ -220,9 +226,15 @@ func (adminAccessController AdminAccessController) AdminAccessUpdate(context *gi
 	}
 
 	// 取得修改者ID
-	adminAccessRepository.AdminID = adminID.GetAdminID()
+	adminID, adminIDError := context.Get("adminID")
+	if adminIDError != true {
+		response.ResultError(http.StatusBadRequest, "修改操作者ID取得失敗")
+		return
+	}
 
-	resultError := adminAccessRepository.AdminAccessUpdate(id, flag)
+	adminAccessRepository.AdminID = adminID.(int)
+
+	resultError := adminAccessRepository.AdminAccessUpdate(adminID.(int), flag)
 
 	if resultError != nil {
 		response.ResultError(http.StatusBadRequest, "操作管理修改錯誤: "+resultError.Error())

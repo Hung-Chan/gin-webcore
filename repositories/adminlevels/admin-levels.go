@@ -14,7 +14,7 @@ type (
 	AdminLevel struct {
 		models.IDInfo
 		adminlevels.AdminLevelModel
-		AdminID       *int                         `json:"admin_id"`
+		AdminID       int                          `json:"admin_id"`
 		Administrator administrators.Administrator `gorm:"ForeignKey:ID;AssociationForeignKey:AdminID"`
 	}
 

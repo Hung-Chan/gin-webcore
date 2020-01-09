@@ -36,6 +36,9 @@ func Jwt() gin.HandlerFunc {
 				code = http.StatusForbidden
 				message = "Token 時效已過期"
 			}
+
+			// set adminID
+			context.Set("adminID", claims.ID)
 		}
 
 		if code != 200 {
