@@ -1,16 +1,19 @@
 package controllers
 
 import (
-	"fmt"
 	"gin-webcore/models"
 	"gin-webcore/repositories/adminaccesses"
 	"gin-webcore/response"
 	"gin-webcore/validate"
+	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+// AdminAccessController .
+type AdminAccessController struct {
+}
 
 // AdminAccessesList .
 // @Summary Admin Access List
@@ -27,18 +30,15 @@ import (
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /admin-accesses [get]
-func AdminAccessesList(context *gin.Context) {
-	s := time.Now()
+func (adminAccessController AdminAccessController) AdminAccessesList(context *gin.Context) {
 	response := response.Gin{Context: context}
-
-	result := make(map[string]interface{})
 
 	var adminAccessRepository = new(adminaccesses.AdminAccess)
 
 	queryModel := models.NewQueryModel()
 
 	if err := context.ShouldBind(&queryModel); err != nil {
-		response.ResultFail(1001, "data bind error")
+		response.ResultError(http.StatusBadRequest, "資料綁定失敗: "+err.Error())
 		return
 	}
 
@@ -49,18 +49,34 @@ func AdminAccessesList(context *gin.Context) {
 	name := queryModel.Name
 	enable := queryModel.Enable
 
-	data, err := adminAccessRepository.AdminAccessesList(page, limit, sortColumn, sortDirection, name, enable)
+	data, total, err := adminAccessRepository.AdminAccessesList(page, limit, sortColumn, sortDirection, name, enable)
 
 	if err != nil {
-		response.ResultFail(66666, err.Error())
+		response.ResultError(http.StatusBadRequest, "操作管理列表資料查詢失敗: "+err.Error())
 		return
 	}
 
-	result["list"] = data
-	result["total"] = adminAccessRepository.Total()
+	var result = make(map[string]interface{})
+	var res []interface{}
 
-	fmt.Println("列表操作管理", time.Since(s))
-	response.ResultOk(200, "Success", result)
+	for _, v := range *data {
+		var save = make(map[string]interface{})
+
+		save["id"] = *v.ID
+		save["name"] = v.Name
+		save["code"] = v.Code
+		save["enable"] = v.Enable
+		save["updated_at"] = v.UpdatedAt
+		save["updated_id"] = v.Administrator.ID
+		save["updated_name"] = v.Administrator.Name
+
+		res = append(res, save)
+	}
+
+	result["list"] = res
+	result["total"] = total
+
+	response.ResultSuccess(200, "Success", result)
 }
 
 // AdminAccessCreate .
@@ -73,31 +89,41 @@ func AdminAccessesList(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /admin-accesses [post]
-func AdminAccessCreate(context *gin.Context) {
-	s := time.Now()
+func (adminAccessController AdminAccessController) AdminAccessCreate(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var adminAccessRepository = new(adminaccesses.AdminAccess)
 
+	// 資料綁定 struct
 	if err := context.ShouldBind(&adminAccessRepository.AdminAccessModel); err != nil {
-		response.ResultFail(1001, "data bind error")
+		response.ResultError(http.StatusBadRequest, "操作管理新增，資料綁定錯誤: "+err.Error())
 		return
 	}
 
+	// 資料驗證 struct
 	if checkData := validate.VdeInfo(&adminAccessRepository.AdminAccessModel); checkData != nil {
-		response.ResultFail(200, checkData.Error())
+		response.ResultError(http.StatusBadRequest, "操作管理新增，資料驗證錯誤: "+checkData.Error())
 		return
 	}
+
+	// 檢查操作代碼
+	code := adminAccessRepository.AdminAccessCodeCheck(adminAccessRepository.Code)
+	if code != nil {
+		response.ResultError(http.StatusBadRequest, "操作代碼已存在")
+		return
+	}
+
+	// 取得修改者ID
+	adminAccessRepository.AdminID = adminID.GetAdminID()
 
 	resultError := adminAccessRepository.AdminAccessCreate()
 
 	if resultError != nil {
-		response.ResultFail(66666, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "操作管理新增失敗: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("新增操作管理", time.Since(s))
-	response.ResultOk(200, "Success", nil)
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // AdminAccessView .
@@ -110,8 +136,7 @@ func AdminAccessCreate(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /admin-accesses/view/{id} [get]
-func AdminAccessView(context *gin.Context) {
-	s := time.Now()
+func (adminAccessController AdminAccessController) AdminAccessView(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var adminAccessRepository = new(adminaccesses.AdminAccess)
@@ -121,19 +146,18 @@ func AdminAccessView(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 		return
 	}
 
 	result, resultError := adminAccessRepository.AdminAccessView(id)
 
 	if resultError != nil {
-		response.ResultFail(66666, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "操作管理檢視失敗: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("檢視操作管理", time.Since(s))
-	response.ResultOk(200, "Success", result)
+	response.ResultSuccess(200, "Success", result)
 }
 
 // AdminAccessUpdate .
@@ -147,8 +171,7 @@ func AdminAccessView(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /admin-accesses/{id} [patch]
-func AdminAccessUpdate(context *gin.Context) {
-	s := time.Now()
+func (adminAccessController AdminAccessController) AdminAccessUpdate(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var adminAccessRepository = new(adminaccesses.AdminAccess)
@@ -158,36 +181,61 @@ func AdminAccessUpdate(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		return
 	}
 
+	// 檢查操作管理代碼是否存在
+	code, codeError := adminAccessRepository.AdminAccessCheckCode(id)
+	if codeError != nil {
+		response.ResultError(http.StatusBadRequest, "查詢操作管理資料: "+codeError.Error())
+		return
+	}
+
+	// 資料綁定 struct
 	if err := context.ShouldBind(&adminAccessRepository.AdminAccessModel); err != nil {
-		response.ResultFail(1001, "data bind error")
+		response.ResultError(http.StatusBadRequest, "操作管理修改，資料綁定錯誤: "+err.Error())
 		return
 	}
 
+	// 資料驗證 struct
 	if checkData := validate.VdeInfo(&adminAccessRepository.AdminAccessModel); checkData != nil {
-		response.ResultFail(200, checkData.Error())
+		response.ResultError(http.StatusBadRequest, "操作管理修改，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
-	resultError := adminAccessRepository.AdminAccessUpdate(id)
+	// 操作管理代碼檢查是否與原本相同
+	var flag bool
+	if adminAccessRepository.Code != *code {
+		flag = true
+	} else {
+		flag = false
+	}
+
+	// 操作管理代碼是否存在(修改操作管理代碼改變時)
+	codeEr := adminAccessRepository.AdminAccessCodeCheck(adminAccessRepository.Code)
+	if codeEr != nil {
+		response.ResultError(http.StatusBadRequest, "操作管理代碼已存在: "+codeEr.Error())
+		return
+	}
+
+	// 取得修改者ID
+	adminAccessRepository.AdminID = adminID.GetAdminID()
+
+	resultError := adminAccessRepository.AdminAccessUpdate(id, flag)
 
 	if resultError != nil {
-		response.ResultFail(66666, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "操作管理修改錯誤: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("修改操作管理", time.Since(s))
-	response.ResultOk(200, "Success", nil)
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // AdminAccessCopy .
-func AdminAccessCopy(context *gin.Context) {
-	s := time.Now()
+func (adminAccessController AdminAccessController) AdminAccessCopy(context *gin.Context) {
 	response := response.Gin{Context: context}
-	fmt.Println("複製操作管理", time.Since(s))
-	response.ResultOk(200, "Success", "Data")
+	response.ResultSuccess(200, "Success", "Data")
 }
 
 // AdminAccessDelete .
@@ -200,8 +248,7 @@ func AdminAccessCopy(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /admin-accesses/{id} [delete]
-func AdminAccessDelete(context *gin.Context) {
-	s := time.Now()
+func (adminAccessController AdminAccessController) AdminAccessDelete(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var adminAccessRepository = new(adminaccesses.AdminAccess)
@@ -211,16 +258,15 @@ func AdminAccessDelete(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 	}
 
 	resultError := adminAccessRepository.AdminAccessDelete(id)
 
 	if resultError != nil {
-		response.ResultFail(55555, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "操作管理刪除錯誤: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("刪除操作管理", time.Since(s))
-	response.ResultOk(200, "Success", nil)
+	response.ResultSuccess(200, "Success", nil)
 }

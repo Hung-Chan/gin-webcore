@@ -40,6 +40,21 @@ func InitRouter() *gin.Engine {
 			adminLevels.DELETE("/:id", adminLevelControllers.AdminLevelDelete)
 		}
 
+		// 操作管理
+		adminAccesses := router.Group("admin-accesses")
+		{
+			var adminAccessControllers controllers.AdminAccessController
+
+			adminAccesses.GET("", adminAccessControllers.AdminAccessesList)
+
+			// 操作api (新增、檢視、修改、複製、刪除)
+			adminAccesses.POST("", adminAccessControllers.AdminAccessCreate)
+			adminAccesses.GET("/view/:id", adminAccessControllers.AdminAccessView)
+			adminAccesses.PATCH("/:id", adminAccessControllers.AdminAccessUpdate)
+			adminAccesses.PUT("", adminAccessControllers.AdminAccessCopy)
+			adminAccesses.DELETE("/:id", adminAccessControllers.AdminAccessDelete)
+		}
+
 	}
 
 	// 帳號管理
@@ -74,18 +89,7 @@ func InitRouter() *gin.Engine {
 
 
 
-	// 操作管理
-	adminAccesses := router.Group("admin-accesses")
-	{
-		adminAccesses.GET("", controllers.AdminAccessesList)
 
-		// 操作api (新增、檢視、修改、複製、刪除)
-		adminAccesses.POST("", controllers.AdminAccessCreate)
-		adminAccesses.GET("/view/:id", controllers.AdminAccessView)
-		adminAccesses.PATCH("/:id", controllers.AdminAccessUpdate)
-		adminAccesses.PUT("", controllers.AdminAccessCopy)
-		adminAccesses.DELETE("/:id", controllers.AdminAccessDelete)
-	}
 
 	// 選單群組管理
 	menuGroups := router.Group("menu-groups")
