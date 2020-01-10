@@ -3,7 +3,10 @@ package ipwhitelistings
 import (
 	"gin-webcore/database"
 	"gin-webcore/models"
+	"gin-webcore/models/administrators"
 	"gin-webcore/models/ipwhitelistings"
+
+	"github.com/jinzhu/gorm"
 )
 
 type (
@@ -11,6 +14,8 @@ type (
 	IPWhitelisting struct {
 		models.IDInfo
 		ipwhitelistings.IPWhitelistingModel
+		AdminID       int                          `json:"admin_id"`
+		Administrator administrators.Administrator `gorm:"ForeignKey:ID;AssociationForeignKey:AdminID"`
 	}
 
 	// IPWhitelistings .
@@ -24,10 +29,13 @@ var (
 )
 
 // IPWhitelistingsList .
-func (ipWhitelisting IPWhitelisting) IPWhitelistingsList(page int, limit int, sortColumn string, sortDirection string, ip *string, enable *int) (*IPWhitelistings, error) {
-	var ipWhitelistings IPWhitelistings
+func (ipWhitelisting IPWhitelisting) IPWhitelistingsList(page int, limit int, sortColumn string, sortDirection string, ip *string, enable *int) (*IPWhitelistings, int, error) {
+	var (
+		ipWhitelistings IPWhitelistings
+		count           int = 0
+	)
 
-	res := db.Debug().Table(TableName)
+	res := db.Table(TableName)
 
 	if ip != nil {
 		res = res.Where("ip LIKE ?", "%"+*ip+"%")
@@ -37,18 +45,20 @@ func (ipWhitelisting IPWhitelisting) IPWhitelistingsList(page int, limit int, so
 		res = res.Where("enable = ?", enable)
 	}
 
-	listError := res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&ipWhitelistings).Error
+	listError := res.Order(sortColumn+" "+sortDirection).Offset((page-1)*limit).Count(&count).Limit(limit).Preload("Administrator", func(db *gorm.DB) *gorm.DB {
+		return db.Select([]string{"id", "name"})
+	}).Find(&ipWhitelistings).Error
 
 	if listError != nil {
-		return nil, listError
+		return nil, 0, listError
 	}
-	return &ipWhitelistings, nil
+	return &ipWhitelistings, count, nil
 
 }
 
 // IPWhitelistingCreate .
 func (ipWhitelisting IPWhitelisting) IPWhitelistingCreate() error {
-	createError := db.Debug().Table(TableName).Create(&ipWhitelisting).Error
+	createError := db.Table(TableName).Create(&ipWhitelisting).Error
 
 	if createError != nil {
 		return createError
@@ -57,9 +67,27 @@ func (ipWhitelisting IPWhitelisting) IPWhitelistingCreate() error {
 	return nil
 }
 
-// IPWhitelistingView .
+// IPWhitelistingCheckExist 檢查IP是否存在 .
+func (ipWhitelisting IPWhitelisting) IPWhitelistingCheckExist(ip string, id int) bool {
+
+	data := db.Table(TableName).Where("ip = ?", ip)
+
+	if id != 0 {
+		data = data.Where("id != ?", id)
+	}
+
+	checkError := data.First(&ipWhitelisting).Error
+
+	if ipWhitelisting.ID != nil || (checkError != nil && db.RecordNotFound()) {
+		return true
+	}
+
+	return false
+}
+
+// IPWhitelistingView IP白名單檢視 .
 func (ipWhitelisting IPWhitelisting) IPWhitelistingView(id int) (*ipwhitelistings.IPWhitelistingModel, error) {
-	viewError := db.Debug().Table(TableName).Where("id = ? ", id).First(&ipWhitelisting.IPWhitelistingModel).Error
+	viewError := db.Table(TableName).Where("id = ? ", id).First(&ipWhitelisting.IPWhitelistingModel).Error
 
 	if viewError != nil {
 		return nil, viewError
@@ -68,9 +96,9 @@ func (ipWhitelisting IPWhitelisting) IPWhitelistingView(id int) (*ipwhitelisting
 	return &ipWhitelisting.IPWhitelistingModel, nil
 }
 
-// IPWhitelistingUpdate .
+// IPWhitelistingUpdate IP白名單修改 .
 func (ipWhitelisting IPWhitelisting) IPWhitelistingUpdate(id int) error {
-	updateError := db.Debug().Model(ipWhitelisting).Where("id = ? ", id).Update(&ipWhitelisting.IPWhitelistingModel).Error
+	updateError := db.Model(ipWhitelisting).Where("id = ? ", id).Update(&ipWhitelisting.IPWhitelistingModel).Error
 
 	if updateError != nil {
 		return updateError
@@ -81,20 +109,11 @@ func (ipWhitelisting IPWhitelisting) IPWhitelistingUpdate(id int) error {
 
 // IPWhitelistingDelete .
 func (ipWhitelisting IPWhitelisting) IPWhitelistingDelete(id int) error {
-	deleteError := db.Debug().Table(TableName).Where("id = ? ", id).Delete(&ipWhitelisting).Error
+	deleteError := db.Table(TableName).Where("id = ? ", id).Delete(&ipWhitelisting).Error
 
 	if deleteError != nil {
 		return deleteError
 	}
 
 	return nil
-}
-
-// Total .
-func (ipWhitelisting IPWhitelisting) Total() int {
-	var count int
-
-	db.Debug().Table(TableName).Count(&count)
-
-	return count
 }

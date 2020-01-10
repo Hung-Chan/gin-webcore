@@ -55,7 +55,22 @@ func InitRouter() *gin.Engine {
 			adminAccesses.DELETE("/:id", adminAccessControllers.AdminAccessDelete)
 		}
 
+		// IP白名單管理
+		ipWhitelistings := router.Group("ip-whitelistings")
+		{
+			var ipWhitelistingControllers controllers.IPWhitelistingController
+
+			ipWhitelistings.GET("", ipWhitelistingControllers.IPWhitelistingsList)
+
+			// 操作api (新增、檢視、修改、複製、刪除)
+			ipWhitelistings.POST("", ipWhitelistingControllers.IPWhitelistingCreate)
+			ipWhitelistings.GET("/view/:id", ipWhitelistingControllers.IPWhitelistingView)
+			ipWhitelistings.PATCH("/:id", ipWhitelistingControllers.IPWhitelistingUpdate)
+			ipWhitelistings.PUT("", ipWhitelistingControllers.IPWhitelistingCopy)
+			ipWhitelistings.DELETE("/:id", ipWhitelistingControllers.IPWhitelistingDelete)
+		}
 	}
+
 
 	// 帳號管理
 	admins := router.Group("admins")
@@ -120,18 +135,7 @@ func InitRouter() *gin.Engine {
 		menuSettings.PATCH("", controllers.MenuSettingsSort)
 	}
 
-	// IP白名單管理
-	ipWhitelistings := router.Group("ip-whitelistings")
-	{
-		ipWhitelistings.GET("", controllers.IPWhitelistingsList)
 
-		// 操作api (新增、檢視、修改、複製、刪除)
-		ipWhitelistings.POST("", controllers.IPWhitelistingCreate)
-		ipWhitelistings.GET("/view/:id", controllers.IPWhitelistingView)
-		ipWhitelistings.PATCH("/:id", controllers.IPWhitelistingUpdate)
-		ipWhitelistings.PUT("", controllers.IPWhitelistingCopy)
-		ipWhitelistings.DELETE("/:id", controllers.IPWhitelistingDelete)
-	}
 
 	// IP網段白名單管理
 	ipSubnetWhitelistings := router.Group("ip-subnet-whitelistings")
