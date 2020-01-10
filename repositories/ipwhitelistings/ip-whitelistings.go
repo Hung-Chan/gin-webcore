@@ -98,7 +98,7 @@ func (ipWhitelisting IPWhitelisting) IPWhitelistingView(id int) (*ipwhitelisting
 
 // IPWhitelistingUpdate IP白名單修改 .
 func (ipWhitelisting IPWhitelisting) IPWhitelistingUpdate(id int) error {
-	updateError := db.Model(ipWhitelisting).Where("id = ? ", id).Update(&ipWhitelisting.IPWhitelistingModel).Error
+	updateError := db.Model(ipWhitelisting).Where("id = ? ", id).Update(&ipWhitelisting).Error
 
 	if updateError != nil {
 		return updateError
