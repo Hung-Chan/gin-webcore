@@ -1,16 +1,19 @@
 package controllers
 
 import (
-	"fmt"
 	"gin-webcore/models"
 	"gin-webcore/repositories/ipsubnetwhitelistings"
 	"gin-webcore/response"
 	"gin-webcore/validate"
+	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+// IPSubnetWhitelistingController .
+type IPSubnetWhitelistingController struct {
+}
 
 // IPSubnetWhitelistingsList .
 // @Summary IP Subnet Whitelisting List
@@ -27,17 +30,15 @@ import (
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /ip-subnet-whitelistings [get]
-func IPSubnetWhitelistingsList(context *gin.Context) {
-	s := time.Now()
+func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhitelistingsList(context *gin.Context) {
 	response := response.Gin{Context: context}
 
-	result := make(map[string]interface{})
 	var ipSubnetWhitelistingRepository = new(ipsubnetwhitelistings.IPSubnetWhitelisting)
 
 	queryModel := models.NewQueryModel()
 
 	if err := context.ShouldBind(&queryModel); err != nil {
-		response.ResultFail(1001, "data bind error")
+		response.ResultError(http.StatusBadRequest, "資料綁定失敗: "+err.Error())
 		return
 	}
 
@@ -48,18 +49,34 @@ func IPSubnetWhitelistingsList(context *gin.Context) {
 	subnet := queryModel.Subnet
 	enable := queryModel.Enable
 
-	data, err := ipSubnetWhitelistingRepository.IPSubnetWhitelistingsList(page, limit, sortColumn, sortDirection, subnet, enable)
+	data, total, err := ipSubnetWhitelistingRepository.IPSubnetWhitelistingsList(page, limit, sortColumn, sortDirection, subnet, enable)
 
 	if err != nil {
-		response.ResultFail(88888, err.Error())
+		response.ResultError(http.StatusBadRequest, "IP網段白名單管理列表資料查詢失敗: "+err.Error())
 		return
 	}
 
-	result["list"] = data
-	result["total"] = ipSubnetWhitelistingRepository.Total()
+	var result = make(map[string]interface{})
+	var res []interface{}
 
-	fmt.Println("列表IP網段白名單管理", time.Since(s))
-	response.ResultOk(200, "Success", result)
+	for _, v := range *data {
+		var save = make(map[string]interface{})
+
+		save["id"] = *v.ID
+		save["subnet"] = v.Subnet
+		save["enable"] = v.Enable
+		save["remark"] = v.Remark
+		save["updated_at"] = v.UpdatedAt
+		save["updated_id"] = v.Administrator.ID
+		save["updated_name"] = v.Administrator.Name
+
+		res = append(res, save)
+	}
+
+	result["list"] = res
+	result["total"] = total
+
+	response.ResultSuccess(200, "Success", result)
 }
 
 // IPSubnetWhitelistingCreate .
@@ -72,31 +89,45 @@ func IPSubnetWhitelistingsList(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /ip-subnet-whitelistings [post]
-func IPSubnetWhitelistingCreate(context *gin.Context) {
-	s := time.Now()
+func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhitelistingCreate(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var ipSubnetWhitelistingRepository = new(ipsubnetwhitelistings.IPSubnetWhitelisting)
 
 	if err := context.ShouldBind(&ipSubnetWhitelistingRepository.IPSubnetWhitelistingModel); err != nil {
-		response.ResultFail(1001, "data bind error")
+		response.ResultError(http.StatusBadRequest, "IP網段白名單管理新增，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&ipSubnetWhitelistingRepository.IPSubnetWhitelistingModel); checkData != nil {
-		response.ResultFail(200, checkData.Error())
+		response.ResultError(http.StatusBadRequest, "IP網段白名單管理新增，資料驗證錯誤: "+checkData.Error())
 		return
 	}
+
+	// 檢查IP是否存在 .
+	ipSubnetExist := ipSubnetWhitelistingRepository.IPSubnetWhitelistingCheckExist(ipSubnetWhitelistingRepository.Subnet, 0)
+	if ipSubnetExist != false {
+		response.ResultError(http.StatusBadRequest, "IP網段已存在")
+		return
+	}
+
+	// 取得修改者ID
+	adminID, adminIDError := context.Get("adminID")
+	if adminIDError != true {
+		response.ResultError(http.StatusBadRequest, "新增操作者ID取得失敗")
+		return
+	}
+
+	ipSubnetWhitelistingRepository.AdminID = adminID.(int)
 
 	resultError := ipSubnetWhitelistingRepository.IPSubnetWhitelistingCreate()
 
 	if resultError != nil {
-		response.ResultFail(88888, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "IP網段白名單管理新增失敗: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("新增IP網段白名單管理", time.Since(s))
-	response.ResultOk(200, "Success", nil)
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // IPSubnetWhitelistingView .
@@ -109,8 +140,7 @@ func IPSubnetWhitelistingCreate(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /ip-subnet-whitelistings/view/{id} [get]
-func IPSubnetWhitelistingView(context *gin.Context) {
-	s := time.Now()
+func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhitelistingView(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var ipSubnetWhitelistingRepository = new(ipsubnetwhitelistings.IPSubnetWhitelisting)
@@ -120,19 +150,18 @@ func IPSubnetWhitelistingView(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 		return
 	}
 
 	result, resultError := ipSubnetWhitelistingRepository.IPSubnetWhitelistingView(id)
 
 	if resultError != nil {
-		response.ResultFail(88888, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "IP網段白名單管理檢視失敗: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("檢視IP網段白名單管理", time.Since(s))
-	response.ResultOk(200, "Success", result)
+	response.ResultSuccess(200, "Success", result)
 }
 
 // IPSubnetWhitelistingUpdate .
@@ -146,8 +175,7 @@ func IPSubnetWhitelistingView(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /ip-subnet-whitelistings/{id} [patch]
-func IPSubnetWhitelistingUpdate(context *gin.Context) {
-	s := time.Now()
+func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhitelistingUpdate(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var ipSubnetWhitelistingRepository = new(ipsubnetwhitelistings.IPSubnetWhitelisting)
@@ -157,37 +185,50 @@ func IPSubnetWhitelistingUpdate(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 		return
 	}
 
 	if err := context.ShouldBind(&ipSubnetWhitelistingRepository.IPSubnetWhitelistingModel); err != nil {
-		response.ResultFail(1001, "data bind error")
+		response.ResultError(http.StatusBadRequest, "IP網段白名單管理修改，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&ipSubnetWhitelistingRepository.IPSubnetWhitelistingModel); checkData != nil {
-		response.ResultFail(200, checkData.Error())
+		response.ResultError(http.StatusBadRequest, "IP網段白名單管理修改，資料驗證錯誤: "+checkData.Error())
 		return
 	}
+
+	// 檢查IP是否存在 .
+	ipSubnetExist := ipSubnetWhitelistingRepository.IPSubnetWhitelistingCheckExist(ipSubnetWhitelistingRepository.Subnet, id)
+	if ipSubnetExist != false {
+		response.ResultError(http.StatusBadRequest, "IP網段已存在")
+		return
+	}
+
+	// 取得修改者ID
+	adminID, adminIDError := context.Get("adminID")
+	if adminIDError != true {
+		response.ResultError(http.StatusBadRequest, "修改操作者ID取得失敗")
+		return
+	}
+
+	ipSubnetWhitelistingRepository.AdminID = adminID.(int)
 
 	resultError := ipSubnetWhitelistingRepository.IPSubnetWhitelistingUpdate(id)
 
 	if resultError != nil {
-		response.ResultFail(88888, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "IP網段白名單管理修改錯誤: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("修改IP網段白名單管理", time.Since(s))
-	response.ResultOk(200, "Success", nil)
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // IPSubnetWhitelistingCopy .
-func IPSubnetWhitelistingCopy(context *gin.Context) {
-	s := time.Now()
+func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhitelistingCopy(context *gin.Context) {
 	response := response.Gin{Context: context}
-	fmt.Println("複製IP網段白名單管理", time.Since(s))
-	response.ResultOk(200, "Success", "Data")
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // IPSubnetWhitelistingDelete .
@@ -200,8 +241,7 @@ func IPSubnetWhitelistingCopy(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /ip-subnet-whitelistings/{id} [delete]
-func IPSubnetWhitelistingDelete(context *gin.Context) {
-	s := time.Now()
+func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhitelistingDelete(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var ipSubnetWhitelistingRepository = new(ipsubnetwhitelistings.IPSubnetWhitelisting)
@@ -211,17 +251,16 @@ func IPSubnetWhitelistingDelete(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 		return
 	}
 
 	resultError := ipSubnetWhitelistingRepository.IPSubnetWhitelistingDelete(id)
 
 	if resultError != nil {
-		response.ResultFail(88888, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "IP網段白名單管理刪除錯誤: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("刪除IP網段白名單管理", time.Since(s))
-	response.ResultOk(200, "Success", nil)
+	response.ResultSuccess(200, "Success", nil)
 }

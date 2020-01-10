@@ -69,8 +69,22 @@ func InitRouter() *gin.Engine {
 			ipWhitelistings.PUT("", ipWhitelistingControllers.IPWhitelistingCopy)
 			ipWhitelistings.DELETE("/:id", ipWhitelistingControllers.IPWhitelistingDelete)
 		}
-	}
 
+		// IP網段白名單管理
+		ipSubnetWhitelistings := router.Group("ip-subnet-whitelistings")
+		{
+			var ipSubnetWhitelistingControllers controllers.IPSubnetWhitelistingController
+
+			ipSubnetWhitelistings.GET("", ipSubnetWhitelistingControllers.IPSubnetWhitelistingsList)
+
+			// 操作api (新增、檢視、修改、複製、刪除)
+			ipSubnetWhitelistings.POST("", ipSubnetWhitelistingControllers.IPSubnetWhitelistingCreate)
+			ipSubnetWhitelistings.GET("/view/:id", ipSubnetWhitelistingControllers.IPSubnetWhitelistingView)
+			ipSubnetWhitelistings.PATCH("/:id", ipSubnetWhitelistingControllers.IPSubnetWhitelistingUpdate)
+			ipSubnetWhitelistings.PUT("", ipSubnetWhitelistingControllers.IPSubnetWhitelistingCopy)
+			ipSubnetWhitelistings.DELETE("/:id", ipSubnetWhitelistingControllers.IPSubnetWhitelistingDelete)
+		}
+	}
 
 	// 帳號管理
 	admins := router.Group("admins")
@@ -102,10 +116,6 @@ func InitRouter() *gin.Engine {
 		adminGroups.DELETE("/:id", controllers.AdminGroupDelete)
 	}
 
-
-
-
-
 	// 選單群組管理
 	menuGroups := router.Group("menu-groups")
 	{
@@ -133,21 +143,6 @@ func InitRouter() *gin.Engine {
 		menuSettings.PUT("", controllers.MenuSettingCopy)
 		menuSettings.DELETE("/:id", controllers.MenuSettingDelete)
 		menuSettings.PATCH("", controllers.MenuSettingsSort)
-	}
-
-
-
-	// IP網段白名單管理
-	ipSubnetWhitelistings := router.Group("ip-subnet-whitelistings")
-	{
-		ipSubnetWhitelistings.GET("", controllers.IPSubnetWhitelistingsList)
-
-		// 操作api (新增、檢視、修改、複製、刪除)
-		ipSubnetWhitelistings.POST("", controllers.IPSubnetWhitelistingCreate)
-		ipSubnetWhitelistings.GET("/view/:id", controllers.IPSubnetWhitelistingView)
-		ipSubnetWhitelistings.PATCH("/:id", controllers.IPSubnetWhitelistingUpdate)
-		ipSubnetWhitelistings.PUT("", controllers.IPSubnetWhitelistingCopy)
-		ipSubnetWhitelistings.DELETE("/:id", controllers.IPSubnetWhitelistingDelete)
 	}
 
 	// 地區黑名單管理
