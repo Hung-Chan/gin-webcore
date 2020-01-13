@@ -99,6 +99,21 @@ func InitRouter() *gin.Engine {
 			areaBlacklistings.PUT("", areaBlacklistingControllers.AreaBlacklistingCopy)
 			areaBlacklistings.DELETE("/:id", areaBlacklistingControllers.AreaBlacklistingDelete)
 		}
+
+		// 選單群組管理
+		menuGroups := router.Group("menu-groups")
+		{
+			var menuGroupControllers controllers.MenuGroupController
+
+			menuGroups.GET("", menuGroupControllers.MenuGroupsList)
+
+			// 操作api (新增、檢視、修改、複製、刪除)
+			menuGroups.POST("", menuGroupControllers.MenuGroupCreate)
+			menuGroups.GET("/view/:id", menuGroupControllers.MenuGroupView)
+			menuGroups.PATCH("/:id", menuGroupControllers.MenuGroupUpdate)
+			menuGroups.PUT("", menuGroupControllers.MenuGroupsCopy)
+			menuGroups.DELETE("/:id", menuGroupControllers.MenuGroupDelete)
+		}
 	}
 
 	// 帳號管理
@@ -129,19 +144,6 @@ func InitRouter() *gin.Engine {
 		adminGroups.PATCH("/:id", controllers.AdminGroupUpdate)
 		adminGroups.PUT("", controllers.AdminGroupCopy)
 		adminGroups.DELETE("/:id", controllers.AdminGroupDelete)
-	}
-
-	// 選單群組管理
-	menuGroups := router.Group("menu-groups")
-	{
-		menuGroups.GET("", controllers.MenuGroupsList)
-
-		// 操作api (新增、檢視、修改、複製、刪除)
-		menuGroups.POST("", controllers.MenuGroupCreate)
-		menuGroups.GET("/view/:id", controllers.MenuGroupView)
-		menuGroups.PATCH("/:id", controllers.MenuGroupUpdate)
-		menuGroups.PUT("", controllers.MenuGroupsCopy)
-		menuGroups.DELETE("/:id", controllers.MenuGroupDelete)
 	}
 
 	// 選單管理

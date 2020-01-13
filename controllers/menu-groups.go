@@ -1,16 +1,19 @@
 package controllers
 
 import (
-	"fmt"
 	"gin-webcore/models"
 	"gin-webcore/repositories/menugroups"
 	"gin-webcore/response"
 	"gin-webcore/validate"
+	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+// MenuGroupController .
+type MenuGroupController struct {
+}
 
 // MenuGroupsList .
 // @Summary Menu Groups List
@@ -27,11 +30,8 @@ import (
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /menu-groups [get]
-func MenuGroupsList(context *gin.Context) {
-	s := time.Now()
+func (menuGroupController MenuGroupController) MenuGroupsList(context *gin.Context) {
 	response := response.Gin{Context: context}
-
-	var result = make(map[string]interface{})
 
 	var menuGroupRepository = new(menugroups.MenuGroup)
 
@@ -39,7 +39,7 @@ func MenuGroupsList(context *gin.Context) {
 	queryModel := models.NewQueryModel()
 
 	if err := context.ShouldBind(&queryModel); err != nil {
-		response.ResultFail(1001, err.Error())
+		response.ResultError(http.StatusBadRequest, "資料綁定失敗: "+err.Error())
 		return
 	}
 
@@ -50,18 +50,33 @@ func MenuGroupsList(context *gin.Context) {
 	name := queryModel.Name
 	enable := queryModel.Enable
 
-	data, err := menuGroupRepository.MenuGroupsList(page, limit, sortColumn, sortDirection, name, enable)
+	data, total, err := menuGroupRepository.MenuGroupsList(page, limit, sortColumn, sortDirection, name, enable)
 
 	if err != nil {
-		response.ResultFail(22222, err.Error())
+		response.ResultError(http.StatusBadRequest, "選單群組管理列表資料查詢失敗: "+err.Error())
 		return
 	}
 
-	result["list"] = data
-	result["total"] = menuGroupRepository.Total()
+	var result = make(map[string]interface{})
+	var res []interface{}
 
-	fmt.Println("列表選單群組", time.Since(s))
-	response.ResultOk(200, "Success", result)
+	for _, v := range *data {
+		var save = make(map[string]interface{})
+
+		save["id"] = *v.ID
+		save["name"] = v.Name
+		save["enable"] = v.Enable
+		save["updated_at"] = v.UpdatedAt
+		save["updated_id"] = v.Administrator.ID
+		save["updated_name"] = v.Administrator.Name
+
+		res = append(res, save)
+	}
+
+	result["list"] = res
+	result["total"] = total
+
+	response.ResultSuccess(200, "Success", result)
 }
 
 // MenuGroupCreate .
@@ -74,32 +89,41 @@ func MenuGroupsList(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /menu-groups [post]
-func MenuGroupCreate(context *gin.Context) {
-	s := time.Now()
+func (menuGroupController MenuGroupController) MenuGroupCreate(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var menuGroupRepository = new(menugroups.MenuGroup)
 
 	if err := context.ShouldBind(&menuGroupRepository.MenuGroupModel); err != nil {
-		response.ResultFail(1001, err.Error())
+		response.ResultError(http.StatusBadRequest, "選單群組管理新增，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&menuGroupRepository.MenuGroupModel); checkData != nil {
-		response.ResultFail(200, checkData.Error())
+		response.ResultError(http.StatusBadRequest, "選單群組管理新增，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
-	menuGroupRepository.SetSort()
+	// 設置 Sort
+	menuGroupRepository.Sort = menuGroupRepository.Total() + 1
+
+	// 取得修改者ID
+	adminID, adminIDError := context.Get("adminID")
+	if adminIDError != true {
+		response.ResultError(http.StatusBadRequest, "新增操作者ID取得失敗")
+		return
+	}
+
+	menuGroupRepository.AdminID = adminID.(int)
+
 	resultError := menuGroupRepository.MenuGroupCreate()
 
 	if resultError != nil {
-		response.ResultFail(22222, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "選單群組管理新增失敗: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("新增選單群組", time.Since(s))
-	response.ResultOk(200, "Success", nil)
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // MenuGroupView .
@@ -112,8 +136,7 @@ func MenuGroupCreate(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /menu-groups/view/{id} [get]
-func MenuGroupView(context *gin.Context) {
-	s := time.Now()
+func (menuGroupController MenuGroupController) MenuGroupView(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var menuGroupRepository = new(menugroups.MenuGroup)
@@ -123,19 +146,18 @@ func MenuGroupView(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 		return
 	}
 
 	result, resultError := menuGroupRepository.MenuGroupView(id)
 
 	if resultError != nil {
-		response.ResultFail(22222, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "選單群組管理檢視失敗: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("檢視選單群組", time.Since(s))
-	response.ResultOk(200, "Success", result)
+	response.ResultSuccess(200, "Success", result)
 }
 
 // MenuGroupUpdate .
@@ -149,43 +171,53 @@ func MenuGroupView(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /menu-groups/{id} [patch]
-func MenuGroupUpdate(context *gin.Context) {
-	s := time.Now()
+func (menuGroupController MenuGroupController) MenuGroupUpdate(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var menuGroupRepository = new(menugroups.MenuGroup)
-
-	if err := context.ShouldBind(&menuGroupRepository.MenuGroupModel); err != nil {
-		response.ResultFail(1001, "data bind error")
-		return
-	}
 
 	// id 型態轉換
 	idParam := context.Param("id")
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 		return
 	}
+
+	if err := context.ShouldBind(&menuGroupRepository.MenuGroupModel); err != nil {
+		response.ResultError(http.StatusBadRequest, "選單群組管理修改，資料綁定錯誤: "+err.Error())
+		return
+	}
+
+	// if checkData := validate.VdeInfo(&menuGroupRepository.MenuGroupModel); checkData != nil {
+	// 	response.ResultError(http.StatusBadRequest, "選單群組管理修改，資料驗證錯誤: "+checkData.Error())
+	// 	return
+	// }
+
+	// 取得修改者ID
+	adminID, adminIDError := context.Get("adminID")
+	if adminIDError != true {
+		response.ResultError(http.StatusBadRequest, "修改操作者ID取得失敗")
+		return
+	}
+
+	menuGroupRepository.AdminID = adminID.(int)
 
 	resultError := menuGroupRepository.MenuGroupUpdate(id)
 
 	if resultError != nil {
-		response.ResultFail(22222, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "選單群組管理修改錯誤: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("修改選單群組", time.Since(s))
-	response.ResultOk(200, "Success", nil)
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // MenuGroupsCopy .
-func MenuGroupsCopy(context *gin.Context) {
-
+func (menuGroupController MenuGroupController) MenuGroupsCopy(context *gin.Context) {
 	response := response.Gin{Context: context}
-
-	response.ResultOk(200, "Success", "Data")
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // MenuGroupDelete .
@@ -198,8 +230,7 @@ func MenuGroupsCopy(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /menu-groups/{id} [delete]
-func MenuGroupDelete(context *gin.Context) {
-	s := time.Now()
+func (menuGroupController MenuGroupController) MenuGroupDelete(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var menuGroupRepository = new(menugroups.MenuGroup)
@@ -209,17 +240,20 @@ func MenuGroupDelete(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 		return
 	}
+
+	// 重新整理排序
+	menuGroupRepository.Sort = menuGroupRepository.Total() + 1
+	menuGroupRepository.MenuGroupUpdate(id)
 
 	resultError := menuGroupRepository.MenuGroupDelete(id)
 
 	if resultError != nil {
-		response.ResultFail(22222, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "選單群組管理刪除錯誤: "+resultError.Error())
 		return
 	}
 
-	fmt.Println("刪除選單群組", time.Since(s))
 	response.ResultOk(200, "Success", nil)
 }
