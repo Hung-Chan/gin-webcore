@@ -84,6 +84,21 @@ func InitRouter() *gin.Engine {
 			ipSubnetWhitelistings.PUT("", ipSubnetWhitelistingControllers.IPSubnetWhitelistingCopy)
 			ipSubnetWhitelistings.DELETE("/:id", ipSubnetWhitelistingControllers.IPSubnetWhitelistingDelete)
 		}
+
+		// 地區黑名單管理
+		areaBlacklistings := router.Group("area-blacklistings")
+		{
+			var areaBlacklistingControllers controllers.AreaBlacklistingController
+
+			areaBlacklistings.GET("", areaBlacklistingControllers.AreaBlacklistingsList)
+
+			// 操作api (新增、檢視、修改、複製、刪除)
+			areaBlacklistings.POST("", areaBlacklistingControllers.AreaBlacklistingCreate)
+			areaBlacklistings.GET("/view/:id", areaBlacklistingControllers.AreaBlacklistingView)
+			areaBlacklistings.PATCH("/:id", areaBlacklistingControllers.AreaBlacklistingUpdate)
+			areaBlacklistings.PUT("", areaBlacklistingControllers.AreaBlacklistingCopy)
+			areaBlacklistings.DELETE("/:id", areaBlacklistingControllers.AreaBlacklistingDelete)
+		}
 	}
 
 	// 帳號管理
@@ -145,18 +160,6 @@ func InitRouter() *gin.Engine {
 		menuSettings.PATCH("", controllers.MenuSettingsSort)
 	}
 
-	// 地區黑名單管理
-	areaBlacklistings := router.Group("area-blacklistings")
-	{
-		areaBlacklistings.GET("", controllers.AreaBlacklistingsList)
-
-		// 操作api (新增、檢視、修改、複製、刪除)
-		areaBlacklistings.POST("", controllers.AreaBlacklistingCreate)
-		areaBlacklistings.GET("/view/:id", controllers.AreaBlacklistingView)
-		areaBlacklistings.PATCH("/:id", controllers.AreaBlacklistingUpdate)
-		areaBlacklistings.PUT("", controllers.AreaBlacklistingCopy)
-		areaBlacklistings.DELETE("/:id", controllers.AreaBlacklistingDelete)
-	}
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
