@@ -132,7 +132,7 @@ func (administrator Administrator) AdministratorUpdate(id int) error {
 		res = res.Where("id = ? ", id)
 	}
 
-	updateError := res.Update(&administrator.AdministratorModel).Error
+	updateError := res.Update(&administrator).Error
 
 	if updateError != nil {
 		return updateError
