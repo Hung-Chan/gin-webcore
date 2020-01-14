@@ -137,7 +137,7 @@ func (adminAccess AdminAccess) AdminAccessCheckCode(id int) (*string, error) {
 func (adminAccess AdminAccess) GetAccess() (*AdminAccessesOption, error) {
 	var adminAccessesOption AdminAccessesOption
 
-	optionError := db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&adminAccessesOption).Error
+	optionError := db.Table(TableName).Where("enable = ? ", 1).Find(&adminAccessesOption).Error
 
 	if optionError != nil {
 		return nil, optionError

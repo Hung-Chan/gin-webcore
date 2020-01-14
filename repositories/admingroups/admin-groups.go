@@ -4,6 +4,9 @@ import (
 	"gin-webcore/database"
 	"gin-webcore/models"
 	"gin-webcore/models/admingroups"
+	"gin-webcore/models/administrators"
+
+	"github.com/jinzhu/gorm"
 )
 
 type (
@@ -11,6 +14,8 @@ type (
 	AdminGroup struct {
 		models.IDInfo
 		admingroups.AdminGroupModel
+		AdminID       int                          `json:"admin_id"`
+		Administrator administrators.Administrator `gorm:"ForeignKey:ID;AssociationForeignKey:AdminID"`
 	}
 
 	// AdminGroups .
@@ -27,10 +32,13 @@ var (
 )
 
 // AdminGroupsList .
-func (adminGroup AdminGroup) AdminGroupsList(page int, limit int, sortColumn string, sortDirection string, name *string, enable *int) (*AdminGroups, error) {
-	var adminGroups AdminGroups
+func (adminGroup AdminGroup) AdminGroupsList(page int, limit int, sortColumn string, sortDirection string, name *string, enable *int) (*AdminGroups, int, error) {
+	var (
+		adminGroups AdminGroups
+		count       int = 0
+	)
 
-	res := db.Debug().Table(TableName)
+	res := db.Table(TableName)
 
 	if name != nil {
 		res = res.Where("name LIKE ?", "%"+*name+"%")
@@ -40,18 +48,20 @@ func (adminGroup AdminGroup) AdminGroupsList(page int, limit int, sortColumn str
 		res = res.Where("enable = ?", enable)
 	}
 
-	listError := res.Order(sortColumn + " " + sortDirection).Offset((page - 1) * limit).Limit(limit).Find(&adminGroups).Error
+	listError := res.Order(sortColumn+" "+sortDirection).Offset((page-1)*limit).Count(&count).Limit(limit).Preload("Administrator", func(db *gorm.DB) *gorm.DB {
+		return db.Select([]string{"id", "name"})
+	}).Find(&adminGroups).Error
 
 	if listError != nil {
-		return nil, listError
+		return nil, 0, listError
 	}
 
-	return &adminGroups, nil
+	return &adminGroups, count, nil
 }
 
 // AdmingroupCreate .
 func (adminGroup AdminGroup) AdmingroupCreate() error {
-	createError := db.Debug().Table(TableName).Create(&adminGroup).Error
+	createError := db.Table(TableName).Create(&adminGroup).Error
 
 	if createError != nil {
 		return createError
@@ -62,7 +72,7 @@ func (adminGroup AdminGroup) AdmingroupCreate() error {
 
 // AdmingroupView .
 func (adminGroup AdminGroup) AdmingroupView(id int) (*admingroups.AdminGroupModel, error) {
-	viewError := db.Debug().Table(TableName).Where("id = ? ", id).First(&adminGroup.AdminGroupModel).Error
+	viewError := db.Table(TableName).Where("id = ? ", id).First(&adminGroup.AdminGroupModel).Error
 
 	if viewError != nil {
 		return nil, viewError
@@ -73,7 +83,7 @@ func (adminGroup AdminGroup) AdmingroupView(id int) (*admingroups.AdminGroupMode
 
 // AdmingroupUpdate .
 func (adminGroup AdminGroup) AdmingroupUpdate(id int) error {
-	updateError := db.Debug().Model(adminGroup).Where("id = ? ", id).Update(&adminGroup.AdminGroupModel).Error
+	updateError := db.Model(adminGroup).Where("id = ? ", id).Update(&adminGroup).Error
 
 	if updateError != nil {
 		return updateError
@@ -84,22 +94,13 @@ func (adminGroup AdminGroup) AdmingroupUpdate(id int) error {
 
 // AdmingroupDelete .
 func (adminGroup AdminGroup) AdmingroupDelete(id int) error {
-	deleteError := db.Debug().Table(TableName).Where("id = ? ", id).Delete(&adminGroup).Error
+	deleteError := db.Table(TableName).Where("id = ? ", id).Delete(&adminGroup).Error
 
 	if deleteError != nil {
 		return deleteError
 	}
 
 	return nil
-}
-
-// Total .
-func (adminGroup AdminGroup) Total() int {
-	var count int
-
-	db.Debug().Table(TableName).Count(&count)
-
-	return count
 }
 
 // AdminGroupOption .

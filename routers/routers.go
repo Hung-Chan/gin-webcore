@@ -25,6 +25,22 @@ func InitRouter() *gin.Engine {
 			auth.POST("/logout", controllers.Logout)
 		}
 
+		// 群組管理
+		adminGroups := router.Group("admin-groups")
+		{
+			var adminGroupControllers controllers.AdminGroupController
+
+			adminGroups.GET("", adminGroupControllers.AdminGroupsList)
+			adminGroups.GET("/permission", adminGroupControllers.AdminGroupsPermission)
+
+			// 操作api (新增、檢視、修改、複製、刪除)
+			adminGroups.POST("", adminGroupControllers.AdminGroupCreate)
+			adminGroups.GET("/view/:id", adminGroupControllers.AdminGroupView)
+			adminGroups.PATCH("/:id", adminGroupControllers.AdminGroupUpdate)
+			adminGroups.PUT("", adminGroupControllers.AdminGroupCopy)
+			adminGroups.DELETE("/:id", adminGroupControllers.AdminGroupDelete)
+		}
+
 		// 層級管理
 		adminLevels := router.Group("admin-levels")
 		{
@@ -130,20 +146,6 @@ func InitRouter() *gin.Engine {
 		admins.PATCH("/:id", controllers.AdministratorUpdate)
 		admins.PUT("", controllers.AdministratorCopy)
 		admins.DELETE("/:id", controllers.AdministratorDelete)
-	}
-
-	// 群組管理
-	adminGroups := router.Group("admin-groups")
-	{
-		adminGroups.GET("", controllers.AdminGroupsList)
-		adminGroups.GET("/permission", controllers.AdminGroupsPermission)
-
-		// 操作api (新增、檢視、修改、複製、刪除)
-		adminGroups.POST("", controllers.AdminGroupCreate)
-		adminGroups.GET("/view/:id", controllers.AdminGroupView)
-		adminGroups.PATCH("/:id", controllers.AdminGroupUpdate)
-		adminGroups.PUT("", controllers.AdminGroupCopy)
-		adminGroups.DELETE("/:id", controllers.AdminGroupDelete)
 	}
 
 	// 選單管理

@@ -54,7 +54,7 @@ func (menuSetting MenuSetting) SidebarMenu() (*MenuSettings, error) {
 func (menuSetting MenuSetting) GetPermission() (Permissions, error) {
 	var permissions Permissions
 
-	permissionError := db.Debug().Table(TableName).Where("enable =? ", 1).Find(&permissions).Error
+	permissionError := db.Table(TableName).Where("enable =? ", 1).Find(&permissions).Error
 
 	if permissionError != nil {
 		return nil, permissionError
