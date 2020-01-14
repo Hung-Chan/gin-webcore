@@ -107,7 +107,7 @@ func (adminGroup AdminGroup) AdmingroupDelete(id int) error {
 func (adminGroup AdminGroup) AdminGroupOption() (*AdminGroupOptions, error) {
 	var adminGroupOptions AdminGroupOptions
 
-	optionError := db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&adminGroupOptions).Error
+	optionError := db.Table(TableName).Where("enable = ? ", 1).Find(&adminGroupOptions).Error
 
 	if optionError != nil {
 		return nil, optionError

@@ -16,9 +16,9 @@ type (
 	Administrator struct {
 		models.IDInfo
 		administrators.AdministratorModel
-		AdminGroups   admingroups.AdminGroup `gorm:"ForeignKey:GroupID"`
-		AdminLevels   adminlevels.AdminLevel `gorm:"ForeignKey:LevelID"`
-		Administrator []Administrator        `gorm:"ForeignKey:ID;AssociationForeignKey:AdminID"`
+		AdminGroups   admingroups.AdminGroup       `gorm:"ForeignKey:GroupID"`
+		AdminLevels   adminlevels.AdminLevel       `gorm:"ForeignKey:LevelID"`
+		Administrator administrators.Administrator `gorm:"ForeignKey:ID;AssociationForeignKey:AdminID"`
 	}
 
 	// Administrators .
@@ -48,10 +48,13 @@ func (administrator Administrator) AdministratorFindByID(id int) (*administrator
 }
 
 // AdministratorsList .
-func (administrator Administrator) AdministratorsList(page int, limit int, sortColumn string, sortDirection string, group *int, level *int, nameItem *string, accountOrName *string, enable *int) (*Administrators, error) {
-	var administrators Administrators
+func (administrator Administrator) AdministratorsList(page int, limit int, sortColumn string, sortDirection string, group *int, level *int, nameItem *string, accountOrName *string, enable *int) (*Administrators, int, error) {
+	var (
+		administrators Administrators
+		count          int = 0
+	)
 
-	res := db.Debug().Table(TableName)
+	res := db.Table(TableName)
 
 	if nameItem != nil && accountOrName != nil {
 		res = res.Where(*nameItem+" LIKE ?", "%"+*accountOrName+"%")
@@ -71,8 +74,9 @@ func (administrator Administrator) AdministratorsList(page int, limit int, sortC
 
 	listError := res.Order(sortColumn+" "+sortDirection).
 		Offset((page-1)*limit).
+		Count(&count).
 		Limit(limit).
-		Select([]string{"id", "account", "name", "group_id", "level_id", "remark", "enable", "admin_id", "created_at", "updated_at"}).
+		Select([]string{"id", "account", "name", "group_id", "level_id", "remark", "enable", "admin_id", "updated_at"}).
 		Preload("AdminGroups", func(db *gorm.DB) *gorm.DB {
 			return db.Select([]string{"id", "name"})
 		}).
@@ -85,15 +89,15 @@ func (administrator Administrator) AdministratorsList(page int, limit int, sortC
 		Find(&administrators).Error
 
 	if listError != nil {
-		return nil, listError
+		return nil, 0, listError
 	}
 
-	return &administrators, nil
+	return &administrators, count, nil
 }
 
 // AdministratorCreate .
 func (administrator Administrator) AdministratorCreate() error {
-	createError := db.Debug().Table(TableName).Create(&administrator).Error
+	createError := db.Table(TableName).Create(&administrator).Error
 
 	if createError != nil {
 		return createError
@@ -102,30 +106,25 @@ func (administrator Administrator) AdministratorCreate() error {
 	return nil
 }
 
-// Total .
-func (administrator Administrator) Total() int {
-	var count int
-
-	db.Debug().Table(TableName).Count(&count)
-
-	return count
-}
-
 // AdministratorView .
-func (administrator Administrator) AdministratorView(id int) (*administrators.AdministratorModel, error) {
+func (administrator Administrator) AdministratorView(id int) (*Administrator, error) {
 
-	viewError := db.Debug().Table(TableName).Where("id = ? ", id).Select([]string{"account", "name", "group_id", "level_id", "remark", "enable"}).First(&administrator.AdministratorModel).Error
+	viewError := db.Table(TableName).Where("id = ? ", id).
+		Select([]string{"account", "name", "group_id", "level_id", "remark", "enable"}).
+		Preload("AdminGroups").
+		First(&administrator).
+		Error
 
 	if viewError != nil {
 		return nil, viewError
 	}
 
-	return &administrator.AdministratorModel, nil
+	return &administrator, nil
 }
 
 // AdministratorUpdate .
 func (administrator Administrator) AdministratorUpdate(id int) error {
-	res := db.Debug().Model(administrator)
+	res := db.Model(administrator)
 
 	if administrator.Password == "" {
 		res = res.Where("id = ? ", id).Omit("Password")
@@ -144,11 +143,29 @@ func (administrator Administrator) AdministratorUpdate(id int) error {
 
 // AdministratorDelete .
 func (administrator Administrator) AdministratorDelete(id int) error {
-	deleteError := db.Debug().Table(TableName).Where("id = ? ", id).Delete(&administrator).Error
+	deleteError := db.Table(TableName).Where("id = ? ", id).Delete(&administrator).Error
 
 	if deleteError != nil {
 		return deleteError
 	}
 
 	return nil
+}
+
+// AdministratorCheckExist 檢查帳號是否存在 .
+func (administrator Administrator) AdministratorCheckExist(account string, id int) bool {
+
+	data := db.Table(TableName).Where("account = ?", account)
+
+	if id != 0 {
+		data = data.Where("id != ?", id)
+	}
+
+	checkError := data.First(&administrator).Error
+
+	if administrator.ID != nil || (checkError != nil && db.RecordNotFound()) {
+		return true
+	}
+
+	return false
 }

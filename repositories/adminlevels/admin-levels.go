@@ -135,7 +135,7 @@ func (adminLevel AdminLevel) AdminLevelCheckLevel(id int) (*int, error) {
 func (adminLevel AdminLevel) AdminLevelOption() (*AdminLevelOptions, error) {
 	var adminLevelOptions AdminLevelOptions
 
-	optionError := db.Debug().Table(TableName).Where("enable = ? ", 1).Find(&adminLevelOptions).Error
+	optionError := db.Table(TableName).Where("enable = ? ", 1).Find(&adminLevelOptions).Error
 
 	if optionError != nil {
 		return nil, optionError

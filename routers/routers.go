@@ -25,6 +25,24 @@ func InitRouter() *gin.Engine {
 			auth.POST("/logout", controllers.Logout)
 		}
 
+		// 帳號管理
+		admins := router.Group("admins")
+		{
+			var administratorControllers controllers.AdministratorController
+
+			admins.GET("", administratorControllers.AdministratorsList)
+			admins.GET("/groups", administratorControllers.AdministratorGroups)
+			admins.GET("/levels", administratorControllers.AdministratorLevels)
+			admins.GET("/group-permission/:id", administratorControllers.AdministratorGroupPermission)
+
+			// 操作api (新增、檢視、修改、複製、刪除)
+			admins.POST("", administratorControllers.AdministratorCreate)
+			admins.GET("/view/:id", administratorControllers.AdministratorView)
+			admins.PATCH("/:id", administratorControllers.AdministratorUpdate)
+			admins.PUT("", administratorControllers.AdministratorCopy)
+			admins.DELETE("/:id", administratorControllers.AdministratorDelete)
+		}
+
 		// 群組管理
 		adminGroups := router.Group("admin-groups")
 		{
@@ -130,22 +148,6 @@ func InitRouter() *gin.Engine {
 			menuGroups.PUT("", menuGroupControllers.MenuGroupsCopy)
 			menuGroups.DELETE("/:id", menuGroupControllers.MenuGroupDelete)
 		}
-	}
-
-	// 帳號管理
-	admins := router.Group("admins")
-	{
-		admins.GET("", controllers.AdministratorsList)
-		admins.GET("/groups", controllers.AdministratorGroups)
-		admins.GET("/levels", controllers.AdministratorLevels)
-		admins.GET("/group-permission/:id", controllers.AdministratorGroupPermission)
-
-		// 操作api (新增、檢視、修改、複製、刪除)
-		admins.POST("", controllers.AdministratorCreate)
-		admins.GET("/view/:id", controllers.AdministratorView)
-		admins.PATCH("/:id", controllers.AdministratorUpdate)
-		admins.PUT("", controllers.AdministratorCopy)
-		admins.DELETE("/:id", controllers.AdministratorDelete)
 	}
 
 	// 選單管理
