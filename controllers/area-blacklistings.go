@@ -214,7 +214,7 @@ func (areaBlacklistingController AreaBlacklistingController) AreaBlacklistingUpd
 // AreaBlacklistingCopy .
 func (areaBlacklistingController AreaBlacklistingController) AreaBlacklistingCopy(context *gin.Context) {
 	response := response.Gin{Context: context}
-	response.ResultSuccess(200, "Success", "Data")
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // AreaBlacklistingDelete .

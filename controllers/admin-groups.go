@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// AdminGroupController .
 type AdminGroupController struct {
 }
 

@@ -247,7 +247,7 @@ func (adminAccessController AdminAccessController) AdminAccessUpdate(context *gi
 // AdminAccessCopy .
 func (adminAccessController AdminAccessController) AdminAccessCopy(context *gin.Context) {
 	response := response.Gin{Context: context}
-	response.ResultSuccess(200, "Success", "Data")
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // AdminAccessDelete .
@@ -271,6 +271,7 @@ func (adminAccessController AdminAccessController) AdminAccessDelete(context *gi
 
 	if idError != nil {
 		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		return
 	}
 
 	resultError := adminAccessRepository.AdminAccessDelete(id)
