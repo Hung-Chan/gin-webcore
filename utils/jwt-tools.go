@@ -22,7 +22,7 @@ func GenerateToken(account string, id int) (string, error) {
 		account,
 		id,
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Minute * 60).Unix(),
+			ExpiresAt: time.Now().Add(time.Minute * 60 * 8).Unix(),
 		},
 	}
 
