@@ -148,24 +148,25 @@ func InitRouter() *gin.Engine {
 			menuGroups.PUT("", menuGroupControllers.MenuGroupsCopy)
 			menuGroups.DELETE("/:id", menuGroupControllers.MenuGroupDelete)
 		}
+
+		// 選單管理
+		menuSettings := router.Group("menu-settings")
+		{
+			var menuSettingControllers controllers.MenuSettingController
+
+			menuSettings.GET("", menuSettingControllers.MenuSettingsList)
+			menuSettings.GET("/groups", menuSettingControllers.MenuGroupsOption)
+			menuSettings.GET("/accesses", menuSettingControllers.MenuAccessesOption)
+
+			// 操作api (新增、檢視、修改、複製、刪除)
+			menuSettings.POST("", menuSettingControllers.MenuSettingCreate)
+			menuSettings.GET("/view/:id", menuSettingControllers.MenuSettingView)
+			menuSettings.PATCH("/:id", menuSettingControllers.MenuSettingUpdate)
+			menuSettings.PUT("", menuSettingControllers.MenuSettingCopy)
+			menuSettings.DELETE("/:id", menuSettingControllers.MenuSettingDelete)
+			menuSettings.PATCH("", menuSettingControllers.MenuSettingsSort)
+		}
 	}
-
-	// 選單管理
-	menuSettings := router.Group("menu-settings")
-	{
-		menuSettings.GET("", controllers.MenuSettingsList)
-		menuSettings.GET("/groups", controllers.MenuGroupsOption)
-		menuSettings.GET("/accesses", controllers.MenuAccessesOption)
-
-		// 操作api (新增、檢視、修改、複製、刪除)
-		menuSettings.POST("", controllers.MenuSettingCreate)
-		menuSettings.GET("/view/:id", controllers.MenuSettingView)
-		menuSettings.PATCH("/:id", controllers.MenuSettingUpdate)
-		menuSettings.PUT("", controllers.MenuSettingCopy)
-		menuSettings.DELETE("/:id", controllers.MenuSettingDelete)
-		menuSettings.PATCH("", controllers.MenuSettingsSort)
-	}
-
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{

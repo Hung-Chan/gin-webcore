@@ -6,10 +6,15 @@ import (
 	"gin-webcore/repositories/menusettings"
 	"gin-webcore/response"
 	"gin-webcore/validate"
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
+
+// MenuSettingController .
+type MenuSettingController struct {
+}
 
 // MenuSettingsList .
 // @Summary Menu Settings List
@@ -20,7 +25,7 @@ import (
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /menu-settings [get]
-func MenuSettingsList(context *gin.Context) {
+func (menuSettingController MenuSettingController) MenuSettingsList(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var menuSettingsRepository = new(menusettings.MenuSetting)
@@ -28,13 +33,20 @@ func MenuSettingsList(context *gin.Context) {
 	data, err := menuSettingsRepository.MenuSettingsList()
 
 	if err != nil {
-		response.ResultFail(66666, err.Error())
+		response.ResultError(http.StatusBadRequest, "選單管理列表資料查詢失敗: "+err.Error())
 		return
 	}
 
+	result := ChildrenRecursion(*data)
+
+	response.ResultSuccess(200, "Success", result)
+}
+
+// ChildrenRecursion .
+func ChildrenRecursion(data menusettings.MenuSettings) interface{} {
 	var result []interface{}
 
-	for _, v := range *data {
+	for _, v := range data {
 		var save = make(map[string]interface{})
 
 		save["id"] = *v.ID
@@ -46,12 +58,19 @@ func MenuSettingsList(context *gin.Context) {
 		save["code"] = v.Code
 		save["enable"] = v.Enable
 		save["updated_at"] = v.UpdatedAt
-		save["children"] = v.Children
+		save["updated_id"] = v.Administrator.ID
+		save["updated_name"] = v.Administrator.Name
+
+		if len(v.Children) > 0 {
+			save["children"] = ChildrenRecursion(v.Children)
+		} else {
+			save["children"] = v.Children
+		}
 
 		result = append(result, save)
 	}
 
-	response.ResultOk(200, "Success", result)
+	return result
 }
 
 // MenuGroupsOption .
@@ -63,7 +82,7 @@ func MenuSettingsList(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /menu-settings/groups [get]
-func MenuGroupsOption(context *gin.Context) {
+func (menuSettingController MenuSettingController) MenuGroupsOption(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var menuGroupsRepository = new(menugroups.MenuGroup)
@@ -71,11 +90,11 @@ func MenuGroupsOption(context *gin.Context) {
 	result, resultError := menuGroupsRepository.MenuGroupOptions()
 
 	if resultError != nil {
-		response.ResultFail(15951, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "選單群組項目取得失敗: "+resultError.Error())
 		return
 	}
 
-	response.ResultOk(200, "Success", result)
+	response.ResultSuccess(200, "Success", result)
 }
 
 // MenuAccessesOption .
@@ -87,7 +106,7 @@ func MenuGroupsOption(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /menu-settings/accesses [get]
-func MenuAccessesOption(context *gin.Context) {
+func (menuSettingController MenuSettingController) MenuAccessesOption(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var adminAccessRepository = new(adminaccesses.AdminAccess)
@@ -95,11 +114,11 @@ func MenuAccessesOption(context *gin.Context) {
 	result, resultError := adminAccessRepository.AdminAccessesOption()
 
 	if resultError != nil {
-		response.ResultFail(15951, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "選單權限項目取得失敗: "+resultError.Error())
 		return
 	}
 
-	response.ResultOk(200, "Success", result)
+	response.ResultSuccess(200, "Success", result)
 }
 
 // MenuSettingCreate .
@@ -112,18 +131,18 @@ func MenuAccessesOption(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /menu-settings [post]
-func MenuSettingCreate(context *gin.Context) {
+func (menuSettingController MenuSettingController) MenuSettingCreate(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var menuSettingsRepository = new(menusettings.MenuSetting)
 
 	if err := context.ShouldBind(&menuSettingsRepository.MenusettingModel); err != nil {
-		response.ResultFail(1001, "data bind error")
+		response.ResultError(http.StatusBadRequest, "選單管理新增，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&menuSettingsRepository.MenusettingModel); checkData != nil {
-		response.ResultFail(15951, checkData.Error())
+		response.ResultError(http.StatusBadRequest, "選單管理新增，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
@@ -135,16 +154,25 @@ func MenuSettingCreate(context *gin.Context) {
 		return
 	}
 
-	menuSettingsRepository.Sort = *total + 1
+	menuSettingsRepository.Sort = total + 1
+
+	// 取得修改者ID
+	adminID, adminIDError := context.Get("adminID")
+	if adminIDError != true {
+		response.ResultError(http.StatusBadRequest, "新增操作者ID取得失敗")
+		return
+	}
+
+	menuSettingsRepository.AdminID = adminID.(int)
 
 	resultError := menuSettingsRepository.MenuSettingCreate()
 
 	if resultError != nil {
-		response.ResultFail(15951, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "選單管理新增失敗: "+resultError.Error())
 		return
 	}
 
-	response.ResultOk(200, "Success", nil)
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // MenuSettingView .
@@ -157,7 +185,7 @@ func MenuSettingCreate(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /menu-settings/view/{id} [get]
-func MenuSettingView(context *gin.Context) {
+func (menuSettingController MenuSettingController) MenuSettingView(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var menuSettingsRepository = new(menusettings.MenuSetting)
@@ -167,18 +195,18 @@ func MenuSettingView(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 		return
 	}
 
 	result, resultError := menuSettingsRepository.MenuSettingView(id)
 
 	if resultError != nil {
-		response.ResultFail(66666, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "選單管理檢視失敗: "+resultError.Error())
 		return
 	}
 
-	response.ResultOk(200, "Success", result)
+	response.ResultSuccess(200, "Success", result)
 }
 
 // MenuSettingUpdate .
@@ -192,7 +220,7 @@ func MenuSettingView(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /menu-settings/{id} [patch]
-func MenuSettingUpdate(context *gin.Context) {
+func (menuSettingController MenuSettingController) MenuSettingUpdate(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var menuSettingsRepository = new(menusettings.MenuSetting)
@@ -202,35 +230,43 @@ func MenuSettingUpdate(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 		return
 	}
 
 	if err := context.ShouldBind(&menuSettingsRepository.MenusettingModel); err != nil {
-		response.ResultFail(1001, "data bind error")
+		response.ResultError(http.StatusBadRequest, "選單管理修改，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&menuSettingsRepository.MenusettingModel); checkData != nil {
-		response.ResultFail(200, checkData.Error())
+		response.ResultError(http.StatusBadRequest, "選單管理修改，資料驗證錯誤: "+checkData.Error())
 		return
 	}
+
+	// 取得修改者ID
+	adminID, adminIDError := context.Get("adminID")
+	if adminIDError != true {
+		response.ResultError(http.StatusBadRequest, "修改操作者ID取得失敗")
+		return
+	}
+
+	menuSettingsRepository.AdminID = adminID.(int)
 
 	resultError := menuSettingsRepository.MenuSettingUpdate(id)
 
 	if resultError != nil {
-		response.ResultFail(66666, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "選單管理修改錯誤: "+resultError.Error())
 		return
 	}
 
-	response.ResultOk(200, "Success", "Data")
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // MenuSettingCopy .
-func MenuSettingCopy(context *gin.Context) {
+func (menuSettingController MenuSettingController) MenuSettingCopy(context *gin.Context) {
 	response := response.Gin{Context: context}
-
-	response.ResultOk(200, "Success", "Data")
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // MenuSettingDelete .
@@ -243,7 +279,7 @@ func MenuSettingCopy(context *gin.Context) {
 // @Success 200 {object} response.response
 // @Failure 400 {object} response.response
 // @Router /menu-settings/{id} [delete]
-func MenuSettingDelete(context *gin.Context) {
+func (menuSettingController MenuSettingController) MenuSettingDelete(context *gin.Context) {
 	response := response.Gin{Context: context}
 
 	var menuSettingsRepository = new(menusettings.MenuSetting)
@@ -253,24 +289,47 @@ func MenuSettingDelete(context *gin.Context) {
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultFail(1002, "id Conversion failed")
+		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
 		return
 	}
 
 	resultError := menuSettingsRepository.MenuSettingDelete(id)
 
 	if resultError != nil {
-		response.ResultFail(66666, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "選單管理刪除錯誤: "+resultError.Error())
 		return
 	}
 
-	response.ResultOk(200, "Success", nil)
+	response.ResultSuccess(200, "Success", nil)
 }
 
 // MenuSettingsSort .
-func MenuSettingsSort(context *gin.Context) {
-
+func (menuSettingController MenuSettingController) MenuSettingsSort(context *gin.Context) {
 	response := response.Gin{Context: context}
 
-	response.ResultOk(200, "Success", "Data")
+	var (
+		menuSettingsRepository = new(menusettings.MenuSetting)
+		menusettingSort        menusettings.MenusettingSort
+	)
+
+	if err := context.ShouldBind(&menusettingSort); err != nil {
+		response.ResultError(http.StatusBadRequest, "選單管理排序，資料綁定錯誤: "+err.Error())
+		return
+	}
+
+	sortable := menusettingSort.Sortables
+
+	for index, value := range sortable {
+
+		sort := index + 1
+
+		resultError := menuSettingsRepository.MenuSettingSort(value.ID, value.ParentID, sort)
+
+		if resultError != nil {
+			response.ResultError(http.StatusBadRequest, "選單管理排序錯誤: "+resultError.Error())
+			return
+		}
+	}
+
+	response.ResultSuccess(200, "Success", nil)
 }

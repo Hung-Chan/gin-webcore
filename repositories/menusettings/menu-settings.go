@@ -3,6 +3,7 @@ package menusettings
 import (
 	"gin-webcore/database"
 	"gin-webcore/models"
+	"gin-webcore/models/administrators"
 	"gin-webcore/models/menusettings"
 	"gin-webcore/repositories/menugroups"
 
@@ -14,8 +15,21 @@ type (
 	MenuSetting struct {
 		models.IDInfo
 		menusettings.MenusettingModel
-		MenuGroups menugroups.MenuGroup `gorm:"ForeignKey:GroupID" PRELOAD:"false"`
-		Children   []MenuSetting        `json:"children" gorm:"foreignkey:ParentID"`
+		MenuGroups    menugroups.MenuGroup         `gorm:"ForeignKey:GroupID" PRELOAD:"false"`
+		Children      []MenuSetting                `json:"children" gorm:"foreignkey:ParentID"`
+		AdminID       int                          `json:"admin_id"`
+		Administrator administrators.Administrator `gorm:"ForeignKey:ID;AssociationForeignKey:AdminID"`
+	}
+
+	// MenusettingSort .
+	MenusettingSort struct {
+		Sortables []Sortable `json:"sortable"`
+	}
+
+	// Sortable .
+	Sortable struct {
+		ID       int `json:"id"`
+		ParentID int `json:"parent_id"`
 	}
 
 	// MenuSettings .
@@ -66,9 +80,12 @@ func (menuSetting MenuSetting) GetPermission() (Permissions, error) {
 func (menuSetting MenuSetting) MenuSettingsList() (*MenuSettings, error) {
 	var menuSettings MenuSettings
 
-	listError := db.Debug().Set("gorm:auto_preload", true).Table(TableName).
+	listError := db.Set("gorm:auto_preload", true).Table(TableName).
 		Preload("MenuGroups", func(db *gorm.DB) *gorm.DB {
 			return db.Select([]string{"id", "name"}).Where("enable = ?", 1)
+		}).
+		Preload("Administrator", func(db *gorm.DB) *gorm.DB {
+			return db.Select([]string{"id", "name"})
 		}).
 		Find(&menuSettings).Error
 
@@ -81,7 +98,7 @@ func (menuSetting MenuSetting) MenuSettingsList() (*MenuSettings, error) {
 
 // MenuSettingCreate .
 func (menuSetting MenuSetting) MenuSettingCreate() error {
-	createError := db.Debug().Table(TableName).Create(&menuSetting).Error
+	createError := db.Table(TableName).Create(&menuSetting).Error
 
 	if createError != nil {
 		return createError
@@ -92,7 +109,7 @@ func (menuSetting MenuSetting) MenuSettingCreate() error {
 
 // MenuSettingView .
 func (menuSetting MenuSetting) MenuSettingView(id int) (*menusettings.MenusettingModel, error) {
-	viewError := db.Debug().Table(TableName).Where("id = ? ", id).First(&menuSetting.MenusettingModel).Error
+	viewError := db.Table(TableName).Where("id = ? ", id).First(&menuSetting.MenusettingModel).Error
 
 	if viewError != nil {
 		return nil, viewError
@@ -103,7 +120,7 @@ func (menuSetting MenuSetting) MenuSettingView(id int) (*menusettings.Menusettin
 
 // MenuSettingUpdate .
 func (menuSetting MenuSetting) MenuSettingUpdate(id int) error {
-	updateError := db.Debug().Model(menuSetting).Where("id = ? ", id).Update(&menuSetting.MenusettingModel).Error
+	updateError := db.Model(menuSetting).Where("id = ? ", id).Update(&menuSetting).Error
 
 	if updateError != nil {
 		return updateError
@@ -114,7 +131,7 @@ func (menuSetting MenuSetting) MenuSettingUpdate(id int) error {
 
 // MenuSettingDelete .
 func (menuSetting MenuSetting) MenuSettingDelete(id int) error {
-	deleteError := db.Debug().Table(TableName).Where("id = ? ", id).Delete(&menuSetting).Error
+	deleteError := db.Table(TableName).Where("id = ? ", id).Delete(&menuSetting).Error
 
 	if deleteError != nil {
 		return deleteError
@@ -124,14 +141,26 @@ func (menuSetting MenuSetting) MenuSettingDelete(id int) error {
 }
 
 // Total .
-func (menuSetting MenuSetting) Total() (*int, error) {
+func (menuSetting MenuSetting) Total() (int, error) {
 	var total int
 
-	totalError := db.Debug().Table(TableName).Count(&total).Error
+	totalError := db.Table(TableName).Count(&total).Error
 
 	if totalError != nil {
-		return nil, totalError
+		return 0, totalError
 	}
 
-	return &total, nil
+	return total, nil
+}
+
+// MenuSettingSort .
+func (menuSetting MenuSetting) MenuSettingSort(id int, parentID int, sort int) error {
+
+	sortError := db.Model(menuSetting).Where("id = ?", id).Updates(map[string]interface{}{"parent_id": parentID, "sort": sort}).Error
+
+	if sortError != nil {
+		return sortError
+	}
+
+	return nil
 }
