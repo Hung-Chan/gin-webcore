@@ -5,9 +5,7 @@ WORKDIR /go/src/gin-webcore
 
 COPY ./ .
 
-RUN ls
-
-RUN apk add bash
+RUN apk add bash && apk add gcc && apk add g++
 
 # RUN go mod init go-core
 
