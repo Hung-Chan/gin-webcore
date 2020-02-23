@@ -5,6 +5,8 @@ import (
 	"gin-webcore/database"
 	_ "gin-webcore/docs"
 	"gin-webcore/routers"
+	"net/http"
+	"time"
 )
 
 // @title Golang Gin-Webcore API
@@ -16,5 +18,14 @@ func main() {
 	defer database.DB.Close()
 
 	router := routers.InitRouter()
-	router.Run(":1002")
+
+	server := &http.Server{
+		Addr:           ":1002",
+		Handler:        router,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+
+	server.ListenAndServe()
 }
