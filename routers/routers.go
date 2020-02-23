@@ -1,18 +1,21 @@
 package routers
 
 import (
-	"gin-webcore/middleware"
 	"gin-webcore/controllers"
+	"gin-webcore/middleware"
 
 	"github.com/gin-gonic/gin"
-	"github.com/swaggo/files"
-	"github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // InitRouter .
 func InitRouter() *gin.Engine {
 
 	router := gin.Default()
+
+	// CORS .
+	router.Use(middleware.CORS())
 
 	router.POST("/auth/login", controllers.Login)
 
