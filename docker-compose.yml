@@ -41,7 +41,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=123456
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
@@ -60,23 +60,27 @@ services:
       - go-net
 
   redis:
+    image: redis:latest
     restart: always
-    container_name: redis
-    image: redis:alpine
     ports:
       - 6379:6379
     volumes:
-      - /data/redis-data:/data
+      - ./data/redis-data:/data
     networks:
       - go-net
 
   redis-webui:
     image: erikdubbelboer/phpredisadmin
     environment:
-      - ADMIN_USER=root
-      - ADMIN_PASS=123456
-      - REDIS_1_HOST=redis
-      - REDIS_1_PORT=6379
+      # 服務器主機
+      REDIS_1_HOST: redis
+      # 服務器名稱
+      REDIS_1_NAME: gin-webcore
+      # 服務器PORT
+      REDIS_1_PORT: 6379
+      # 設定帳號密碼
+      ADMIN_USER: root
+      ADMIN_PASS: 123456
     networks:
       - go-net
     ports:
