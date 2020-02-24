@@ -24,9 +24,12 @@ import (
 var DB *gorm.DB
 var err error
 
-func init() {
+// Conn .
+func Conn(drive string, conn string) {
 	fmt.Println("DB Conn")
-	DB, err = gorm.Open("mysql", "root:123456@tcp(mariadb:3306)/default_go?charset=utf8&parseTime=True&loc=Local")
+
+	DB, err = gorm.Open(drive, conn) //"root:123456@tcp(127.0.0.1:3307)/default_go?charset=utf8&parseTime=True&loc=Local")
+
 	fmt.Println(DB)
 	if err != nil {
 		log.Fatalln(err)
