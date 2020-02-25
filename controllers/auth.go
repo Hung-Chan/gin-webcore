@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	// "gin-webcore/middleware"
 	"gin-webcore/redis"
@@ -79,7 +80,8 @@ func Login(context *gin.Context) {
 	}
 
 	// 將Token寫入redis
-	writeRedisError := redis.SetValue(adminInfo.Account, token, 0)
+	coverID := strconv.Itoa(*adminInfo.ID)
+	writeRedisError := redis.SetValue(coverID, token, 0)
 	if writeRedisError != nil {
 		response.ResultError(http.StatusBadRequest, "Token紀錄Redis失敗")
 		return
@@ -197,6 +199,10 @@ func Logout(context *gin.Context) {
 		response.ResultError(http.StatusBadRequest, err.Error())
 		return
 	}
+
+	coverID := strconv.Itoa(adminID.(int))
+	// 刪除redis token
+	redis.DeleteValue(coverID)
 
 	response.ResultSuccess(200, "Success", nil)
 }

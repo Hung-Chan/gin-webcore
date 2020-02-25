@@ -5,6 +5,7 @@ import (
 	"gin-webcore/response"
 	"gin-webcore/utils"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -39,7 +40,8 @@ func Jwt() gin.HandlerFunc {
 			}
 
 			// Token && Redis Token 比對
-			redisToken, redisTokenError := redis.RedisManage.Get(claims.Account).Result()
+			coverID := strconv.Itoa(claims.ID)
+			redisToken, redisTokenError := redis.RedisManage.Get(coverID).Result()
 			if redisTokenError != nil {
 				code = http.StatusForbidden
 				message = "Token 驗證錯誤"
