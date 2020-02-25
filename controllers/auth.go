@@ -159,7 +159,7 @@ func SidebarMenu(context *gin.Context) {
 
 	response := response.Gin{Context: context}
 
-	var menusettingService = new(menusettings.MenuSetting)
+	var menusettingService = new(menusettings.SidebarMenuSetting)
 
 	result, resultError := menusettingService.SidebarMenu()
 

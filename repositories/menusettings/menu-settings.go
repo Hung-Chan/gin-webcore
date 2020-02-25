@@ -21,6 +21,15 @@ type (
 		Administrator administrators.Administrator `gorm:"ForeignKey:ID;AssociationForeignKey:AdminID"`
 	}
 
+	// SidebarMenuSetting .
+	SidebarMenuSetting struct {
+		models.IDInfo
+		menusettings.SidebarMenusettingModel
+		MenuGroups    menugroups.MenuGroup         `gorm:"ForeignKey:GroupID" PRELOAD:"false"`
+		Children      []MenuSetting                `json:"children" gorm:"foreignkey:ParentID"`
+		AdminID       int                          `json:"admin_id"`
+		Administrator administrators.Administrator `gorm:"ForeignKey:ID;AssociationForeignKey:AdminID"`
+	}
 	// MenusettingSort .
 	MenusettingSort struct {
 		Sortables []Sortable `json:"sortable"`
@@ -35,6 +44,8 @@ type (
 	// MenuSettings .
 	MenuSettings []MenuSetting
 
+	// SidebarMenuSettings .
+	SidebarMenuSettings []SidebarMenuSetting
 	// Permissions .
 	Permissions []menusettings.Permission
 )
@@ -46,22 +57,22 @@ var (
 )
 
 // SidebarMenu .
-func (menuSetting MenuSetting) SidebarMenu() (*MenuSettings, error) {
-	var menuSettings MenuSettings
+func (sidebarMenuSetting SidebarMenuSetting) SidebarMenu() (*SidebarMenuSettings, error) {
+	var sidebarMenuSettings SidebarMenuSettings
 
 	err := db.Table(TableName).
 		Where("enable =? ", 1).
 		Preload("Children", func(db *gorm.DB) *gorm.DB {
 			return db.Table(TableName).Select("*")
 		}).
-		Find(&menuSettings).
+		Find(&sidebarMenuSettings).
 		Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &menuSettings, nil
+	return &sidebarMenuSettings, nil
 }
 
 // GetPermission .
