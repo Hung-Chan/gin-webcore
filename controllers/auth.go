@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	// "gin-webcore/middleware"
+	"gin-webcore/redis"
 	"gin-webcore/repositories/admingroups"
 	"gin-webcore/repositories/administrators"
 	"gin-webcore/repositories/auth"
@@ -74,6 +75,13 @@ func Login(context *gin.Context) {
 	// 紀錄Token
 	if updateTokenError := authRepository.UpdateToken(*adminInfo.ID, token); updateTokenError != nil {
 		response.ResultError(http.StatusBadRequest, "Token紀錄失敗")
+		return
+	}
+
+	// 將Token寫入redis
+	writeRedisError := redis.SetValue(adminInfo.Account, token, 0)
+	if writeRedisError != nil {
+		response.ResultError(http.StatusBadRequest, "Token紀錄Redis失敗")
 		return
 	}
 
