@@ -12,23 +12,41 @@ import (
 	"gin-webcore/migrations/menugroups"
 	"gin-webcore/migrations/menusettings"
 	"log"
+	"os"
 	"time"
 
 	"github.com/jinzhu/gorm"
 
 	// mysql
 	_ "github.com/go-sql-driver/mysql"
+
+	"github.com/joho/godotenv"
 )
 
 // DB global .
 var DB *gorm.DB
 var err error
 
-// Conn .
-func Conn(drive string, conn string) {
-	fmt.Println("DB Conn")
+//init
+func init() {
+	fmt.Println("DB init")
 
-	DB, err = gorm.Open(drive, conn) //"root:123456@tcp(127.0.0.1:3307)/default_go?charset=utf8&parseTime=True&loc=Local")
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+		panic("Error loading .env file")
+	}
+
+	drive := os.Getenv("DB_CONNECTION")
+	user := os.Getenv("DB_USERNAME")
+	password := os.Getenv("DB_PASSWORD")
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	dbDatabase := os.Getenv("DB_DATABASE")
+
+	conn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", user, password, host, port, dbDatabase)
+
+	DB, err = gorm.Open(drive, conn) //"root:123456@tcp(mariadb:3306)/default_go?charset=utf8&parseTime=True&loc=Local")
 
 	fmt.Println(DB)
 	if err != nil {
