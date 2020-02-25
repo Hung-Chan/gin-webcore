@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"gin-webcore/redis"
 	"gin-webcore/response"
 	"gin-webcore/utils"
 	"net/http"
@@ -35,6 +36,18 @@ func Jwt() gin.HandlerFunc {
 			} else if time.Now().Unix() > claims.ExpiresAt {
 				code = http.StatusForbidden
 				message = "Token 時效已過期"
+			}
+
+			// Token && Redis Token 比對
+			redisToken, redisTokenError := redis.RedisManage.Get(claims.Account).Result()
+			if redisTokenError != nil {
+				code = http.StatusForbidden
+				message = "Token 驗證錯誤"
+			}
+
+			if redisToken != token {
+				code = http.StatusForbidden
+				message = "Token 遺失或驗證錯誤"
 			}
 
 			// set adminID
