@@ -38,7 +38,7 @@ func (areaBlacklistingController AreaBlacklistingController) AreaBlacklistingsLi
 	queryModel := models.NewQueryModel()
 
 	if err := context.ShouldBind(&queryModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "資料綁定失敗: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-B999999", "資料綁定失敗: "+err.Error())
 		return
 	}
 
@@ -52,7 +52,7 @@ func (areaBlacklistingController AreaBlacklistingController) AreaBlacklistingsLi
 	data, total, err := areaBlacklistingRepository.AreaBlacklistingsList(page, limit, sortColumn, sortDirection, country, enable)
 
 	if err != nil {
-		response.ResultError(http.StatusBadRequest, "地區黑名單管理列表資料查詢失敗: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-B100001", "地區黑名單管理列表資料查詢失敗: "+err.Error())
 		return
 	}
 
@@ -95,19 +95,19 @@ func (areaBlacklistingController AreaBlacklistingController) AreaBlacklistingCre
 	var areaBlacklistingRepository = new(areablacklistings.AreaBlacklisting)
 
 	if err := context.ShouldBind(&areaBlacklistingRepository.AreaBlacklistingModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "地區黑名單管理新增，資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-B999999", "地區黑名單管理新增，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&areaBlacklistingRepository.AreaBlacklistingModel); checkData != nil {
-		response.ResultError(http.StatusBadRequest, "地區黑名單管理新增，資料驗證錯誤: "+checkData.Error())
+		response.ResultError(http.StatusBadRequest, "A-B999998", "地區黑名單管理新增，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "新增操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "A-B100002", "新增操作者ID取得失敗")
 		return
 	}
 
@@ -116,7 +116,7 @@ func (areaBlacklistingController AreaBlacklistingController) AreaBlacklistingCre
 	resultError := areaBlacklistingRepository.AreaBlacklistingCreate()
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "地區黑名單管理新增失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-B100003", "地區黑名單管理新增失敗: "+resultError.Error())
 		return
 	}
 
@@ -143,14 +143,14 @@ func (areaBlacklistingController AreaBlacklistingController) AreaBlacklistingVie
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "A-B999997", "id 型態轉換錯誤")
 		return
 	}
 
 	result, resultError := areaBlacklistingRepository.AreaBlacklistingView(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "地區黑名單管理檢視失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-B100004", "地區黑名單管理檢視失敗: "+resultError.Error())
 		return
 	}
 
@@ -178,24 +178,24 @@ func (areaBlacklistingController AreaBlacklistingController) AreaBlacklistingUpd
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "A-B999997", "id 型態轉換錯誤")
 		return
 	}
 
 	if err := context.ShouldBind(&areaBlacklistingRepository.AreaBlacklistingModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "地區黑名單管理修改，資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-B999999", "地區黑名單管理修改，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&areaBlacklistingRepository.AreaBlacklistingModel); checkData != nil {
-		response.ResultError(http.StatusBadRequest, "地區黑名單管理修改，資料驗證錯誤: "+checkData.Error())
+		response.ResultError(http.StatusBadRequest, "A-B999998", "地區黑名單管理修改，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "修改操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "A-B100005", "修改操作者ID取得失敗")
 		return
 	}
 
@@ -204,7 +204,7 @@ func (areaBlacklistingController AreaBlacklistingController) AreaBlacklistingUpd
 	resultError := areaBlacklistingRepository.AreaBlacklistingUpdate(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "地區黑名單管理修改錯誤: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-B100006", "地區黑名單管理修改錯誤: "+resultError.Error())
 		return
 	}
 
@@ -237,14 +237,14 @@ func (areaBlacklistingController AreaBlacklistingController) AreaBlacklistingDel
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "A-B999997", "id 型態轉換錯誤")
 		return
 	}
 
 	resultError := areaBlacklistingRepository.AreaBlacklistingDelete(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "地區黑名單管理刪除錯誤: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-B100007", "地區黑名單管理刪除錯誤: "+resultError.Error())
 		return
 	}
 

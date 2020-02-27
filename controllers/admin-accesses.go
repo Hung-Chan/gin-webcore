@@ -38,7 +38,7 @@ func (adminAccessController AdminAccessController) AdminAccessesList(context *gi
 	queryModel := models.NewQueryModel()
 
 	if err := context.ShouldBind(&queryModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "資料綁定失敗: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-A999999", "資料綁定失敗: "+err.Error())
 		return
 	}
 
@@ -52,7 +52,7 @@ func (adminAccessController AdminAccessController) AdminAccessesList(context *gi
 	data, total, err := adminAccessRepository.AdminAccessesList(page, limit, sortColumn, sortDirection, name, enable)
 
 	if err != nil {
-		response.ResultError(http.StatusBadRequest, "操作管理列表資料查詢失敗: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-A100001", "操作管理列表資料查詢失敗: "+err.Error())
 		return
 	}
 
@@ -96,27 +96,27 @@ func (adminAccessController AdminAccessController) AdminAccessCreate(context *gi
 
 	// 資料綁定 struct
 	if err := context.ShouldBind(&adminAccessRepository.AdminAccessModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "操作管理新增，資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-A999999", "操作管理新增，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	// 資料驗證 struct
 	if checkData := validate.VdeInfo(&adminAccessRepository.AdminAccessModel); checkData != nil {
-		response.ResultError(http.StatusBadRequest, "操作管理新增，資料驗證錯誤: "+checkData.Error())
+		response.ResultError(http.StatusBadRequest, "A-A999998", "操作管理新增，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
 	// 檢查操作代碼
 	code := adminAccessRepository.AdminAccessCodeCheck(adminAccessRepository.Code)
 	if code != nil {
-		response.ResultError(http.StatusBadRequest, "操作代碼已存在")
+		response.ResultError(http.StatusBadRequest, "A-A100002", "操作代碼已存在")
 		return
 	}
 
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "新增操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "A-A100003", "新增操作者ID取得失敗")
 		return
 	}
 
@@ -125,7 +125,7 @@ func (adminAccessController AdminAccessController) AdminAccessCreate(context *gi
 	resultError := adminAccessRepository.AdminAccessCreate()
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "操作管理新增失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-A100004", "操作管理新增失敗: "+resultError.Error())
 		return
 	}
 
@@ -152,14 +152,14 @@ func (adminAccessController AdminAccessController) AdminAccessView(context *gin.
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "A-A999997", "id 型態轉換錯誤")
 		return
 	}
 
 	result, resultError := adminAccessRepository.AdminAccessView(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "操作管理檢視失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-A100005", "操作管理檢視失敗: "+resultError.Error())
 		return
 	}
 
@@ -187,26 +187,26 @@ func (adminAccessController AdminAccessController) AdminAccessUpdate(context *gi
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "A-A999997", "id 型態轉換錯誤")
 		return
 	}
 
 	// 檢查操作管理代碼是否存在
 	code, codeError := adminAccessRepository.AdminAccessCheckCode(id)
 	if codeError != nil {
-		response.ResultError(http.StatusBadRequest, "查詢操作管理資料: "+codeError.Error())
+		response.ResultError(http.StatusBadRequest, "A-A100006", "查詢操作管理資料: "+codeError.Error())
 		return
 	}
 
 	// 資料綁定 struct
 	if err := context.ShouldBind(&adminAccessRepository.AdminAccessModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "操作管理修改，資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-A999999", "操作管理修改，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	// 資料驗證 struct
 	if checkData := validate.VdeInfo(&adminAccessRepository.AdminAccessModel); checkData != nil {
-		response.ResultError(http.StatusBadRequest, "操作管理修改，資料驗證錯誤: "+checkData.Error())
+		response.ResultError(http.StatusBadRequest, "A-A999998", "操作管理修改，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
@@ -221,14 +221,14 @@ func (adminAccessController AdminAccessController) AdminAccessUpdate(context *gi
 	// 操作管理代碼是否存在(修改操作管理代碼改變時)
 	codeEr := adminAccessRepository.AdminAccessCodeCheck(adminAccessRepository.Code)
 	if codeEr != nil {
-		response.ResultError(http.StatusBadRequest, "操作管理代碼已存在: "+codeEr.Error())
+		response.ResultError(http.StatusBadRequest, "A-A100007", "操作管理代碼已存在: "+codeEr.Error())
 		return
 	}
 
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "修改操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "A-A100008", "修改操作者ID取得失敗")
 		return
 	}
 
@@ -237,7 +237,7 @@ func (adminAccessController AdminAccessController) AdminAccessUpdate(context *gi
 	resultError := adminAccessRepository.AdminAccessUpdate(adminID.(int), flag)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "操作管理修改錯誤: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-A100009", "操作管理修改錯誤: "+resultError.Error())
 		return
 	}
 
@@ -270,14 +270,14 @@ func (adminAccessController AdminAccessController) AdminAccessDelete(context *gi
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "A-A999997", "id 型態轉換錯誤")
 		return
 	}
 
 	resultError := adminAccessRepository.AdminAccessDelete(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "操作管理刪除錯誤: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-A100010", "操作管理刪除錯誤: "+resultError.Error())
 		return
 	}
 

@@ -57,7 +57,7 @@ func Jwt() gin.HandlerFunc {
 		}
 
 		if code != 200 {
-			response.ResultError(http.StatusForbidden, message)
+			response.ResultError(http.StatusForbidden, "M-W100001", message)
 
 			context.Abort()
 			return

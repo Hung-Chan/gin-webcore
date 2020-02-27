@@ -1,8 +1,6 @@
 package response
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,25 +16,18 @@ type response struct {
 	Code    int         `json:"code"`
 }
 
-// ResultOk .
-func (gin Gin) ResultOk(code int, message string, data interface{}) {
-	gin.Context.JSON(http.StatusOK, response{
-		Code:    code,
-		Message: message,
-		Data:    data,
-	})
+// fail .
+type fail struct {
+	Error Error `json:"error"`
 }
 
-// ResultFail .
-func (gin Gin) ResultFail(code int, message string) {
-	gin.Context.JSON(http.StatusUnauthorized, response{
-		Code:    code,
-		Message: message,
-		Data:    nil,
-	})
+// Error .
+type Error struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
 }
 
-// Result .
+// ResultSuccess .
 func (gin *Gin) ResultSuccess(code int, message string, data interface{}) {
 	gin.Context.JSON(code, response{
 		Code:    code,
@@ -46,10 +37,13 @@ func (gin *Gin) ResultSuccess(code int, message string, data interface{}) {
 }
 
 // ResultError .
-func (gin *Gin) ResultError(code int, message string) {
-	gin.Context.JSON(code, response{
-		Code:    code,
-		Message: message,
-		Data:    nil,
+func (gin *Gin) ResultError(status int, code string, message string) {
+	var err Error
+
+	err.Code = code
+	err.Message = message
+
+	gin.Context.JSON(status, fail{
+		Error: err,
 	})
 }

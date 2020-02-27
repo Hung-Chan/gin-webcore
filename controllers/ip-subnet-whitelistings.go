@@ -38,7 +38,7 @@ func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhi
 	queryModel := models.NewQueryModel()
 
 	if err := context.ShouldBind(&queryModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "資料綁定失敗: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "I-S-W999999", "資料綁定失敗: "+err.Error())
 		return
 	}
 
@@ -52,7 +52,7 @@ func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhi
 	data, total, err := ipSubnetWhitelistingRepository.IPSubnetWhitelistingsList(page, limit, sortColumn, sortDirection, subnet, enable)
 
 	if err != nil {
-		response.ResultError(http.StatusBadRequest, "IP網段白名單管理列表資料查詢失敗: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "I-S-W100001", "IP網段白名單管理列表資料查詢失敗: "+err.Error())
 		return
 	}
 
@@ -95,26 +95,26 @@ func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhi
 	var ipSubnetWhitelistingRepository = new(ipsubnetwhitelistings.IPSubnetWhitelisting)
 
 	if err := context.ShouldBind(&ipSubnetWhitelistingRepository.IPSubnetWhitelistingModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "IP網段白名單管理新增，資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "I-S-W999999", "IP網段白名單管理新增，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&ipSubnetWhitelistingRepository.IPSubnetWhitelistingModel); checkData != nil {
-		response.ResultError(http.StatusBadRequest, "IP網段白名單管理新增，資料驗證錯誤: "+checkData.Error())
+		response.ResultError(http.StatusBadRequest, "I-S-W999998", "IP網段白名單管理新增，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
 	// 檢查IP是否存在 .
 	ipSubnetExist := ipSubnetWhitelistingRepository.IPSubnetWhitelistingCheckExist(ipSubnetWhitelistingRepository.Subnet, 0)
 	if ipSubnetExist != false {
-		response.ResultError(http.StatusBadRequest, "IP網段已存在")
+		response.ResultError(http.StatusBadRequest, "I-S-W100002", "IP網段已存在")
 		return
 	}
 
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "新增操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "I-S-W100003", "新增操作者ID取得失敗")
 		return
 	}
 
@@ -123,7 +123,7 @@ func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhi
 	resultError := ipSubnetWhitelistingRepository.IPSubnetWhitelistingCreate()
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "IP網段白名單管理新增失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "I-S-W100004", "IP網段白名單管理新增失敗: "+resultError.Error())
 		return
 	}
 
@@ -150,14 +150,14 @@ func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhi
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "I-S-W999997", "id 型態轉換錯誤")
 		return
 	}
 
 	result, resultError := ipSubnetWhitelistingRepository.IPSubnetWhitelistingView(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "IP網段白名單管理檢視失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "I-S-W100005", "IP網段白名單管理檢視失敗: "+resultError.Error())
 		return
 	}
 
@@ -185,31 +185,31 @@ func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhi
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "I-S-W999997", "id 型態轉換錯誤")
 		return
 	}
 
 	if err := context.ShouldBind(&ipSubnetWhitelistingRepository.IPSubnetWhitelistingModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "IP網段白名單管理修改，資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "I-S-W999999", "IP網段白名單管理修改，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&ipSubnetWhitelistingRepository.IPSubnetWhitelistingModel); checkData != nil {
-		response.ResultError(http.StatusBadRequest, "IP網段白名單管理修改，資料驗證錯誤: "+checkData.Error())
+		response.ResultError(http.StatusBadRequest, "I-S-W999998", "IP網段白名單管理修改，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
 	// 檢查IP是否存在 .
 	ipSubnetExist := ipSubnetWhitelistingRepository.IPSubnetWhitelistingCheckExist(ipSubnetWhitelistingRepository.Subnet, id)
 	if ipSubnetExist != false {
-		response.ResultError(http.StatusBadRequest, "IP網段已存在")
+		response.ResultError(http.StatusBadRequest, "I-S-W100006", "IP網段已存在")
 		return
 	}
 
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "修改操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "I-S-W100007", "修改操作者ID取得失敗")
 		return
 	}
 
@@ -218,7 +218,7 @@ func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhi
 	resultError := ipSubnetWhitelistingRepository.IPSubnetWhitelistingUpdate(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "IP網段白名單管理修改錯誤: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "I-S-W100008", "IP網段白名單管理修改錯誤: "+resultError.Error())
 		return
 	}
 
@@ -251,14 +251,14 @@ func (ipSubnetWhitelistingController IPSubnetWhitelistingController) IPSubnetWhi
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "I-S-W999997", "id 型態轉換錯誤")
 		return
 	}
 
 	resultError := ipSubnetWhitelistingRepository.IPSubnetWhitelistingDelete(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "IP網段白名單管理刪除錯誤: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "I-S-W100009", "IP網段白名單管理刪除錯誤: "+resultError.Error())
 		return
 	}
 

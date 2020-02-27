@@ -39,7 +39,7 @@ func (menuGroupController MenuGroupController) MenuGroupsList(context *gin.Conte
 	queryModel := models.NewQueryModel()
 
 	if err := context.ShouldBind(&queryModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "資料綁定失敗: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "M-G999999", "資料綁定失敗: "+err.Error())
 		return
 	}
 
@@ -53,7 +53,7 @@ func (menuGroupController MenuGroupController) MenuGroupsList(context *gin.Conte
 	data, total, err := menuGroupRepository.MenuGroupsList(page, limit, sortColumn, sortDirection, name, enable)
 
 	if err != nil {
-		response.ResultError(http.StatusBadRequest, "選單群組管理列表資料查詢失敗: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "M-G100001", "選單群組管理列表資料查詢失敗: "+err.Error())
 		return
 	}
 
@@ -95,12 +95,12 @@ func (menuGroupController MenuGroupController) MenuGroupCreate(context *gin.Cont
 	var menuGroupRepository = new(menugroups.MenuGroup)
 
 	if err := context.ShouldBind(&menuGroupRepository.MenuGroupModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "選單群組管理新增，資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "M-G999999", "選單群組管理新增，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&menuGroupRepository.MenuGroupModel); checkData != nil {
-		response.ResultError(http.StatusBadRequest, "選單群組管理新增，資料驗證錯誤: "+checkData.Error())
+		response.ResultError(http.StatusBadRequest, "M-G999998", "選單群組管理新增，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
@@ -110,7 +110,7 @@ func (menuGroupController MenuGroupController) MenuGroupCreate(context *gin.Cont
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "新增操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "M-G100002", "新增操作者ID取得失敗")
 		return
 	}
 
@@ -119,7 +119,7 @@ func (menuGroupController MenuGroupController) MenuGroupCreate(context *gin.Cont
 	resultError := menuGroupRepository.MenuGroupCreate()
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "選單群組管理新增失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "M-G100003", "選單群組管理新增失敗: "+resultError.Error())
 		return
 	}
 
@@ -146,14 +146,14 @@ func (menuGroupController MenuGroupController) MenuGroupView(context *gin.Contex
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "M-G999997", "id 型態轉換錯誤")
 		return
 	}
 
 	result, resultError := menuGroupRepository.MenuGroupView(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "選單群組管理檢視失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "M-G100004", "選單群組管理檢視失敗: "+resultError.Error())
 		return
 	}
 
@@ -181,12 +181,12 @@ func (menuGroupController MenuGroupController) MenuGroupUpdate(context *gin.Cont
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "M-G999997", "id 型態轉換錯誤")
 		return
 	}
 
 	if err := context.ShouldBind(&menuGroupRepository.MenuGroupModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "選單群組管理修改，資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "M-G999999", "選單群組管理修改，資料綁定錯誤: "+err.Error())
 		return
 	}
 
@@ -198,7 +198,7 @@ func (menuGroupController MenuGroupController) MenuGroupUpdate(context *gin.Cont
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "修改操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "M-G100005", "修改操作者ID取得失敗")
 		return
 	}
 
@@ -207,7 +207,7 @@ func (menuGroupController MenuGroupController) MenuGroupUpdate(context *gin.Cont
 	resultError := menuGroupRepository.MenuGroupUpdate(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "選單群組管理修改錯誤: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "M-G100006", "選單群組管理修改錯誤: "+resultError.Error())
 		return
 	}
 
@@ -240,7 +240,7 @@ func (menuGroupController MenuGroupController) MenuGroupDelete(context *gin.Cont
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "M-G999997", "id 型態轉換錯誤")
 		return
 	}
 
@@ -251,9 +251,9 @@ func (menuGroupController MenuGroupController) MenuGroupDelete(context *gin.Cont
 	resultError := menuGroupRepository.MenuGroupDelete(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "選單群組管理刪除錯誤: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "M-G100007", "選單群組管理刪除錯誤: "+resultError.Error())
 		return
 	}
 
-	response.ResultOk(200, "Success", nil)
+	response.ResultSuccess(200, "Success", nil)
 }

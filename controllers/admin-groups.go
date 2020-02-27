@@ -39,7 +39,7 @@ func (adminGroupController AdminGroupController) AdminGroupsList(context *gin.Co
 	queryModel := models.NewQueryModel()
 
 	if err := context.ShouldBind(&queryModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "資料綁定失敗: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-G999999", "資料綁定失敗: "+err.Error())
 		return
 	}
 
@@ -55,7 +55,7 @@ func (adminGroupController AdminGroupController) AdminGroupsList(context *gin.Co
 	data, total, err := adminGroupsRepository.AdminGroupsList(page, limit, sortColumn, sortDirection, name, enable)
 
 	if err != nil {
-		response.ResultError(http.StatusBadRequest, "群組管理列表資料查詢失敗: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-G100001", "群組管理列表資料查詢失敗: "+err.Error())
 		return
 	}
 
@@ -102,14 +102,14 @@ func (adminGroupController AdminGroupController) AdminGroupsPermission(context *
 	// 取得 MenuSettings
 	resultPermission, resultPermissionError := menuSettingsRepository.GetPermission()
 	if resultPermissionError != nil {
-		response.ResultError(http.StatusBadRequest, "取得權限項目失敗: "+resultPermissionError.Error())
+		response.ResultError(http.StatusBadRequest, "A-G100002", "取得權限項目失敗: "+resultPermissionError.Error())
 		return
 	}
 
 	// 取得操作項目
 	access, accessError := adminAccessesRepository.GetAccess()
 	if accessError != nil {
-		response.ResultError(http.StatusBadRequest, "取得操作項目失敗: "+accessError.Error())
+		response.ResultError(http.StatusBadRequest, "A-G100003", "取得操作項目失敗: "+accessError.Error())
 		return
 	}
 
@@ -121,7 +121,7 @@ func (adminGroupController AdminGroupController) AdminGroupsPermission(context *
 
 	accessToJSON, accessToJSONError := json.Marshal(accessToArray)
 	if accessToJSONError != nil {
-		response.ResultError(http.StatusBadRequest, "資料型態轉換失敗: "+accessToJSONError.Error())
+		response.ResultError(http.StatusBadRequest, "A-G100004", "資料型態轉換失敗: "+accessToJSONError.Error())
 		return
 	}
 
@@ -148,19 +148,19 @@ func (adminGroupController AdminGroupController) AdminGroupCreate(context *gin.C
 	var adminGroupsRepository = new(admingroups.AdminGroup)
 
 	if err := context.ShouldBind(&adminGroupsRepository.AdminGroupModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "群組管理新增，資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-G999999", "群組管理新增，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&adminGroupsRepository.AdminGroupModel); checkData != nil {
-		response.ResultError(http.StatusBadRequest, "群組管理新增，資料驗證錯誤: "+checkData.Error())
+		response.ResultError(http.StatusBadRequest, "A-G999998", "群組管理新增，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "新增操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "A-G100005", "新增操作者ID取得失敗")
 		return
 	}
 
@@ -169,7 +169,7 @@ func (adminGroupController AdminGroupController) AdminGroupCreate(context *gin.C
 	resultError := adminGroupsRepository.AdmingroupCreate()
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "群組管理新增失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-G100006", "群組管理新增失敗: "+resultError.Error())
 		return
 	}
 
@@ -196,14 +196,14 @@ func (adminGroupController AdminGroupController) AdminGroupView(context *gin.Con
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "A-G999997", "id 型態轉換錯誤")
 		return
 	}
 
 	result, resultError := adminGroupsRepository.AdmingroupView(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "群組管理檢視失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-G100007", "群組管理檢視失敗: "+resultError.Error())
 		return
 	}
 
@@ -231,24 +231,24 @@ func (adminGroupController AdminGroupController) AdminGroupUpdate(context *gin.C
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "A-G999997", "id 型態轉換錯誤")
 		return
 	}
 
 	if err := context.ShouldBind(&adminGroupsRepository.AdminGroupModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "群組管理修改，資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-G999999", "群組管理修改，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&adminGroupsRepository.AdminGroupModel); checkData != nil {
-		response.ResultError(http.StatusBadRequest, "群組管理修改，資料驗證錯誤: "+checkData.Error())
+		response.ResultError(http.StatusBadRequest, "A-G999998", "群組管理修改，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "修改操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "A-G100008", "修改操作者ID取得失敗")
 		return
 	}
 
@@ -257,7 +257,7 @@ func (adminGroupController AdminGroupController) AdminGroupUpdate(context *gin.C
 	resultError := adminGroupsRepository.AdmingroupUpdate(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "群組管理修改錯誤: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-G100009", "群組管理修改錯誤: "+resultError.Error())
 		return
 	}
 
@@ -290,14 +290,14 @@ func (adminGroupController AdminGroupController) AdminGroupDelete(context *gin.C
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "A-G999997", "id 型態轉換錯誤")
 		return
 	}
 
 	resultError := adminGroupsRepository.AdmingroupDelete(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "群組管理刪除錯誤: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-G100010", "群組管理刪除錯誤: "+resultError.Error())
 		return
 	}
 

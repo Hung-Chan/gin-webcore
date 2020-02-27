@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	// "gin-webcore/middleware"
 	"gin-webcore/redis"
 	"gin-webcore/repositories/admingroups"
 	"gin-webcore/repositories/administrators"
@@ -42,40 +41,40 @@ func Login(context *gin.Context) {
 
 	// 登入資料綁定
 	if bindError := context.ShouldBind(&authRepository.Login); bindError != nil {
-		response.ResultError(http.StatusBadRequest, bindError.Error())
+		response.ResultError(http.StatusBadRequest, "A-T999999", "資料綁定失敗: "+bindError.Error())
 		return
 	}
 
 	// 登入資料驗證
 	if checkData := validate.VdeInfo(&authRepository.Login); checkData != nil {
-		response.ResultError(http.StatusBadRequest, checkData.Error())
+		response.ResultError(http.StatusBadRequest, "A-T999998", checkData.Error())
 		return
 	}
 
 	// 檢查帳號
 	adminInfo, adminInfoError := authRepository.GetAccount()
 	if adminInfoError != nil {
-		response.ResultError(http.StatusBadRequest, "查無此帳號")
+		response.ResultError(http.StatusBadRequest, "A-T100001", "查無此帳號")
 		return
 	}
 
 	// 密碼比對
 	adminCheckPassword := utils.CheckHashPassword(adminInfo.Password, authRepository.Password)
 	if adminCheckPassword == false {
-		response.ResultError(http.StatusBadRequest, "密碼錯誤")
+		response.ResultError(http.StatusBadRequest, "A-T100002", "密碼錯誤")
 		return
 	}
 
 	// 產生Token
 	token, tokenError := utils.GenerateToken(adminInfo.Account, *adminInfo.ID)
 	if tokenError != nil {
-		response.ResultError(http.StatusBadRequest, "Token錯誤")
+		response.ResultError(http.StatusBadRequest, "A-T100003", "Token錯誤")
 		return
 	}
 
 	// 紀錄Token
 	if updateTokenError := authRepository.UpdateToken(*adminInfo.ID, token); updateTokenError != nil {
-		response.ResultError(http.StatusBadRequest, "Token紀錄失敗")
+		response.ResultError(http.StatusBadRequest, "A-T100004", "Token紀錄失敗")
 		return
 	}
 
@@ -83,7 +82,7 @@ func Login(context *gin.Context) {
 	coverID := strconv.Itoa(*adminInfo.ID)
 	writeRedisError := redis.SetValue(coverID, token, 0)
 	if writeRedisError != nil {
-		response.ResultError(http.StatusBadRequest, "Token紀錄Redis失敗")
+		response.ResultError(http.StatusBadRequest, "A-T100005", "Token紀錄Redis失敗")
 		return
 	}
 
@@ -115,7 +114,7 @@ func Info(context *gin.Context) {
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "A-T100006", "操作者ID取得失敗")
 		return
 	}
 
@@ -123,20 +122,20 @@ func Info(context *gin.Context) {
 	data, dataError := adminsRepository.AdministratorFindByID(adminID.(int))
 
 	if dataError != nil {
-		response.ResultError(http.StatusBadRequest, dataError.Error())
+		response.ResultError(http.StatusBadRequest, "A-T100007", dataError.Error())
 		return
 	}
 
 	// 取得登入者權限
 	res, resError := adminGroupsRepository.GetPermission(*data.GroupID)
 	if resError != nil {
-		response.ResultError(http.StatusBadRequest, resError.Error())
+		response.ResultError(http.StatusBadRequest, "A-T100008", resError.Error())
 		return
 	}
 
 	permission := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(res.Permission), &permission); err != nil {
-		response.ResultError(http.StatusBadRequest, err.Error())
+		response.ResultError(http.StatusBadRequest, "A-T100009", err.Error())
 		return
 	}
 
@@ -164,7 +163,7 @@ func SidebarMenu(context *gin.Context) {
 	result, resultError := menusettingService.SidebarMenu()
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-T100010", resultError.Error())
 		return
 	}
 
@@ -189,14 +188,14 @@ func Logout(context *gin.Context) {
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "A-T100011", "操作者ID取得失敗")
 		return
 	}
 
 	err := authRepository.CleanToken(adminID.(int))
 
 	if err != nil {
-		response.ResultError(http.StatusBadRequest, err.Error())
+		response.ResultError(http.StatusBadRequest, "A-T100012", err.Error())
 		return
 	}
 

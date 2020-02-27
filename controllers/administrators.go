@@ -44,7 +44,7 @@ func (administratorController AdministratorController) AdministratorsList(contex
 	queryModel := models.NewQueryModel()
 
 	if err := context.ShouldBind(&queryModel); err != nil {
-		response.ResultFail(1001, "data bind error")
+		response.ResultError(http.StatusBadRequest, "A-I999999", "資料綁定失敗："+err.Error())
 		return
 	}
 
@@ -61,7 +61,7 @@ func (administratorController AdministratorController) AdministratorsList(contex
 	data, total, err := administratorsRepository.AdministratorsList(page, limit, sortColumn, sortDirection, group, level, nameItem, accountOrName, enable)
 
 	if err != nil {
-		response.ResultError(http.StatusBadRequest, "帳號管理列表資料查詢失敗"+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-I100001", "帳號管理列表資料查詢失敗"+err.Error())
 		return
 	}
 
@@ -109,7 +109,7 @@ func (administratorController AdministratorController) AdministratorGroups(conte
 	result, resultError := adminGroupRepository.AdminGroupOption()
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "帳號管理群組項目取得失敗"+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-I100002", "帳號管理群組項目取得失敗"+resultError.Error())
 		return
 	}
 
@@ -133,7 +133,7 @@ func (administratorController AdministratorController) AdministratorLevels(conte
 	result, resultError := adminLevelRepository.AdminLevelOption()
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "帳號管理層級項目取得失敗"+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-I100003", "帳號管理層級項目取得失敗"+resultError.Error())
 		return
 	}
 
@@ -159,14 +159,14 @@ func (administratorController AdministratorController) AdministratorGroupPermiss
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "A-I999997", "id 型態轉換錯誤")
 		return
 	}
 
 	result, resultError := adminGroupsRepository.GetPermission(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "帳號管理權限項目取得失敗"+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-I100004", "帳號管理權限項目取得失敗"+resultError.Error())
 		return
 	}
 
@@ -189,31 +189,31 @@ func (administratorController AdministratorController) AdministratorCreate(conte
 	var administratorsRepository = new(administrators.Administrator)
 
 	if err := context.ShouldBind(&administratorsRepository.AdministratorModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-I999999", "資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&administratorsRepository.AdministratorModel); checkData != nil {
-		response.ResultError(http.StatusBadRequest, "資料驗證錯誤: "+checkData.Error())
+		response.ResultError(http.StatusBadRequest, "A-I999998", "資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
 	if administratorsRepository.Password == "" {
-		response.ResultError(http.StatusBadRequest, "密碼必填")
+		response.ResultError(http.StatusBadRequest, "A-I100005", "密碼必填")
 		return
 	}
 
 	// 檢查帳號是否存在 .
 	accountExist := administratorsRepository.AdministratorCheckExist(administratorsRepository.Account, 0)
 	if accountExist != false {
-		response.ResultError(http.StatusBadRequest, "帳號已存在")
+		response.ResultError(http.StatusBadRequest, "A-I100006", "帳號已存在")
 		return
 	}
 
 	// 密碼加密
 	hashPassword, err := utils.HashPassword(administratorsRepository.Password)
 	if err != nil {
-		response.ResultError(http.StatusBadRequest, "密碼加密錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-I100007", "密碼加密錯誤: "+err.Error())
 		return
 	}
 
@@ -222,7 +222,7 @@ func (administratorController AdministratorController) AdministratorCreate(conte
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "新增操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "A-I100008", "新增操作者ID取得失敗")
 		return
 	}
 
@@ -231,7 +231,7 @@ func (administratorController AdministratorController) AdministratorCreate(conte
 	resultError := administratorsRepository.AdministratorCreate()
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "帳號新增失敗"+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-I100009", "帳號新增失敗"+resultError.Error())
 		return
 	}
 
@@ -258,7 +258,7 @@ func (administratorController AdministratorController) AdministratorView(context
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "A-I999997", "id 型態轉換錯誤")
 		return
 	}
 
@@ -266,7 +266,7 @@ func (administratorController AdministratorController) AdministratorView(context
 	viewResult, viewResultError := administratorsRepository.AdministratorView(id)
 
 	if viewResultError != nil {
-		response.ResultError(http.StatusBadRequest, "帳號管理檢視查詢失敗: "+viewResultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-I100010", "帳號管理檢視查詢失敗: "+viewResultError.Error())
 		return
 	}
 
@@ -304,24 +304,24 @@ func (administratorController AdministratorController) AdministratorUpdate(conte
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "A-I999997", "id 型態轉換錯誤")
 		return
 	}
 
 	if err := context.ShouldBind(&administratorsRepository.AdministratorModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "A-I999999", "資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&administratorsRepository.AdministratorModel); checkData != nil {
-		response.ResultError(http.StatusBadRequest, "資料驗證錯誤: "+checkData.Error())
+		response.ResultError(http.StatusBadRequest, "A-I999998", "資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
 	// 檢查帳號是否存在 .
 	accountExist := administratorsRepository.AdministratorCheckExist(administratorsRepository.Account, id)
 	if accountExist != false {
-		response.ResultError(http.StatusBadRequest, "帳號已存在")
+		response.ResultError(http.StatusBadRequest, "A-I100011", "帳號已存在")
 		return
 	}
 
@@ -329,7 +329,7 @@ func (administratorController AdministratorController) AdministratorUpdate(conte
 		// 密碼加密
 		hashPassword, err := utils.HashPassword(administratorsRepository.Password)
 		if err != nil {
-			response.ResultError(http.StatusBadRequest, "密碼加密錯誤: "+err.Error())
+			response.ResultError(http.StatusBadRequest, "A-I100012", "密碼加密錯誤: "+err.Error())
 			return
 		}
 
@@ -339,7 +339,7 @@ func (administratorController AdministratorController) AdministratorUpdate(conte
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "修改操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "A-I100013", "修改操作者ID取得失敗")
 		return
 	}
 
@@ -348,7 +348,7 @@ func (administratorController AdministratorController) AdministratorUpdate(conte
 	resultError := administratorsRepository.AdministratorUpdate(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "帳號管理資料修改失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-I100014", "帳號管理資料修改失敗: "+resultError.Error())
 		return
 	}
 
@@ -381,14 +381,14 @@ func (administratorController AdministratorController) AdministratorDelete(conte
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "A-I999997", "id 型態轉換錯誤")
 		return
 	}
 
 	resultError := administratorsRepository.AdministratorDelete(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "刪除失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "A-I100016", "刪除失敗: "+resultError.Error())
 		return
 	}
 

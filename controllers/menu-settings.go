@@ -33,7 +33,7 @@ func (menuSettingController MenuSettingController) MenuSettingsList(context *gin
 	data, err := menuSettingsRepository.MenuSettingsList()
 
 	if err != nil {
-		response.ResultError(http.StatusBadRequest, "選單管理列表資料查詢失敗: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "M-S999999", "選單管理列表資料查詢失敗: "+err.Error())
 		return
 	}
 
@@ -90,7 +90,7 @@ func (menuSettingController MenuSettingController) MenuGroupsOption(context *gin
 	result, resultError := menuGroupsRepository.MenuGroupOptions()
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "選單群組項目取得失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "M-S100001", "選單群組項目取得失敗: "+resultError.Error())
 		return
 	}
 
@@ -114,7 +114,7 @@ func (menuSettingController MenuSettingController) MenuAccessesOption(context *g
 	result, resultError := adminAccessRepository.AdminAccessesOption()
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "選單權限項目取得失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "M-S100002", "選單權限項目取得失敗: "+resultError.Error())
 		return
 	}
 
@@ -137,12 +137,12 @@ func (menuSettingController MenuSettingController) MenuSettingCreate(context *gi
 	var menuSettingsRepository = new(menusettings.MenuSetting)
 
 	if err := context.ShouldBind(&menuSettingsRepository.MenusettingModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "選單管理新增，資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "M-S999999", "選單管理新增，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&menuSettingsRepository.MenusettingModel); checkData != nil {
-		response.ResultError(http.StatusBadRequest, "選單管理新增，資料驗證錯誤: "+checkData.Error())
+		response.ResultError(http.StatusBadRequest, "M-S999998", "選單管理新增，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
@@ -150,7 +150,7 @@ func (menuSettingController MenuSettingController) MenuSettingCreate(context *gi
 	total, totalError := menuSettingsRepository.Total()
 
 	if totalError != nil {
-		response.ResultFail(15951, totalError.Error())
+		response.ResultError(http.StatusBadRequest, "M-S100003", "選單管理新增，總筆數錯誤: "+totalError.Error())
 		return
 	}
 
@@ -159,7 +159,7 @@ func (menuSettingController MenuSettingController) MenuSettingCreate(context *gi
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "新增操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "M-S100004", "新增操作者ID取得失敗")
 		return
 	}
 
@@ -168,7 +168,7 @@ func (menuSettingController MenuSettingController) MenuSettingCreate(context *gi
 	resultError := menuSettingsRepository.MenuSettingCreate()
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "選單管理新增失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "M-S100005", "選單管理新增失敗: "+resultError.Error())
 		return
 	}
 
@@ -195,14 +195,14 @@ func (menuSettingController MenuSettingController) MenuSettingView(context *gin.
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "M-S999997", "id 型態轉換錯誤")
 		return
 	}
 
 	result, resultError := menuSettingsRepository.MenuSettingView(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "選單管理檢視失敗: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "M-S100006", "選單管理檢視失敗: "+resultError.Error())
 		return
 	}
 
@@ -230,24 +230,24 @@ func (menuSettingController MenuSettingController) MenuSettingUpdate(context *gi
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "M-S999997", "id 型態轉換錯誤")
 		return
 	}
 
 	if err := context.ShouldBind(&menuSettingsRepository.MenusettingModel); err != nil {
-		response.ResultError(http.StatusBadRequest, "選單管理修改，資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "M-S999999", "選單管理修改，資料綁定錯誤: "+err.Error())
 		return
 	}
 
 	if checkData := validate.VdeInfo(&menuSettingsRepository.MenusettingModel); checkData != nil {
-		response.ResultError(http.StatusBadRequest, "選單管理修改，資料驗證錯誤: "+checkData.Error())
+		response.ResultError(http.StatusBadRequest, "M-S999998", "選單管理修改，資料驗證錯誤: "+checkData.Error())
 		return
 	}
 
 	// 取得修改者ID
 	adminID, adminIDError := context.Get("adminID")
 	if adminIDError != true {
-		response.ResultError(http.StatusBadRequest, "修改操作者ID取得失敗")
+		response.ResultError(http.StatusBadRequest, "M-S100007", "修改操作者ID取得失敗")
 		return
 	}
 
@@ -256,7 +256,7 @@ func (menuSettingController MenuSettingController) MenuSettingUpdate(context *gi
 	resultError := menuSettingsRepository.MenuSettingUpdate(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "選單管理修改錯誤: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "M-S100008", "選單管理修改錯誤: "+resultError.Error())
 		return
 	}
 
@@ -289,14 +289,14 @@ func (menuSettingController MenuSettingController) MenuSettingDelete(context *gi
 	id, idError := strconv.Atoi(idParam)
 
 	if idError != nil {
-		response.ResultError(http.StatusBadRequest, "id 型態轉換錯誤")
+		response.ResultError(http.StatusBadRequest, "M-S999997", "id 型態轉換錯誤")
 		return
 	}
 
 	resultError := menuSettingsRepository.MenuSettingDelete(id)
 
 	if resultError != nil {
-		response.ResultError(http.StatusBadRequest, "選單管理刪除錯誤: "+resultError.Error())
+		response.ResultError(http.StatusBadRequest, "M-S100009", "選單管理刪除錯誤: "+resultError.Error())
 		return
 	}
 
@@ -313,7 +313,7 @@ func (menuSettingController MenuSettingController) MenuSettingsSort(context *gin
 	)
 
 	if err := context.ShouldBind(&menusettingSort); err != nil {
-		response.ResultError(http.StatusBadRequest, "選單管理排序，資料綁定錯誤: "+err.Error())
+		response.ResultError(http.StatusBadRequest, "M-S100010", "選單管理排序，資料綁定錯誤: "+err.Error())
 		return
 	}
 
@@ -326,7 +326,7 @@ func (menuSettingController MenuSettingController) MenuSettingsSort(context *gin
 		resultError := menuSettingsRepository.MenuSettingSort(value.ID, value.ParentID, sort)
 
 		if resultError != nil {
-			response.ResultError(http.StatusBadRequest, "選單管理排序錯誤: "+resultError.Error())
+			response.ResultError(http.StatusBadRequest, "M-S100011", "選單管理排序錯誤: "+resultError.Error())
 			return
 		}
 	}
